@@ -1,0 +1,187 @@
+﻿@using iFood.Data.Enum
+@using iFood.ViewModels
+@model CreateProductViewModel
+
+@{
+}
+<style>
+    #formContainer {
+    background-color: rgba(8, 50, 81, 0.441); /* Màu xanh dương */
+    padding: 10px;
+    border-radius: 10px;
+}
+</style>
+<section>
+    <div class="container d-flex align-items-center justify-content-center min-vh-100" id="formContainer">
+        <div class="form-container w-100 max-w-3xl">
+            <h2 class="text-white">Add Product</h2>
+            <form method="post" asp-action="Create" enctype="multipart/form-data">
+              <div class="row"> <!-- Chia thành hàng -->
+                  <input type="hidden" id="AppUserId" name="AppUserId" asp-for="AppUserId" />
+                  
+                  <!-- Cột nhập thông tin sản phẩm -->
+                  <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                          <input class="form-control" asp-for="Title" type="text" placeholder="Title" required />
+                          <label asp-for="Title">Title</label>
+                          <span asp-validation-for="Title" class="text-danger"></span>
+                      </div>
+
+                      <div class="form-floating mb-3">
+                          <select asp-for="Category" asp-items="@Html.GetEnumSelectList<ProductCategory>()" class="form-control" required>
+                              <option selected="selected" value="">--Select--</option>
+                          </select>
+                          <label asp-for="Category">Product Category</label>
+                          <span asp-validation-for="Category" class="text-danger"></span>
+                      </div>
+
+                      <div class="form-floating mb-3">
+                          <input class="form-control" asp-for="Date" type="date" placeholder="Release" id="dateInput" required />
+                          <label asp-for="Date">Release</label>
+                          <span asp-validation-for="Date" class="text-danger"></span>
+                      </div>
+
+                      <div class="form-floating mb-3">
+                          <input type="number" asp-for="Quantity" class="form-control form-control-lg" placeholder="Quantity" min="1" required />
+                          <label asp-for="Quantity">Quantity</label>
+                          <span asp-validation-for="Quantity" class="text-danger"></span>
+                      </div>
+
+                      <div class="form-floating mb-3">
+                          <input type="number" asp-for="Price" class="form-control form-control-lg" placeholder="Price" min="0.01" step="0.01" required />
+                          <label asp-for="Price">Price</label>
+                          <span asp-validation-for="Price" class="text-danger"></span>
+                      </div>
+                  </div>
+
+                  <!-- Cột upload hình ảnh sản phẩm -->
+                  <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                          <textarea class="form-control" asp-for="Description" placeholder="Description" rows="4" required></textarea>
+                          <label asp-for="Description">Description</label>
+                          <span asp-validation-for="Description" class="text-danger"></span>
+                      </div>
+
+                      <div class="form-floating mb-3">
+                          <label class="text-white">The Image of the Product</label>
+                          <div class="upload-placeholder mb-2 d-flex align-items-center justify-content-center border rounded p-4" id="uploadIcon" style="height: 270px;">
+                              <i class="bi bi-cloud-upload display-4"></i>
+                          </div>
+
+                          <input asp-for="Image" type="file" class="form-control form-control-lg" id="productImage" accept="image/*" required />
+                          <span asp-validation-for="Image" class="text-danger"></span>
+                      </div>
+                  </div>
+              </div>
+
+              <button type="submit" class="btn btn-warning btn-block mt-3 w-100">Add product</button>
+          </form>
+        </div>
+    </div>
+</section>
+@* 
+ <div class="navbar-container">
+    </div>
+    <div class="main-container">
+      <section class="space-sm">
+        <div class="container">
+          <div class="row mb-5">
+            <!--end of col-->
+          </div>
+          <!--end of row-->
+          <div class="row flex-md-row card card-md">
+            <div class="card-body bg-secondary">
+              <div class="text-center mb-5">
+                <h1 class="h2 mb-2">Create your own running club</h1>
+                <span>Bring together runners in your community</span>
+              </div>
+              <div class="row justify-content-center">
+                <div class="col-6 col-lg-5">
+                  <form method="post" asp-action="Create" enctype="multipart/form-data">
+                   <input type="hidden" id="AppUserId" name="AppUserId" asp-for="AppUserId"/>
+                    <div class="form-row form-group">
+                      <div class="col">                        
+                        <input asp-for="Title" class="form-control form-control-lg" placeholder="Title" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                      </div>
+                      <div class="col">                        
+                        <select asp-for="Category" asp-items="@Html.GetEnumSelectList<ProductCategory>()" class="form-control form-control-lg">
+                                <option>--Select--</option>
+                        </select>
+                        <span asp-validation-for="Category" class="text-danger"></span>
+                      </div>
+                    </div>
+                    <div class="form-row form-group">
+                      <div class="col">                       
+                        <input asp-for="Description" class="form-control form-control-lg" placeholder="Description" />
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                      </div>
+                    </div> 
+                    <div class="form-row form-group">
+                      <div class="col">                        
+                        <input asp-for="Price" class="form-control form-control-lg" placeholder="Price" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                      </div>
+                    </div>
+                    <div class="form-row form-group">
+                      <div class="col">                        
+                        <input type="number" asp-for="Quantity" class="form-control form-control-lg" placeholder="Quantity" />
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                      </div>
+                    </div>
+                    <div class="form-row form-group">
+                      <div class="col">                        
+                        <input asp-for="Image" type="file" class="form-control form-control-lg" placeholder="Image" />
+                        <span asp-validation-for="Image" class="text-danger"></span>
+                      </div>
+                    </div>
+                    <div class="form-row form-group">
+                      <div class="col">
+                        <button class="btn btn-block btn-success btn-lg" type="submit">Create Account</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--end of container-->
+      </section>
+      <!--end of section-->
+    </div>
+ *@
+
+<script>
+    document.getElementById('productImage').addEventListener('change', function(event) {
+        const file = event.target.files[0]; // Lấy file từ input
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Lấy phần tử chứa biểu tượng tải lên
+                const uploadIcon = document.getElementById('uploadIcon');
+                
+                // Đặt ảnh làm background cho phần tử uploadIcon
+                uploadIcon.style.backgroundImage = `url(${e.target.result})`; // Đặt ảnh làm background
+                uploadIcon.style.backgroundSize = 'contain'; // Giữ tỷ lệ ảnh với chiều cao cố định
+                uploadIcon.style.backgroundPosition = 'center'; // Căn giữa ảnh
+                uploadIcon.style.backgroundRepeat = 'no-repeat'; // Không lặp lại ảnh
+
+                // Ẩn biểu tượng tải lên (icon) sau khi upload
+                const icon = uploadIcon.querySelector('i');
+                icon.style.display = 'none'; // Ẩn biểu tượng tải lên
+            };
+            reader.readAsDataURL(file); // Đọc file ảnh
+        }
+    });
+    const dateInput = document.getElementById('dateInput');
+    const today = new Date().toISOString().split('T')[0]; // Lấy ngày hiện tại dưới định dạng YYYY-MM-DD
+
+    // Kiểm tra nếu trường không có giá trị, gán ngày hiện tại
+    if (!dateInput.value) {
+        dateInput.value = today;
+    }
+</script>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

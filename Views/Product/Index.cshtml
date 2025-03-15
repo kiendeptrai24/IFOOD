@@ -1,0 +1,245 @@
+﻿@using iFood.Data.Enum
+@using iFood.Extensions
+@using iFood.ViewModels
+@model IndexProductViewModel
+
+@{
+    bool isAuthenticated = User.Identity?.IsAuthenticated == true;
+
+    int resultStart = ((Model.Page - 1) * Model.PageSize) + 1;
+    int resultEnd = Math.Min(resultStart + Model.PageSize - 1, Model.TotalProducts);
+
+    bool isValidPage = resultStart <= Model.TotalProducts;
+
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+
+<section class="space-sm flush-with-above">
+    <div class="container">
+        <div class="row">
+            <div class="col text-center">
+                <p>Product Categories</p>
+                <div class="mb-3">
+                    <a type="button" class="btn btn-secondary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="-1">All</a>
+                    @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
+                    {
+                        <a type="button" class="btn btn-secondary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="@category.Value">@category.Text</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                @if (isValidPage)
+                {
+                    <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
+                   asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
+                        Prev
+                    </a>
+                    <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
+                   asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
+                        Next
+                    </a>
+                    <span class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</span>
+                }
+            </div>
+        </div>
+        
+        <ul class="row feature-list feature-list-sm">
+            @foreach (var product in Model.Products)
+            {
+
+                
+                    <li class="col-12 col-md-4 col-lg-3">
+                        <a type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID" >
+                        <div class="card">
+                            @* <a type="button" asp-controller="Club" asp-action="DetailClub" asp-route-runningClub="@club.Title.GenerateSlug()" asp-route-id="@club.Id"> *@
+                                @if(@product.Image != null)
+                                {
+                                    <img class="card-img-top" src="@product.Image" alt="Card image cap">   
+                                }
+                                else
+                                {
+                                    <img class="card-img-top" src="/img/rungroopclub.png" alt="Card image cap">   
+                                }
+                                
+                            @* </a> *@
+                            <div class="card-body">
+                                <h4 class="card-title">@product.Name</h4>
+                                <p class="card-text">@product.Description</p>
+                                <p class="card-text">@product.Quantity, @product.Price</p>Price
+                            </div>
+                            <div class="card-footer card-footer-borderless d-flex justify-content-between">
+                                <div>
+                                    <small>@product.Category</small>
+                                </div>
+                                @if (isAuthenticated && User.IsInRole("admin"))
+                                {
+                                    <div>
+                                        <a type="button" class="btn btn-sm btn-outline-info" asp-controller="Product" asp-action="Edit" asp-route-id="@product.ProductID">
+                                            Edit
+                                        </a>
+                                        <a type="button" class="btn btn-sm btn-outline-danger" asp-controller="Product" asp-action="Delete" asp-route-id="@product.ProductID">
+                                            Delete
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        </a>
+                    </li>
+            }
+        </ul>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                @if (isValidPage)
+                {
+                    <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
+                   asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
+                        Prev
+                    </a>
+                    <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
+                   asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
+                        Next
+                    </a>
+                    <span class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</span>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@* 
+
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+        <div class="row">
+            @foreach(var item in Model)
+            {
+                <div class="col-3">
+                    <a asp-controller="Club" asp-action="Detail" asp-route-id="@item.Id"
+                                            class="btn btn-sm btn-outline-secondary">
+                        <div class="card" width="430" height="400">
+                            <img src="@item.Image" class="card-img-top" width="300" height="170">
+                            <div class="card-body">
+                                <h5 class="card-title">@item.Title</h5>
+                                <p class="card-text">@item.Description</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="h5 mb-0">$99.99</span>
+                                    <div>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-half text-warning"></i>
+                                        <small class="text-muted">(4.5)</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between bg-light">
+                                <button class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-heart"></i></button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col">
+                    <div class="card shadow-sm">
+                       <img class="card-img-top" src="@item.Image" width="100%" height="225" alt="Card image cap">
+                            <div class="card-body">
+                                <p class="card-text">@item.Title</p>
+                                <p class="card-text">@item.Description</p>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="btn-group">
+                                        <a asp-controller="Club" asp-action="Detail" asp-route-id="@item.Id"
+                                        class="btn btn-sm btn-outline-secondary">View</a>
+                                        <a asp-controller="Club" asp-action="Edit" asp-route-id="@item.Id"
+                                         class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    </div>
+                                    <small class="text-body-secondary">@item.ClubCategory</small>
+                                </div>
+                            </div>
+                    </div>
+                </div> 
+            }
+        </div>
+    </div>
+</div> 
+*@
+
+<section class="container my-5 pt-5">
+        <div class="row">
+            <div class="col-lg-6">
+                <img class="img-fluid" src="https://storage.googleapis.com/a1aa/image/AbP7s-t6UYDnPFjrBoVtnffCJOhfCeCtt1_rpi1RXPM.jpg" alt="Product Image">
+                <div class="d-flex mt-3">
+                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
+                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
+                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <h1 class="h2">Nonstick Dishwasher PFOA</h1>
+                <div class="d-flex align-items-center mt-2">
+                    <div class="text-warning">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-half"></i>
+                    </div>
+                    <span class="ms-2 text-muted">(102) Reviews</span>
+                </div>
+                <div class="mt-3">
+                    <span class="h3 text-orange">$70.00</span>
+                    <span class="h5 text-muted ms-2"><del>$80.00</del></span>
+                </div>
+                <p class="mt-4 text-muted">Mô tả sản phẩm của bạn ở đây...</p>
+
+                <div class="mt-4">
+                    <h5>Available Options</h5>
+                    <div class="mt-2">
+                        <span class="text-muted">Color</span>
+                        <div class="d-flex mt-2">
+                            <div class="bg-primary" style="width: 30px; height: 30px;"></div>
+                            <div class="bg-warning ms-2" style="width: 30px; height: 30px;"></div>
+                            <div class="bg-success ms-2" style="width: 30px; height: 30px;"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="text-muted">Size</span>
+                        <div class="d-flex mt-2">
+                            <button class="btn btn-outline-secondary">S</button>
+                            <button class="btn btn-outline-secondary ms-2">M</button>
+                            <button class="btn btn-outline-secondary ms-2">L</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <span class="text-muted">Quantity:</span>
+                    <div class="d-flex align-items-center mt-2">
+                        <button class="btn btn-outline-secondary">-</button>
+                        <input class="form-control text-center mx-2" style="width: 60px;" type="text" value="1">
+                        <button class="btn btn-outline-secondary">+</button>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex">
+                    <button class="btn btn-dark">Add To Cart</button>
+                    <button class="btn btn-outline-secondary ms-2"><i class="bi bi-heart"></i></button>
+                    <button class="btn btn-outline-secondary ms-2"><i class="bi bi-share"></i></button>
+                </div>
+
+                <div class="mt-4">
+                    <p class="text-muted">Category: <span class="fw-bold">Clothing</span></p>
+                    <p class="text-muted">Availability: <span class="fw-bold">180 Products In Stock</span></p>
+                </div>
+            </div>
+        </div>
+    </section>

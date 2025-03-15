@@ -1,0 +1,54 @@
+﻿@using iFood.Data.Enum
+@model Product
+
+<h1>Are you sure you want to delete this product?</h1>
+<div class="container">
+    <form method="post" asp-action="Delete" enctype="multipart/form-data">
+        <div class="form-group">
+            <label asp-for="Name">Title</label>
+            <input asp-for="Name" class="form-control" placeholder="Title">
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Description">Description</label>
+            <input asp-for="Description" class="form-control" placeholder="Description">
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Category">Product Category</label>
+            <select asp-for="Category" asp-items="@Html.GetEnumSelectList<ProductCategory>()" class="form-control">
+                <option selected="selected" value="">--Select--</option>
+            </select>
+            <span asp-validation-for="Category" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SoldOut">SoldOut</label>
+            <input asp-for="SoldOut" class="form-control" placeholder="SoldOut">
+            <span asp-validation-for="SoldOut" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Quantity">Quantity</label>
+            <input asp-for="Quantity" class="form-control" placeholder="Quantity">
+            <span asp-validation-for="Quantity" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Price">Price</label>
+            <input asp-for="Price" class="form-control" placeholder="Price">
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Image">Image</label>
+            <input asp-for="Image" type="file" class="form-control" placeholder="Image">
+            <span asp-validation-for="Image" class="text-danger"></span>
+
+        </div>
+    </form>
+    <div class="form-group">
+        <form  asp-action="Delete" method="post">
+            <div class="d-flex justify-content-center">
+                <input type="hidden" asp-for="ProductID" />
+                <input type="submit" value="Confirm" class="btn btn-danger float-right mt-3 " />
+            </div>
+        </form>
+    </div>
+</div>

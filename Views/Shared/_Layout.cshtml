@@ -1,0 +1,612 @@
+﻿
+@{
+
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    @* test *@
+
+
+
+
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MyMvcApp</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+ 
+    <link href="~/css/styles.css" rel="stylesheet" asp-append-version="true" />
+
+    <link rel="icon" type="image/x-icon" href="@Url.Content("~/favicon.ico")" />
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+  
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.css" rel="stylesheet" />
+
+    
+</head>
+<Style>
+    .btntest {
+        padding: .55rem 1.5rem .45rem;
+
+        .nav-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: none; /* Mặc định ẩn */
+        position: absolute;
+        top: 50px;
+        right: 0;
+        background: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+    }
+
+    .nav-links li {
+        padding: 10px;
+    }
+
+    .nav-links a {
+        text-decoration: none;
+        color: black;
+        display: block;
+    }
+
+    .menu-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+    }
+/* Đảm bảo ảnh đại diện hiển thị đúng */
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+
+/* Định vị dropdown từ phải qua trái */
+.dropdown-menu {
+    position: absolute !important;
+    top: 100% !important; /* Ngay dưới avatar */
+    right: 0 !important; /* Căn lề phải */
+    transform: translateX(0); /* Không bị lệch */
+    min-width: 180px;
+    z-index: 1050;
+}
+
+/* Căn chỉnh text từ phải qua trái */
+.dropdown-item {
+    text-align: right !important; /* Chữ căn phải */ /* Để chữ không sát mép */
+}
+
+/* Căn biểu tượng bên phải chữ */
+.dropdown-item i {
+    margin-left: 10px;
+    margin-right: 0;
+}
+
+
+    .searchbar{
+    margin-bottom: auto;
+    margin-top: auto;
+    height: 60px;
+    background-color: #353b48;
+    border-radius: 30px;
+    padding: 10px;
+    }
+
+    .search_input{
+    color: white;
+    border: 0;
+    outline: 0;
+    background: none;
+    width: 0;
+    caret-color:transparent;
+    line-height: 40px;
+    transition: width 0.4s linear;
+    }
+
+    .searchbar:hover > .search_input{
+    padding: 0 10px;
+    width: 450px;
+    caret-color:red;
+    transition: width 0.4s linear;
+    }
+
+    .searchbar:hover > .search_icon{
+    background: white;
+    color: #e74c3c;
+    }
+
+    .search_icon{
+    height: 40px;
+    width: 40px;
+    float: right;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    color:white;
+    text-decoration:none;
+    }
+
+
+}
+</Style>
+<style>
+     /* Nút mở Chatbox */
+     #chatbox-button {
+         position: fixed;
+         bottom: 20px;
+         right: 20px;
+         background-color: #007bff;
+         color: white;
+         padding: 12px 20px;
+         border-radius: 50px;
+         cursor: pointer;
+         z-index: 1000;
+         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+         transition: all 0.3s ease;
+         font-size: 16px;
+         font-weight: 500;
+     }
+
+         #chatbox-button:hover {
+             background-color: #0056b3;
+             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+             transform: translateY(-2px);
+         }
+
+     /* Container Chatbox */
+     #chatbox-container {
+         position: fixed;
+         bottom: 80px;
+         right: 20px;
+         width: 340px;
+         height: 470px;
+         border: none;
+         background: #fff;
+         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+         display: none;
+         z-index: 1000;
+         border-radius: 12px;
+         overflow: hidden;
+         transition: all 0.3s ease;
+     }
+
+     /* Header Chatbox */
+     #chatbox-header {
+         background: linear-gradient(135deg, #007bff, #00c4ff);
+         color: #fff;
+         padding: 12px;
+         font-weight: 600;
+         font-size: 16px;
+         text-align: center;
+         cursor: pointer;
+         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+     }
+
+         #chatbox-header:hover {
+             background: linear-gradient(135deg, #0056b3, #0099cc);
+         }
+
+     /* Nội dung Chatbox */
+     #chatbox-content {
+         padding: 15px;
+         height: 360px;
+         overflow-y: auto;
+         background-color: #f5f7fa;
+         font-size: 14px;
+         line-height: 1.5;
+     }
+
+         /* Thanh cuộn tùy chỉnh */
+         #chatbox-content::-webkit-scrollbar {
+             width: 6px;
+         }
+
+         #chatbox-content::-webkit-scrollbar-thumb {
+             background: #007bff;
+             border-radius: 10px;
+         }
+
+         #chatbox-content::-webkit-scrollbar-track {
+             background: #e9ecef;
+         }
+
+     /* Tin nhắn trong chatlog */
+     #chatlog p {
+         margin: 8px 0;
+         padding: 10px 14px;
+         border-radius: 10px;
+         max-width: 80%;
+         word-wrap: break-word;
+     }
+
+         #chatlog p strong {
+             font-weight: 600;
+         }
+
+         /* Tin nhắn của người dùng */
+         #chatlog p.user-message {
+             background: #007bff;
+             color: white;
+             margin-left: auto;
+             text-align: right;
+         }
+
+         /* Tin nhắn của bot */
+         #chatlog p.bot-message {
+             background: #e9ecef;
+             color: #333;
+             margin-right: auto;
+         }
+
+     /* Input Chatbox */
+     #chatbox-input {
+         padding: 10px;
+         background: #fff;
+         border-top: 1px solid #e0e0e0;
+         display: flex;
+         align-items: center;
+         gap: 8px;
+     }
+
+         #chatbox-input input {
+            flex: 1;
+             padding: 8px 12px;
+             border: 1px solid #ddd;
+             border-radius: 20px;
+             outline: none;
+             font-size: 14px;
+             transition: border-color 0.3s ease;
+         }
+
+             #chatbox-input input:focus {
+                 border-color: #007bff;
+                 box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+             }
+
+         #chatbox-input button {
+             padding: 8px 16px;
+             background: #007bff;
+             color: white;
+             border: none;
+             border-radius: 20px;
+             cursor: pointer;
+             font-size: 14px;
+             font-weight: 500;
+             transition: background 0.3s ease;
+         }
+
+             #chatbox-input button:hover {
+                 background: #0056b3;
+             }
+        #chatlog img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+     /* Sidebar */
+
+ </style>
+<body id="page-top">
+    <header>
+
+            @* <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
+                <div class="container px-4 px-lg-5">
+                    <a class="navbar-brand"asp-area="" asp-controller="Home" asp-action="Index">iFood</a>
+                    <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                    <div class="collapse navbar-collapse" id="navbarResponsive">
+                        <ul class="navbar-nav ms-auto my-2 my-lg-0">
+                            <li class="nav-item"><a class="nav-link"asp-area="" asp-controller="Home" asp-action="Index">About</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="CLub" asp-action="Index">Services</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Race" asp-action="Index">Portfolio</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav> *@
+
+
+            <nav class="navbar navbar-expand-lg navbar-light  sticky-top py-3 bg-primary">
+                <div class="container px-4 px-lg-5">
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="font-weight: bold;"><i class="bi bi-egg-fried"></i>IFood</a>
+                    <form method="get" class="form-inline my-2 my-lg-0">
+                        <div style="position: relative; min-width: 200px; background-color: rgb(227, 229, 210); border: 25px;">
+                            <input class="form-control" type="search" placeholder="Search" aria-label="Search"
+                            name="searchTerm"
+                                style="padding-right: 35px;">
+                            <button type="submit"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: none;">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <button class="navbar-toggler" id="menuToggle" type="button">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarResponsive">
+                        <ul class="navbar-nav ms-auto my-2 my-lg-0" style="color: rgb(0, 0, 0); font-weight: bold;">
+                            <li class="nav-item pt-1"><a class="nav-link" href="#product">Product</a></li>
+                            <li class="nav-item pt-1"><a class="nav-link" href="#services">Services</a></li>
+                            <li class="nav-item pt-1"><a class="nav-link" href="#about">About</a></li>
+                            <li class="nav-item pt-1"><a class="nav-link" href="#portfolio">Portfolio</a></li>
+                            <li class="nav-item pt-1"><a class="nav-link" href="#contact">Contact</a></li>
+                            @if(User.Identity.IsAuthenticated)
+                            {
+                                if(User.IsInRole("admin"))
+                                {
+                                    <li class="nav-item pt-1"><a class="nav-link" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+                                }
+                                <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Logout"><i class="bi bi-box-arrow-in-right fs-5"></i></a></li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="Cart" asp-action="Index">
+                                        <i class="bi bi-cart3 fs-5"></i> 
+                                    </a>
+                                </li>
+                                <li class="nav-item d-flex align-items-center">
+                                    
+                                    <div>
+                                        <a class="avatar" href="#"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false"
+                                            id="avatarDropdown">
+                                            <img class="avatar" src="https://placehold.co/30x30">
+                                        </a>
+
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="avatarDropdown">
+                                            <li>
+                                                <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">
+                                                    <i class="bi bi-person-bounding-box fs-5"></i>Profile</a>
+                                            </li>
+                                            @if(User.IsInRole("admin"))
+                                            {
+                                                <li>
+                                                    <a class="dropdown-item" asp-area="" asp-controller="Dashboard" asp-action="Index">
+                                                        <i class="bi bi-card-list fs-5"></i> Manager product
+                                                    </a>
+                                                </li>
+                                            }
+                                            <li>
+                                                <a class="dropdown-item" asp-area="" asp-controller="Cart" asp-action="Index">
+                                                    <i class="bi bi-cart3 fs-5"></i> Your cart
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-area="" asp-controller="Order" asp-action="Index">
+                                                    <i class="bi bi-clock-history fs-5"></i> Your History
+                                                </a>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
+                                                    <i class="bi bi-box-arrow-in-right fs-5"></i> SignOut
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item pt-1"><a class="nav-link" asp-controller="Account" asp-action="Login">Login/Register</a> </li>
+
+                            }
+
+                        </ul>
+
+
+                    </div>
+                </div>
+            </nav>
+
+        
+        @* <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MyMvcApp</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="CLub" asp-action="Index">Club</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Race" asp-action="Index">Races</a>
+                        </li>
+                    </ul>
+                </div>
+              
+            </div>
+        </nav> *@
+        @* @if(User.Identity.IsAuthenticated)
+        {
+            <div class="container">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div> 
+        }
+        else
+        { *@
+            <div>
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                    <div id="chatbox-button" onclick="toggleChatbox()">💬 Chat</div>
+                        <div id="chatbox-container">
+                        <div id="chatbox-header" onclick="toggleChatbox()">Chatbot - Click để đóng</div>
+                        <div id="chatbox-content">
+                            <div id="chatlog"></div>
+                        </div>
+                        <div id="chatbox-input">
+                            <input type="text" id="userInput" class="form-control" placeholder="Nhập tin nhắn của bạn..." />
+                            <button id="sendButton" class="btn btn-primary">Gửi</button>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <!-- Nút mở Chatbox -->
+        
+    </header>
+
+    
+@* 
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - MyMvcApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer> *@
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/scripts.js"></script>
+
+
+    @* <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script> *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js"></script>
+    <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.2/sweetalert2.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.2/sweetalert2.all.min.js"></script>    
+    @* hop thoai *@
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+    <!-- Toastr CSS -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        var successMessage = '@TempData["SuccessMessage"]';
+        var errorMessage = '@TempData["ErrorMessage"]';
+        var warnMessage = '@TempData["WarnMessage"]';
+        var infoMessage = '@TempData["InfoMessage"]';
+
+
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            positionClass: "toast-top-right",
+            timeOut: 3000
+        };
+
+        if (successMessage) {
+            toastr.success(successMessage, "Successful!");
+        }
+        else if (errorMessage) {
+            toastr.error(errorMessage, "Error!");
+        }
+        else if(warnMessage)
+        {
+            toastr.warning(warnMessage,"Warning!")
+        }else if(infoMessage)
+        {
+            toastr.info(infoMessage,"Infomation")
+        }
+        
+    });
+    //SweetAlert2
+    
+   
+ 
+    function toggleChatbox() {
+            $("#chatbox-container").toggle();
+        }
+
+   $(document).ready(function () {
+    function limitChatlog(maxMessages = 20) {
+        const messages = $("#chatlog p, #chatlog img");
+        if (messages.length > maxMessages) {
+            messages.slice(0, messages.length - maxMessages).remove();
+        }
+    }
+
+    $("#sendButton").click(function () {
+        const userMessage = $("#userInput").val()?.trim();
+        if (!userMessage) return;
+
+        // Hiển thị tin nhắn người dùng
+        $("#chatlog").append(`<p class="user-message"><strong>You:</strong> ${userMessage}</p>`);
+        $("#userInput").val("");
+
+        // Gửi AJAX đến controller ChatbotController
+        $.ajax({
+            url: '@Url.Action("GetResponse", "Chatbot")',
+            type: 'POST',
+            data: { message: userMessage },
+            success: function (data) {
+                let botMessage = `<p class="bot-message"><strong>Bot:</strong> ${data.response || 'Không nhận được phản hồi từ bot.'}</p>`;
+
+                // Xử lý hình ảnh nếu có
+                if (data.imageUrl) {
+                    if (data.imageUrl.startsWith("data:image")) {
+                        // Nếu API trả về Base64 có tiền tố sẵn, hiển thị ngay
+                        botMessage += `<img src="${data.imageUrl}" alt="Product Image" style="max-width: 200px; margin-top: 5px;">`;
+                    } else if (data.imageUrl.startsWith("/9j/") || data.imageUrl.length > 100) {
+                        // Nếu chuỗi trông giống Base64 (JPEG Base64 bắt đầu bằng '/9j/')
+                        botMessage += `<img src="data:image/jpeg;base64,${data.imageUrl}" alt="Product Image" style="max-width: 200px; margin-top: 5px;">`;
+                    } else {
+                        // Nếu là URL, hiển thị trực tiếp
+                        botMessage += `<img src="${data.imageUrl}" alt="Product Image" style="max-width: 200px; margin-top: 5px;">`;
+                    }
+                }
+
+                // Thêm phản hồi vào chatlog
+                $("#chatlog").append(botMessage);
+                limitChatlog(20);
+                $("#chatbox-content").scrollTop($("#chatbox-content")[0].scrollHeight);
+            },
+            error: function (xhr, status, error) {
+                const errorMessage = xhr.responseJSON?.response || 'Lỗi hệ thống, vui lòng thử lại sau.';
+                $("#chatlog").append(`<p class="bot-message"><strong>Bot:</strong> ${errorMessage}</p>`);
+                limitChatlog(20);
+                $("#chatbox-content").scrollTop($("#chatbox-content")[0].scrollHeight);
+            }
+        });
+    });
+
+    // Cho phép nhấn Enter để gửi tin nhắn
+    $("#userInput").keypress(function (e) {
+        if (e.which === 13) { // Enter key
+            $("#sendButton").click();
+        }
+    });
+});
+
+
+
+
+    </script>
+    
+    @* test *@
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+
+
+

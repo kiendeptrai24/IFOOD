@@ -1,0 +1,103 @@
+﻿@using iFood.Models
+@model IEnumerable<Product>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Featured Products</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        .product-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .product-card img {
+            height: 150px;
+            object-fit: cover;
+        }
+        .product-card .price {
+            color: green;
+            font-weight: bold;
+        }
+        .product-card .old-price {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .carousel-indicators li {
+            background-color: gray;
+        }
+        .carousel-control-prev, 
+    .carousel-control-next {
+        width: 50px; /* Độ rộng */
+        height: 50px; /* Độ cao */
+        background-color: #7ED321; /* Màu nền */
+        border-radius: 50%; /* Bo tròn */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 1; /* Hiển thị luôn */
+    }
+    .carousel-control-prev:hover, 
+    .carousel-control-next:hover {
+        background-color: #5FA110; /* Màu khi hover */
+    }
+
+    </style>
+</head>
+  <div class="container my-5">
+        <h1 class="text-center mb-4">FEATURED PRODUCTS</h1>
+        <div class="d-flex justify-content-center mb-4">
+            <div class="w-25" style="height: 4px; background-color: green;"></div>
+        </div>
+        <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="row justify-content-center">
+                        @foreach (var product in Model)
+                        {
+                            <div class="col-md-3">
+                                <div class="product-card">
+                                    <div class="d-flex justify-content-end">
+                                        <i class="far fa-heart text-gray"></i>
+                                    </div>
+                                    <img src="@product.Image" alt="@product.Name" class="img-fluid mb-3">
+                                    <h5>@product.Name</h5>
+                                    @* <div class="mb-2">
+                                        @for (int i = 0; i < 5; i++)
+                                        {
+                                            <i class="fas fa-star @(i < product.Rating ? "text-warning" : "text-gray")"></i>
+                                        }
+                                    </div> *@
+                                    <div class="mb-3">
+                                        <span class="old-price">$@product.Price</span>
+                                        <span class="price">$@product.Price</span>
+                                    </div>
+                                    <button class="btn btn-outline-success">ADD TO CART</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <a class="carousel-control-prev" href="#productCarousel" role="button" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#productCarousel" role="button" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </a>
+        </div>
+        <ol class="carousel-indicators mt-4">
+            <li data-bs-target="#productCarousel" data-bs-slide-to="0" class="active"></li>
+            <li data-bs-target="#productCarousel" data-bs-slide-to="1"></li>
+            <li data-bs-target="#productCarousel" data-bs-slide-to="2"></li>
+        </ol>
+    </div>

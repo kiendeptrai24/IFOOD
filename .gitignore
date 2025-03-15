@@ -1,0 +1,42 @@
+# ASP.NET Core
+bin/
+obj/
+out/
+*.log
+*.swp
+*.suo
+*.user
+*.lock.json
+*.db
+*.sqlite
+.vscode/
+.idea/
+*.bak
+*.tmp
+Thumbs.db
+*.DS_Store
+
+# Build files
+**/bin/
+**/obj/
+**/out/
+*.exe
+*.dll
+*.pdb
+*.apk
+*.aab
+*.o
+*.so
+
+# User-specific files
+*.vs/
+.vscode/
+.idea/
+.env
+
+# Config files (optional)
+appsettings.json
+appsettings.Development.json
+
+# Entity Framework migrations
+Migrations/

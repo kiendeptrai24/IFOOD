@@ -1,0 +1,57 @@
+﻿@model IEnumerable<Order>
+
+<div class="container">
+    <h2 class="mt-4 mb-3">Order History</h2>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Order Date</th>
+                        <th>Payment Method</th>
+                        <th>Order Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        var firstRow = true; // Để xác định dòng đầu tiên của mỗi đơn hàng
+                        int count = 0;
+                        @foreach (var product in order.OrderDetails)
+                        {
+                            <tr>
+                                @if (firstRow) 
+                                {
+                                    <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@count</td>
+                                }
+
+                                <td>@(product.Product?.Name ?? "N/A")</td>
+                                <td class="text-center">@product.Quantity</td>
+                                <td class="text-end">$@product.Product?.Price</td>
+                                <td class="text-end">$@((product.Quantity * (product.Product?.Price ?? 0)).ToString("0.00"))</td>
+
+                                @if (firstRow) 
+                                {
+                                    <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">
+                                        @order.OrderDate.ToString("dd/MM/yyyy HH:mm") 
+                                    </td>
+                                    <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@order.PaymentMethod</td>
+                                    <td rowspan="@order.OrderDetails.Count" class="text-end align-middle">$@order.TotalPrice</td>
+                                    firstRow = false; 
+                                }
+                            </tr>
+                            count++;
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

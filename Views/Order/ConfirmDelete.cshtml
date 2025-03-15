@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Xác nhận xóa giỏ hàng";
+}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    function checkStockBeforeCheckout(productId, quantity) {
+        $.ajax({
+            url: "/Cart/CheckStock",
+            type: "POST",
+            data: { productId: productId, quantity: quantity },
+            success: function (response) {
+                if (!response.success) {
+                    // Nếu số lượng vượt quá kho, hiển thị hộp thoại xác nhận
+                    if (confirm(response.message)) {
+                        // Nếu người dùng đồng ý mua số lượng còn lại
+                        proceedToCheckout(productId, response.stockAvailable);
+                    } else {
+                        // Nếu người dùng từ chối, hủy thanh toán
+                        alert("Bạn đã hủy thanh toán.");
+                    }
+                } else {
+                    // Nếu số lượng hợp lệ, tiến hành thanh toán
+                    proceedToCheckout(productId, quantity);
+                }
+            }
+        });
+    }
+
+// Hàm thực hiện thanh toán
+function proceedToCheckout(productId, quantity) {
+    $.ajax({
+        url: "/Cart/Checkout",
+        type: "POST",
+        data: { productId: productId, quantity: quantity },
+        success: function (response) {
+            alert(response.message);
+            if (response.success) {
+                window.location.href = "/Cart/Success";
+            }
+        }
+    });
+}
+</script>

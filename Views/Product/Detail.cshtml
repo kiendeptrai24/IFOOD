@@ -1,0 +1,274 @@
+﻿
+
+@model Product
+<style>
+        .product-card {
+            height: 300px;
+            width: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f8f8;
+            border-radius: 10px;
+        
+        }
+
+        .product-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .product-price {
+            color: #f77b0b;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn-buy {
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-buy:hover {
+            background-color: #e64a19;
+        }
+        #notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 18px;
+            display: none; /* Ban đầu ẩn */
+            z-index: 9999;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+    </style>
+<div id="success-message" style="display:none; background-color: #4CAF50; color: white; padding: 10px; text-align: center; border-radius: 5px;"></div>
+<div id="error-message" style="display:none; background-color: #f44336; color: white; padding: 10px; text-align: center; border-radius: 5px;"></div>
+<section class="container my-5 pt-5">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="d-flex justify-content-center mt-5">
+                    <div class="product-card"  style="position: relative; display: inline-block;">
+               
+                        <img class="product-image"src="@Model.Image" alt="Profile picture" >
+                        <h5 style="position: absolute; bottom: 2px; right: 5px; background: rgba(0, 0, 0, 0.6); color: white; padding: 1px 5px; border-radius: 5px;">
+                            (123) <i class="bi bi-eye-fill fs-4"></i>
+                        </h5>
+                    </div>
+                </div>
+                <div class="d-flex mt-3">
+                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
+                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
+                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row">
+
+                    <span  class="col h1">@Model.Name</span>
+                    <h3>(123)<i class="bi bi-eye-fill fs-4"></i></h3>
+                </div>
+                <div class="d-flex align-items-center mt-2">
+                    <div id="ratingStars" class="text-warning"></div>
+                   <span class="ms-2 text-muted">
+                        (@(Model.Reviews?.Count ?? 0) Reviews)
+                    </span>
+                </div>
+                <div class="mt-3">
+                    <span class="h3 text-orange">$@Model.Price</span>
+                    <span class="h5 text-muted ms-2"><del>$@Model.Price</del></span>
+                </div>
+                <p class="mt-4 text-muted">@Model.Description</p>
+
+                <div class="mt-4">
+                    <h5>Available Options</h5>
+                    <div class="mt-2">
+                        <span class="text-muted">Color</span>
+                        <div class="d-flex mt-2">
+                            <div class="bg-primary" style="width: 30px; height: 30px;"></div>
+                            <div class="bg-warning ms-2" style="width: 30px; height: 30px;"></div>
+                            <div class="bg-success ms-2" style="width: 30px; height: 30px;"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="text-muted">Size</span>
+                        <div class="d-flex mt-2">
+                            <button class="btn btn-outline-secondary">S</button>
+                            <button class="btn btn-outline-secondary ms-2">M</button>
+                            <button class="btn btn-outline-secondary ms-2">L</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <span class="text-muted">Quantity:</span>
+                    <div class="d-flex align-items-center mt-2">
+                        <button class="btn btn-outline-secondary">-</button>
+                        <input class="form-control text-center mx-2" style="width: 60px;" type="text" value="1">
+                        <button class="btn btn-outline-secondary">+</button>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex">
+                    @* <form method="post" asp-action="CreatePaymentMomo" asp-controller="Payment">
+                        
+                        <input type="hidden" name="Amount"  value="@Model.Price" />
+                        <input type="hidden" name="OrderId"  value="@Guid.NewGuid().ToString()"/>
+                        <input type="hidden" name="OrderInfomation"value="thanh toan momo cho don hang tai iFood"  />
+                        <input type="hidden" accesskey=""name="FullName"value="kien ngo"  />
+
+
+                        <button class="btn btn-primary" name="PayUrl" type="submit">Pay with momo</button>
+                    </form> *@
+                    <button class="btn btn-primary"  onclick="BuyItems(this)" data-id="@Model.ProductID">
+                        Pay with momo
+                    </button>
+                    <a type="button" class="btn btn-sm btn-outline-info" asp-controller="Cart" asp-action="Create"
+                         asp-route-id="@Model.ProductID">
+                                        Add to cart
+                                    </a>
+                    
+                    <button class="btn btn-outline-secondary ms-2"><i class="bi bi-heart"></i></button>
+                    <button class="btn btn-outline-secondary ms-2"><i class="bi bi-share"></i></button>
+                </div>
+
+                <div class="mt-4">
+                    <p class="text-muted">Category: <span class="fw-bold">@Model.Category</span></p>
+                    <p class="text-muted">Release: <span class="fw-bold">@Model.DateSell.ToString("yyyy/MM/dd")</span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+    function generateStars(rating) {
+        let fullStar = '<i class="bi bi-star-fill"></i>';
+        let halfStar = '<i class="bi bi-star-half"></i>';
+        let emptyStar = '<i class="bi bi-star"></i>';
+
+        let starsHTML = '';
+        let roundedRating = Math.floor(rating);
+        let hasHalfStar = rating % 1 >= 0.5;
+
+        // Thêm sao đầy
+        for (let i = 0; i < roundedRating; i++) {
+            starsHTML += fullStar;
+        }
+        // Thêm sao nửa nếu có
+        if (hasHalfStar) {
+            starsHTML += halfStar;
+        }
+        // Thêm sao trống cho đủ 5 sao
+        while (starsHTML.split('i').length - 1 < 10) { // Mỗi `<i>` có 2 thẻ `i`
+            starsHTML += emptyStar;
+        }
+
+        document.getElementById("ratingStars").innerHTML = starsHTML;
+    }
+
+    // Gọi hàm với giá trị điểm đánh giá (Ví dụ: 4.5)
+    //generateStars("@Model.Rating");
+    generateStars(4.5);
+
+
+   
+    $(document).on("click", ".add-to-cart-btn", function (e) {
+    e.preventDefault();
+    var productId = $(this).data("id");
+
+    $.ajax({
+        url: "/Cart/Create",
+        type: "GET",
+        data: { id: productId },
+        success: function (response) {
+            if (response.success) {
+                $("#success-message").text(response.message).fadeIn().delay(2000).fadeOut();
+            } else {
+                $("#error-message").text(response.message).fadeIn().delay(2000).fadeOut();
+            }
+        }
+    });
+});
+
+</script>
+
+<script>
+    function BuyItems(button) {
+        let productId = button.getAttribute("data-id"); // Lấy ID sản phẩm
+
+        Swal.fire({
+            title: "Chọn phương thức thanh toán",
+            text: "Vui lòng chọn phương thức thanh toán bạn muốn sử dụng.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "COD",
+            cancelButtonText: "MoMo",
+            showDenyButton: true,
+            denyButtonText: "ZaloPay",
+            html: `
+                <button id="other-payment" class="swal2-confirm swal2-styled" style="margin-top: 10px;">
+                    Ví điện tử khác
+                </button>
+            `,
+            didOpen: () => {
+                document.getElementById("other-payment").addEventListener("click", function () {
+                    processOrder(productId, "Other");
+                    Swal.close(); // Đóng hộp thoại sau khi chọn
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                processOrder(productId, 2); // COD
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                processOrder(productId, 0); // MoMo
+            } else if (result.isDenied) {
+                processOrder(productId, 1); // ZaloPay
+            }
+        });
+    }
+
+    function processOrder(productId, paymentMethod) {
+        console.log("Đặt hàng với ProductID:", productId, "Thanh toán bằng:", paymentMethod);
+
+        // Gửi request đến server xử lý
+        fetch('/Order/CreateOrder', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ productId, paymentMethod })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.payUrl) {
+                window.location.href = data.payUrl;  // Redirect ở FE
+            }
+        });
+    }
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -1,0 +1,124 @@
+﻿@using iFood.ViewModels
+
+@model RegisterViewModel
+
+@{
+  ViewData["Title"] = "Sign up";
+}
+<head>
+    <!-- Thêm Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+</head>
+<style>
+  .position-relative {
+      position: relative;
+  }
+
+  /* Định vị biểu tượng mắt bên trong input */
+  .field-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px; /* Điều chỉnh khoảng cách của icon từ cạnh phải */
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px; /* Điều chỉnh kích thước biểu tượng mắt */
+  }
+
+  /* Đảm bảo input không bị che phủ bởi icon */
+  .form-control {
+    padding-right: 40px; /* Cung cấp khoảng trống cho biểu tượng mắt bên trong */
+  }
+
+  .button-container {
+    display: flex;
+    gap: 10px;
+}
+
+.arrow-button {
+    width: 60px;
+    height: 60px;
+    background-color: #ccc;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s;
+}
+
+.arrow-button:hover {
+    background-color: #2196F3;
+}
+
+</style>
+<div class="row">
+    <div class="col-md-6 offset-3">
+        <div class="row">
+          <div class="col-12">
+            <div class="mb-4">
+              <div class = "text-center">
+                  <h2>Sign up</h2>
+                  <hr class="divider"/>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+
+        @if (TempData["Error"] != null)
+        {
+          <div class="col-md-12 alert alert-danger">
+              <span><b>Sorry!</b> - @TempData["Error"] </span>
+          </div>
+        }
+        <div class="row">
+            <div class="col-md-8 offset-2">
+                <form asp-action="Register">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="EmailAddress" class="form-control" type="email"/>
+                        <label asp-for="EmailAddress" >Email address</label>
+                        <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3 position-relative">
+                        <input asp-for="Password" id="password-field" class="form-control" type="password" />
+                        <label asp-for="Password">Password</label>
+                        <div class="invalid-feedback" data-sb-feedback="password-field:required">A password is required.</div>
+                        <span class="fa fa-fw fa-eye field-icon toggle-password" data-toggle="password-field"></span>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mb-3 position-relative">
+                        <input asp-for="ConfirmPassword" id="confirmpassword-field" class="form-control" type="password" />
+                        <label asp-for="ConfirmPassword">Confirm Password</label>
+                        <div class="invalid-feedback" data-sb-feedback="ConfirmPassword:required">A password is required.</div>
+                        <span class="fa fa-fw fa-eye field-icon toggle-password" data-toggle="confirmpassword-field"></span>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                      <div class="d-flex justify-content-center gap-3 m-1">
+                            <input class="btn btn-primary btn-xl" type="submit" value="Sign up">
+                            <a class="btn btn-secondary btn-xl" asp-controller="Home" asp-action="Index">Cancel</a>
+                      </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.toggle-password').forEach(item => {
+        item.addEventListener('click', function () {
+            var passwordField = document.getElementById(this.getAttribute('data-toggle'));
+            if (passwordField) {
+                passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            }
+        });
+    });
+
+
+</script>

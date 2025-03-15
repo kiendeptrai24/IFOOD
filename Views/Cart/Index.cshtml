@@ -1,0 +1,160 @@
+﻿@using iFood.ViewModels
+@using iFood.Data.Enum
+@model IndexCartViewModel
+
+<section class="bg-light d-flex justify-content-center align-items-center min-vh-100 pt-3">
+    <div class="card w-75 shadow-lg">
+        <div class="card-header bg-dark text-white text-center position-relative">
+            <i class="bi bi-cart3 fs-3"></i>
+            <span class="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger">@Model.CartCount</span>
+        </div>
+        <div class="card-body">
+            <h2 class="text-center mb-4">Shopping Bag</h2>
+            <div class="list-group">
+
+                @foreach (var item in Model.CartItems)
+                {
+                    <div class="row position-relative">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            
+                            <input type="checkbox" class="position-absolute top-0 end-0 m-2 form-check-input item-checkbox"
+                             checked onchange="calculateTotal()"
+                                   data-id="@item.Id" data-price="@item.Total">
+
+                            <div class="col-lg-6 col-md-8 d-flex align-items-center">
+                                <a type="button" class="delete-button" data-id="@item.Id">
+                                    <button class="btn btn-light me-2"><i class="bi bi-x"></i></button>
+                                </a>
+                                <button class="btn btn-light me-2"><i class="bi bi-heart"></i></button>
+                                <img src="@item.product.Image" alt="Product Image" class="img-thumbnail" width="70">
+                                <div class="ms-3">
+                                    <p class="mb-0 fw-semibold">@item.product.Name</p>
+                                    <small class="text-muted">Category: @item.product.Category</small>
+                                    <small class="text-muted">Price of one: $@item.Price</small>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col-6 d-flex align-items-center justify-content-center">
+                                        <button class="btn btn-light"><i class="bi bi-plus"></i></button>
+                                        <span class="mx-2">@item.Quantity</span>
+                                        <button class="btn btn-light"><i class="bi bi-dash"></i></button>
+                                    </div>
+                                    <div class="col">
+                                        <p class="fw-semibold mb-0 col">Price: $@item.Price</p>
+                                    </div>
+                                    <div class="col">
+                                        <p class="fw-semibold mb-0 col">Total: $@item.Total</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+        <div class="card-footer bg-danger text-white text-end">
+            <p class="fw-semibold mb-0" onclick="">Total: $<span id="totalPrice">@Model.TotalPrice</span></p>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <button class="btn btn-dark">Update</button>
+            <button onclick="submitCheckedItems()" class="btn btn-primary text-center">Checkout</button>
+        </div>
+    </div>
+</section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+   function calculateTotal() {
+        let total = 0;
+        // Lấy tất cả checkbox đã được chọn
+        document.querySelectorAll('.item-checkbox:checked').forEach(cb => {
+            total += parseFloat(cb.dataset.price);
+        });
+        document.getElementById('totalPrice').innerText = total.toLocaleString() + " VND";
+    }
+
+    function submitCheckedItems() {
+        let selectedIds = [];
+        document.querySelectorAll('.item-checkbox:checked').forEach(cb => {
+            selectedIds.push(parseInt(cb.dataset.id));
+        });
+
+        if (selectedIds.length === 0) {
+            Swal.fire("Thông báo", "Vui lòng chọn ít nhất một sản phẩm!", "warning");
+            return;
+        }
+
+        // Hiển thị hộp thoại chọn phương thức thanh toán
+        Swal.fire({
+            title: "Chọn phương thức thanh toán",
+            text: "Vui lòng chọn phương thức thanh toán bạn muốn sử dụng.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "COD",
+            cancelButtonText: "MoMo",
+            showDenyButton: true,
+            denyButtonText: "ZaloPay",
+            html: `
+                <button id="other-payment" class="swal2-confirm swal2-styled" style="margin-top: 10px;">
+                    Ví điện tử khác
+                </button>
+            `,
+            didOpen: () => {
+                document.getElementById("other-payment").addEventListener("click", function () {
+                    processOrder(selectedIds, "Other");
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                processOrder(selectedIds, 2);
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                processOrder(selectedIds, 0);
+            } else if (result.isDenied) {
+                processOrder(selectedIds, 1);
+            }
+        });
+    }
+
+    function processOrder(cartIds, paymentMethod) {
+        fetch('/Order/CreateOrderWithCart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cartIds: cartIds, paymentMethod: paymentMethod })
+        }).then(response => response.json())
+        .then(data => {
+            if (data.payUrl) {
+                window.location.href = data.payUrl;  // Redirect ở FE
+            }
+        });
+    }
+    window.onload = calculateTotal;
+</script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".delete-button").forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault(); // Ngăn điều hướng mặc định
+                let itemId = this.getAttribute("data-id"); // Lấy ID sản phẩm
+
+                Swal.fire({
+                    title: "Are you sure you want to delete?",
+                    text: "This action cannot be undone!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Confirm",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Nếu người dùng xác nhận, chuyển hướng đến Controller để xóa
+                        window.location.href = `/Cart/Delete/${itemId}`;
+                    }
+                });
+            });
+        });
+    });
+</script>
