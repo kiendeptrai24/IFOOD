@@ -49,14 +49,21 @@ public class OrderRepository : IOrderRepository
         return await userOrders.ToListAsync();
     }
 
-    public Task<Order> GetByIdAsync(int id)
+    public async Task<Order> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        return await _context.Orders
+        .Include(o => o.OrderDetails) // Nạp thêm danh sách chi tiết đơn hàng
+        .ThenInclude(od => od.Product) // Nạp thêm thông tin sản phẩm của từng chi tiết đơn hàng
+        .FirstOrDefaultAsync(o => o.Id == id);
     }
 
-    public Task<Order> GetByIdAsyncNoTracking(int id)
+    public async Task<Order> GetByIdAsyncNoTracking(int id)
     {
-        throw new NotImplementedException();
+         return await _context.Orders
+        .AsNoTracking() // Không theo dõi thực thể => hiệu suất tốt hơn
+        .Include(o => o.OrderDetails)
+        .ThenInclude(od => od.Product)
+        .FirstOrDefaultAsync(o => o.Id == id);
     }
 
     public async Task<int> GetCountAsync()
@@ -64,9 +71,29 @@ public class OrderRepository : IOrderRepository
         return await _context.Orders.CountAsync();
     }
 
-    public Task<IEnumerable<Order>> GetSliceAsync(int offset, int size)
+    public async Task<int> GetCountByCategoryAsync(ProductCategory category)
     {
-        throw new NotImplementedException();
+        return await _context.Products
+            .Where(p => p.Category == category)
+            .CountAsync();
+    }
+
+    public async Task<IEnumerable<Order>> GetProductsByCategoryAndSliceAsync(ProductCategory category, int offset, int size)
+    {
+            return await _context.Orders
+            .Where(o => o.OrderDetails.Any(od => od.Product.Category == category))
+            .Skip(offset)
+            .Take(size)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Order>> GetSliceAsync(int offset, int size)
+    {
+        return await _context.Orders.Include(i => i.OrderDetails)
+        .OrderByDescending(o => o.OrderDate) // Sắp xếp theo ngày đặt hàng mới nhất
+        .Skip(offset) // Bỏ qua số lượng đơn hàng đầu tiên
+        .Take(size) // Lấy số lượng đơn hàng theo yêu cầu
+        .ToListAsync();
     }
 
     public bool Save()
@@ -78,6 +105,22 @@ public class OrderRepository : IOrderRepository
     {
         var saved = await _context.SaveChangesAsync();
         return saved > 0 ? true : false;
+    }
+
+    public async Task<IEnumerable<Order>> SearchAsync(string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            return await _context.Orders.ToListAsync(); // Trả về toàn bộ đơn hàng nếu không có từ khóa
+        }
+
+        return await _context.Orders
+            .Where(o => 
+                o.Ordercode.Contains(searchTerm) || // Tìm theo mã đơn hàng
+                o.AppUserId.Contains(searchTerm) || // Tìm theo ID người mua
+                o.status.ToString().Contains(searchTerm)) // Tìm theo trạng thái đơn hàng
+            .OrderByDescending(o => o.OrderDate) // Sắp xếp theo ngày đặt hàng mới nhất
+            .ToListAsync();
     }
 
     public bool Update(Order order)

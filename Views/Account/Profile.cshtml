@@ -1,36 +1,38 @@
 ﻿@using iFood.ViewModels
 
-
 @model ProfileUserViewModel
 
 <style>
+    body {
+        background-color: #021C2E; /* Màu xanh đậm bên ngoài */
+    }
+
     #formContainer {
-    background-color: rgba(2, 28, 46, 0.395); /* Màu xanh dương */
-    padding: 20px;
-    border-radius: 10px;
-    
+        background-color: rgba(255, 140, 0, 0.9); /* Màu cam */
+        padding: 40px;
+        border-radius: 20px;
+        color: white;
+        max-width: 800px;
     }
-    #boderx
-    {
-        border-radius: 15px;
-    }
+
     .position-relative {
         position: relative;
     }
 
-    /* Định vị biểu tượng mắt bên trong input */
     .field-icon {
         position: absolute;
         top: 50%;
-        right: 10px; /* Điều chỉnh khoảng cách của icon từ cạnh phải */
+        right: 10px;
         transform: translateY(-50%);
         cursor: pointer;
-        font-size: 18px; /* Điều chỉnh kích thước biểu tượng mắt */
+        font-size: 18px;
     }
 
-    /* Đảm bảo input không bị che phủ bởi icon */
     .form-control {
-        padding-right: 40px; /* Cung cấp khoảng trống cho biểu tượng mắt bên trong */
+        padding-right: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
     }
 
     .button-container {
@@ -38,21 +40,31 @@
         gap: 10px;
     }
 
-    .arrow-button {
-        width: 60px;
-        height: 60px;
-        background-color: #ccc;
-        border: none;
-        border-radius: 10px;
+    .btn-custom {
+        background: #FF5722;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        transition: 0.3s;
+        font-size: 16px;
+    }
+
+    .btn-custom:hover {
+        background: #E64A19;
+    }
+
+    .avatar-preview {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        object-fit: cover;
         cursor: pointer;
-        position: relative;
-        transition: background-color 0.3s;
+        transition: transform 0.3s;
     }
 
-    .arrow-button:hover {
-        background-color: #2196F3;
+    .avatar-preview:hover {
+        transform: scale(1.1);
     }
-
 </style>
 
 <section>
@@ -62,64 +74,47 @@
             <span><b>Sorry!</b> - @TempData["Error"]</span>
         </div>
     }
-   <div class="container d-flex align-items-center justify-content-center min-vh-100" id="formContainer">
-        <div class="row">
-            <div class="col-md-4 text-center mb-4 mb-md-0">
-                <h2 class="text-white mb-4">Change Avatar</h2>
-                    <div class="form-group">
-                        <img src="https://placehold.co/300x300" alt="Avatar of a woman with blonde hair wearing a blue sweater" class="img-fluid rounded mb-4">
-                    </div>
-                <button class="btn btn-custom btn-block">UPLOAD NEW PHOTO</button>
-            </div>
-            <div class="col-md-6">
+   <div class="container d-flex align-items-center justify-content-center min-vh-100">
+        <div id="formContainer">
+            <h2 class="text-center">Account Settings</h2>
+            <form id="avatar-form" action="ChangeAvatar" method="post" enctype="multipart/form-data">
+                <div class="text-center mb-4">
+                    <input type="file" asp-for="Avatar" class="d-none" id="avatar-input" accept="image/*">
+                    <img src="@(Model.AvatarUrl ?? "https://placehold.co/180")"
+                        class="avatar-preview"
+                        alt="User Avatar"
+                        onclick="document.getElementById('avatar-input').click();">
 
-                <form asp-action="Profile" method="post">
-                    <div class="col-md-12">
-                        <h2 class="text-white mb-4">Account Settings</h2>
-                        <div asp-validation-summary="ModelOnly" class="text-danger">
-
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input asp-for="Name" class="form-control" type="text"/>
-                        <label asp-for="Name" >User name</label>
-                        <span asp-validation-for="Name" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input asp-for="Email" class="form-control" type="email" readonly>
-                        <label asp-for="Email" >Email address</label>
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-floating mb-3 position-relative">
-                        <input asp-for="Password" id="password-field" class="form-control" type="password" />
-                        <label asp-for="Password">Password</label>
-                        <div class="invalid-feedback" data-sb-feedback="password-field:required">A password is required.</div>
-                        <span class="fa fa-fw fa-eye field-icon toggle-password" data-toggle="password-field"></span>
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                        <small class="form-text text-muted">Leave blank if you don't want to change your password.</small>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input asp-for="Phone" class="form-control" type="phone"/>
-                        <label asp-for="Phone" >Phone</label>
-                        <span asp-validation-for="Phone" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group justify-content-between">
-                        <button class="btn btn-primary btn-block mb-3" type="submit">UPDATE YOUR PROFILE</button>
-                        <button class="btn btn-primary btn-block mb-3">DELETE YOUR ACCOUNT</button>
-                    </div>
-
-
-                </form>
-            </div>
-
-
-
+                    <button type="submit" class="btn btn-custom mt-3">UPLOAD NEW PHOTO</button>
+                </div>
+            </form>
+            <form asp-action="Profile" method="post">
+                <div class="form-floating mb-3">
+                    <input asp-for="Name" class="form-control" type="text" placeholder="Username"/>
+                    <label asp-for="Name">Username</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Email" class="form-control" type="email" readonly>
+                    <label asp-for="Email">Email address</label>
+                </div>
+                <div class="form-floating mb-3 position-relative">
+                    <input asp-for="Password" id="password-field" class="form-control" type="password" placeholder="Password"/>
+                    <label asp-for="Password">Password</label>
+                    <i class="fa fa-eye field-icon toggle-password" data-toggle="password-field"></i>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Phone" class="form-control" type="phone" placeholder="Phone Number"/>
+                    <label asp-for="Phone">Phone</label>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-custom" type="submit">UPDATE PROFILE</button>
+                    <button class="btn btn-danger">DELETE ACCOUNT</button>
+                </div>
+            </form>
         </div>
     </div>
 </section>
+
 <script>
     document.querySelectorAll('.toggle-password').forEach(item => {
         item.addEventListener('click', function () {
@@ -131,7 +126,30 @@
             }
         });
     });
+    document.getElementById('avatar-input').addEventListener('change', function(event) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.querySelector('.avatar-preview').src = e.target.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    });
+    
+</script>
+<script>
+    document.getElementById('avatar-input').addEventListener('change', function(event) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.querySelector('.avatar-preview').src = e.target.result;
+            document.getElementById('avatar-form').setAttribute('data-changed', 'true'); // Đánh dấu đã thay đổi ảnh
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    });
 
+    document.getElementById('avatar-form').addEventListener('submit', function(event) {
+        if (this.getAttribute('data-changed') !== 'true') {
+            event.preventDefault(); // Ngăn submit nếu ảnh chưa thay đổi
+        }
+    });
 </script>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

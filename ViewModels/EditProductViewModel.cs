@@ -14,4 +14,5 @@ public class EditProductViewModel
     public string? URL { get; set; }
     public IFormFile? Image { get; set; }
     public ProductCategory? Category { get; set; }
+    public ProductStatus? Status { get; set; }
 }

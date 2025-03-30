@@ -161,7 +161,32 @@
                 @* <a type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID" > *@
                     <div class="card m-2 col-12 col-md-4 col-lg-3 mt-2" style="width: 18rem;">
                         <div class="card-body">
-                            <span class="badge badge-pill badge-light text-purple-800 bg-purple-200 mb-2">Nearest Seller</span>
+
+                             @if(product.Status == null || product.Status == ProductStatus.Unknown)
+                                {
+                                        <span class="badge badge-pill badge-light text-purple-800 bg-purple-200 mb-2">
+                                            
+                                        </span>
+                                }
+                                else
+                                {
+                                     <span class="badge badge-pill text-white mb-2"
+                                        style="background-color: 
+                                            @(product.Status switch
+                                            {
+                                                ProductStatus.Bestseller => "green",
+                                                ProductStatus.NewArrival => "blue",
+                                                ProductStatus.Featured => "purple",
+                                                ProductStatus.OutOfStock => "gray",
+                                                ProductStatus.Discounted => "red",
+                                                ProductStatus.LimitedEdition => "gold",
+                                                ProductStatus.ComingSoon => "orange",
+                                                _ => "brown" // Mặc định
+                                            });">
+                                        @product.Status
+                                    </span>
+                                }
+                         
                             <div>
                                 <a class="fixed-card" type="button" asp-controller="Product" asp-action="Detail"  asp-route-id="@product.ProductID" fixed-card>
                                 @if(@product.Image != null)
@@ -298,189 +323,7 @@
                 </div>
             </div>
         </section>
-        <!-- Portfolio-->
-     
-        <!-- Call to action-->
-        <section class="page-section bg-dark text-white">
-            <div class="container px-4 px-lg-5 text-center">
-                <h2 class="mb-4">Free Download at Start Bootstrap!</h2>
-                <a class="btn btn-light btn-xl" href="https://startbootstrap.com/theme/creative/">Download Now!</a>
-            </div>
-        </section>
-        <!-- Contact-->
-        <section class="page-section" id="contact">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-lg-8 col-xl-6 text-center">
-                        <h2 class="mt-0">Let's Get In Touch!</h2>
-                        <hr class="divider" />
-                        <p class="text-muted mb-5">Ready to start your next project with us? Send us a messages and we will get back to you as soon as possible!</p>
-                    </div>
-                </div>
-                <div class="row gx-4 gx-lg-5 justify-content-center mb-5">
-                    <div class="col-lg-6">
-                        <!-- * * * * * * * * * * * * * * *-->
-                        <!-- * * SB Forms Contact Form * *-->
-                        <!-- * * * * * * * * * * * * * * *-->
-                        <!-- This form is pre-integrated with SB Forms.-->
-                        <!-- To make this form functional, sign up at-->
-                        <!-- https://startbootstrap.com/solution/contact-forms-->
-                        <!-- to get an API token!-->
-                        <form asp-action ="Login"  method="post" accept=""data-sb-form-api-token="API_TOKEN">
-                            <!-- Name input-->
-                            <div class="form-floating mb-3">
-                                <input class="form-control" id="name" type="text" placeholder="Enter your name..." data-sb-validations="required" />
-                                <label for="name">Full name</label>
-                                <div class="invalid-feedback" data-sb-feedback="name:required">A name is required.</div>
-                            </div>
-                            <!-- Email address input-->
-                            <div class="form-floating mb-3">
-                                <input class="form-control" id="email" type="email" placeholder="name@example.com" data-sb-validations="required,email" />
-                                <label for="email">Email address</label>
-                                <div class="invalid-feedback" data-sb-feedback="email:required">An email is required.</div>
-                                <div class="invalid-feedback" data-sb-feedback="email:email">Email is not valid.</div>
-                            </div>
-                            <!-- Phone number input-->
-                            <div class="form-floating mb-3">
-                                <input class="form-control" id="phone" type="tel" placeholder="(123) 456-7890" data-sb-validations="required" />
-                                <label for="phone">Phone number</label>
-                                <div class="invalid-feedback" data-sb-feedback="phone:required">A phone number is required.</div>
-                            </div>
-                            <!-- Message input-->
-                            <div class="form-floating mb-3">
-                                <textarea class="form-control" id="message" type="text" placeholder="Enter your message here..." style="height: 10rem" data-sb-validations="required"></textarea>
-                                <label for="message">Message</label>
-                                <div class="invalid-feedback" data-sb-feedback="message:required">A message is required.</div>
-                            </div>
-                            <!-- Submit success message-->
-                            <!---->
-                            <!-- This is what your users will see when the form-->
-                            <!-- has successfully submitted-->
-                            <div class="d-none" id="submitSuccessMessage">
-                                @* <div class="text-center mb-3">
-                                    <div class="fw-bolder">Form submission successful!</div>
-                                    To activate this form, sign up at
-                                    <br />
-                                    <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
-                                </div> *@
-                            </div>
-                            <!-- Submit error message-->
-                            <!---->
-                            <!-- This is what your users will see when there is-->
-                            <!-- an error submitting the form-->
-                            <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error sending message!</div></div>
-                            <!-- Submit Button-->
-                            <div class="d-grid"><button class="btn btn-primary btn-xl disabled" id="submitButton" type="submit">Submit</button></div>
-                        </form>
-                    </div>
-                </div>
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-lg-4 text-center mb-5 mb-lg-0">
-                        <i class="bi-phone fs-2 mb-3 text-muted"></i>
-                        <div>+1 (555) 123-4567</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-   
-<!--end of section-->
 
-<section>
-    <div class="container mt-5">
-        <div class="bg-primary text-white p-4 rounded-top">
-            <h1 class="text-center">PHP CRUD Application Using jQuery Ajax</h1>
-        </div>
-        <div class="bg-white p-4 rounded-bottom shadow-sm">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <button class="btn btn-primary d-flex align-items-center">
-                    <i class="bi bi-plus-circle fs-4"></i>
-                    <span class="ms-2">Add New</span>
-                </button>
-                <div class="input-group w-25 ms-auto">
-                    <label for="searchInput" class="input-group-text bg-white border-0">
-                        <i class="bi bi-search fs-5"></i>
-                    </label>
-                    <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Search...">
-                </div>
-            </div>
-
-            <table class="table table-bordered">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="d-flex align-items-center">
-                            <img src="https://placehold.co/50x50" alt="Profile picture" class="rounded-circle mr-2" width="50" height="50">
-                            Virat Kohli
-                        </td>
-                        <td>virat@example.com</td>
-                        <td>9834567832</td>
-                        <td>
-                            <button class="btn btn-success btn-sm"><i class="bi bi-card-heading fs-2"></i></button>
-                            <button class="btn btn-warning btn-sm"><i class="bi bi-pencil-square fs-2"></i></button>
-                            <button class="btn btn-danger btn-sm"><i class="bi bi-calendar-x fs-2"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <nav>
-                <ul class="pagination justify-content-center">
-                    <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-                </ul>
-            </nav>
-        </div>
-</section>
-
-<section>
-   <div class="container d-flex align-items-center justify-content-center min-vh-100" id="formContainer">
-            <form action="Edit">
-                <div class="row">
-                    <div class="col-md-4 text-center mb-4 mb-md-0">
-                        <h2 class="text-white mb-4">Change Avatar</h2>
-                            <div class="form-group">
-                                <img src="https://placehold.co/300x300" alt="Avatar of a woman with blonde hair wearing a blue sweater" class="img-fluid rounded mb-4">
-                            </div>
-                        <button class="btn btn-custom btn-block">UPLOAD NEW PHOTO</button>
-                    </div>
-                    <div class="col-md-8">
-                        <h2 class="text-white mb-4">Account Settings</h2>
-                        <div class="form-group">
-                            <input type="text" class="form-control mb-3" placeholder="Account Name">
-                        </div>
-                        <div class="form-group">
-                            <input type="email" class="form-control mb-3" placeholder="Account Email">
-                        </div>
-                        <div class="form-group">
-                            <input type="password" class="form-control mb-3" placeholder="Password">
-                        </div>
-                        <div class="form-group">
-                            <input type="password" class="form-control mb-3" placeholder="Re-enter Password">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-control mb-3" placeholder="Phone">
-                        </div>
-                        <div class="form-group justify-content-between">
-                            <button class="btn btn-custom btn-block mb-3">UPDATE YOUR PROFILE</button>
-                            <button class="btn btn-custom btn-block mb-3">DELETE YOUR ACCOUNT</button>
-                        </div>
-                    </div>
-                </div>
-
-            </form>
-
-        </div>
-    </div>
-</section>
 <script>
     document.getElementById('productImage').addEventListener('change', function(event) {
         const file = event.target.files[0]; // Lấy file từ input

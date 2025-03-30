@@ -10,9 +10,5 @@ namespace iFood.Models
         [ForeignKey("Address")]
         public int? AddressId { get; set; }
         public Address? Address { get; set; }
-
-        public ICollection<Product>? Products { get; set; }
-        public ICollection<Order>? Orders { get; set; }
-        public ICollection<Wishlist>? Wishlists { get; set; }
     }
 }

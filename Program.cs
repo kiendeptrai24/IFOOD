@@ -48,7 +48,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
 builder.Services.AddDistributedMemoryCache(); 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // ⚡ Timeout 30 phút
+    options.IdleTimeout = TimeSpan.FromMinutes(1440); // ⚡ Timeout 30 phút
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });

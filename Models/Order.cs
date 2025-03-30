@@ -9,12 +9,13 @@ namespace iFood.Models
 		[Key]
 		public int Id { get; set; }
 		[ForeignKey("AppUser")]
-		public string AppUserId { get; set; }
+		public string? AppUserId { get; set; }
 		public DateTime OrderDate  { get; set; }
+		public string? Ordercode { get; set; }
+		public Status status { get; set; }
 		public List<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 		public decimal TotalPrice => OrderDetails?.Sum(i => i.TotalPrice) ?? 0;
-		[ForeignKey("MomoInfo")]
-		public int? MomoInfoId { get; set;}
+		public string? TransactionId { get; set; }
 		public PaymentMethod? PaymentMethod {get; set;}
 	}
 }

@@ -16,38 +16,51 @@
                         <th>Order Date</th>
                         <th>Payment Method</th>
                         <th>Order Total</th>
+                        <th>details</th>
+
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var order in Model)
                     {
-                        var firstRow = true; // Để xác định dòng đầu tiên của mỗi đơn hàng
+
+
+                        var firstRow = true;
                         int count = 0;
-                        @foreach (var product in order.OrderDetails)
-                        {
-                            <tr>
-                                @if (firstRow) 
-                                {
-                                    <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@count</td>
-                                }
+                            @foreach (var product in order.OrderDetails)
+                            {
+                                <tr>
+               
+                                    @if (firstRow) 
+                                    {
+                                        <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@count</td>
+                                    }
 
-                                <td>@(product.Product?.Name ?? "N/A")</td>
-                                <td class="text-center">@product.Quantity</td>
-                                <td class="text-end">$@product.Product?.Price</td>
-                                <td class="text-end">$@((product.Quantity * (product.Product?.Price ?? 0)).ToString("0.00"))</td>
+                                    <td>@(product.Product?.Name ?? "N/A")</td>
+                                    <td class="text-center">@product.Quantity</td>
+                                    <td class="text-end">$@product.Product?.Price</td>
+                                    <td class="text-end">$@((product.Quantity * (product.Product?.Price ?? 0)).ToString("0.00"))</td>
 
-                                @if (firstRow) 
-                                {
-                                    <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">
-                                        @order.OrderDate.ToString("dd/MM/yyyy HH:mm") 
-                                    </td>
-                                    <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@order.PaymentMethod</td>
-                                    <td rowspan="@order.OrderDetails.Count" class="text-end align-middle">$@order.TotalPrice</td>
-                                    firstRow = false; 
-                                }
-                            </tr>
-                            count++;
-                        }
+                                    @if (firstRow) 
+                                    {
+                                        <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">
+                                            @order.OrderDate.ToString("dd/MM/yyyy HH:mm") 
+                                        </td>
+                                        <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@order.PaymentMethod</td>
+                                        <td rowspan="@order.OrderDetails.Count" class="text-end align-middle">$@order.TotalPrice</td>
+                                        <td rowspan="@order.OrderDetails.Count" class="text-end align-middle">
+                                            <a type="button" asp-controller="Order" asp-action="OrderDetail" asp-route-id="@order.Id">
+                                                <i class="bi bi-pencil-square fs-1"></i>    
+                                            </a>
+                                        </td>
+                                        
+                                        firstRow = false; 
+                                    }
+                                    
+                        
+                                </tr>
+                                count++;
+                            }
                     }
 
                 </tbody>

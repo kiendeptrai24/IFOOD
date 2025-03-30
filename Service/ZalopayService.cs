@@ -31,7 +31,7 @@ namespace iFood.Service
 
         public async Task<string> CreatePaymentZaloPayAsync(OrderInfo model)
         {
-
+            
             Random rnd = new Random();
             var items = new[]{new{}};
             var app_trans_id   = rnd.Next(1000000); // Generate a random order's ID.
@@ -42,6 +42,7 @@ namespace iFood.Service
             var embed_data = new Dictionary<string, object>
             {
                 { "redirecturl", _options.Value.NotifyUrl }
+                
             };
             
             param.Add("app_id", app_id);

@@ -5,6 +5,7 @@ using iFood.Models;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using iFood.ViewModels;
+using iFood.Data.Enum;
 
 namespace iFood.Controllers;
 
@@ -33,7 +34,38 @@ public class OrderController : Controller
 
         return View(order);
     }
-   
+    public async Task<IActionResult> OrderDetail(int id)
+    {
+
+        var order =await _orderRepository.GetByIdAsync(id);
+        return View(order);
+    }
+    
+    
+    public async Task<IActionResult> UpdateStateForOrder(int id)
+    {
+        var order = await _orderRepository.GetByIdAsync(id);
+        if (order == null)
+        {
+            return NotFound("Order not found");
+        }
+        order.status = GetNextStatus(order.status);
+        _orderRepository.Update(order);
+        return RedirectToAction("OrderIndex","Dashboard");
+    }
+   private Status GetNextStatus(Status currentStatus)
+{
+    return currentStatus switch
+    {
+        Status.PendingConfirmation => Status.Shipping,
+        Status.Shipping => Status.Delivered,
+        Status.Delivered => Status.Completed,
+        Status.Completed => Status.Completed, // Không thay đổi nếu đã hoàn thành
+        Status.Canceled => Status.Canceled, // Đã hủy thì không thay đổi
+        Status.ReturnedOrRefunded => Status.ReturnedOrRefunded, // Đã hoàn tiền thì không thay đổi
+        _ => currentStatus
+    };
+}
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] SelectedProductViewModel model)
     {
@@ -42,12 +74,13 @@ public class OrderController : Controller
             TempData["WarnMessage"] = "Please sign in before";
             RedirectToAction("Login", "Account");
         }
-        var product = await _productRepository.GetByIdAsync(model.productId);
+        var product = await _productRepository.GetByIdAsyncNoTracking(model.productId);
         if(product.Quantity <= 0)
         {
             TempData["InfoMessage"] = "Product sold out!";
             return RedirectToAction("Index", "Home");
         }
+        product.Quantity = 1; 
         
         
         var curUserId = HttpContext.User.GetUserId();
@@ -62,15 +95,14 @@ public class OrderController : Controller
                 {
                     ProductId = product.ProductID,
                     Product = product,
-                    Quantity = 1,
+                    Quantity = product.Quantity,
                 }
             }
         };
 
         List<Product> products = new List<Product>();
-        Product productToDelete = await _productRepository.GetByIdAsyncNoTracking(product.ProductID); 
         products.Add(product);
-        HttpContext.Session.SetString("ProductToDelete", JsonConvert.SerializeObject(productToDelete));
+        HttpContext.Session.SetString("ProductToDelete", JsonConvert.SerializeObject(products));
         HttpContext.Session.SetString("NewOrder", JsonConvert.SerializeObject(newOrder));
         
         return RedirectToAction("CreatePayment", "Payment",new { paymentMethod = model.paymentMethod });
@@ -147,4 +179,6 @@ public class OrderController : Controller
 
         return RedirectToAction("CreatePaymentByCart", "Payment",new { paymentMethod = model.paymentMethod });
     }
+
+    
 }

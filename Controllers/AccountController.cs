@@ -8,6 +8,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using iFood.Interfaces;
 
 namespace MyMvcApp;
 
@@ -15,12 +16,13 @@ public class AccountController : Controller
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly SignInManager<AppUser> _signInManager;
-    private readonly ApplicationDBContext _context;
-    public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ApplicationDBContext context)
+    private readonly IPhotoService _photoService;
+
+    public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IPhotoService photoService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
-        _context = context;
+        _photoService = photoService;
     }
     [HttpGet]
     public IActionResult Login()
@@ -181,7 +183,8 @@ public class AccountController : Controller
         {
             Email = user.Email,
             Name = user.UserName,
-            Phone = user.PhoneNumber
+            Phone = user.PhoneNumber,
+            AvatarUrl = user.ProfileImageUrl
         };
 
         return View(model);
@@ -240,4 +243,77 @@ public class AccountController : Controller
             TempData["SuccessMessage"] = "Profile updated successfully!";
             return RedirectToAction("Profile");
     }
+    [HttpGet]
+    public IActionResult ForgetPassword()
+    {
+        return View();
+    }
+
+   [HttpPost]
+    public async Task<IActionResult> ForgetPassword(ForgetPasswordViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        // Kiểm tra email có tồn tại không
+        var user = await _userManager.FindByEmailAsync(model.EmailAddress);
+        if (user == null)
+        {
+            TempData["Error"] = "Email address not found.";
+            return View(model);
+        }
+
+        // Kiểm tra số điện thoại có khớp với tài khoản không
+        if (user.PhoneNumber != model.PhoneNumber)
+        {
+            TempData["Error"] = "Phone number does not match our records.";
+            return View(model);
+        }
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, resetToken, model.Password);
+
+        if (result.Succeeded)
+        {
+            TempData["Success"] = "Password has been changed successfully.";
+            return RedirectToAction("Login", "Account");
+        }
+
+        TempData["Error"] = "Failed to reset password. Please try again.";
+        return View(model);
+
+    }
+    [HttpPost]
+    public async Task<IActionResult> ChangeAvatar(ChangeAvatarViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound("User not found.");
+
+        // Upload ảnh mới
+        var photoResult = await _photoService.AddPhotoAsync(model.Avatar);
+        if (photoResult.Error != null)
+        {
+            ModelState.AddModelError("Avatar", "Photo upload failed");
+            return View(model);
+        }
+
+        // Xóa ảnh cũ nếu có
+        if (!string.IsNullOrEmpty(user.ProfileImageUrl))
+        {
+            await _photoService.DeletePhotoAsync(user.ProfileImageUrl);
+        }
+
+        // Cập nhật đường dẫn ảnh
+        user.ProfileImageUrl = photoResult.Url.ToString();
+        await _userManager.UpdateAsync(user);
+
+        TempData["Success"] = "Avatar updated successfully!";
+        return RedirectToAction("Profile", "Account");
+    }
+
 }

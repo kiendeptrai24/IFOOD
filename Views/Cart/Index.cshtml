@@ -30,7 +30,7 @@
                                 <div class="ms-3">
                                     <p class="mb-0 fw-semibold">@item.product.Name</p>
                                     <small class="text-muted">Category: @item.product.Category</small>
-                                    <small class="text-muted">Price of one: $@item.Price</small>
+                                    <small class="text-muted">Price of one: @item.Price$</small>
                                 </div>
                             </div>
 
@@ -42,10 +42,10 @@
                                         <button class="btn btn-light"><i class="bi bi-dash"></i></button>
                                     </div>
                                     <div class="col">
-                                        <p class="fw-semibold mb-0 col">Price: $@item.Price</p>
+                                        <p class="fw-semibold mb-0 col">Price: @item.Price$</p>
                                     </div>
                                     <div class="col">
-                                        <p class="fw-semibold mb-0 col">Total: $@item.Total</p>
+                                        <p class="fw-semibold mb-0 col">Total: @item.Total$</p>
                                     </div>
                                 </div>
                             </div>
@@ -56,10 +56,10 @@
             </div>
         </div>
         <div class="card-footer bg-danger text-white text-end">
-            <p class="fw-semibold mb-0" onclick="">Total: $<span id="totalPrice">@Model.TotalPrice</span></p>
+            <p class="fw-semibold mb-0" onclick="">Total: <span id="totalPrice">@Model.TotalPrice</span></p>
         </div>
         <div class="card-footer d-flex justify-content-between">
-            <button class="btn btn-dark">Update</button>
+            <a class="btn btn-dark" type="button" asp-controller="Cart" asp-action="DeleteAll" >Delete all</a>
             <button onclick="submitCheckedItems()" class="btn btn-primary text-center">Checkout</button>
         </div>
     </div>
@@ -73,7 +73,7 @@
         document.querySelectorAll('.item-checkbox:checked').forEach(cb => {
             total += parseFloat(cb.dataset.price);
         });
-        document.getElementById('totalPrice').innerText = total.toLocaleString() + " VND";
+        document.getElementById('totalPrice').innerText = total.toLocaleString() + "$";
     }
 
     function submitCheckedItems() {

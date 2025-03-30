@@ -67,97 +67,64 @@
     </style>
 <div id="success-message" style="display:none; background-color: #4CAF50; color: white; padding: 10px; text-align: center; border-radius: 5px;"></div>
 <div id="error-message" style="display:none; background-color: #f44336; color: white; padding: 10px; text-align: center; border-radius: 5px;"></div>
-<section class="container my-5 pt-5">
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="d-flex justify-content-center mt-5">
-                    <div class="product-card"  style="position: relative; display: inline-block;">
-               
-                        <img class="product-image"src="@Model.Image" alt="Profile picture" >
-                        <h5 style="position: absolute; bottom: 2px; right: 5px; background: rgba(0, 0, 0, 0.6); color: white; padding: 1px 5px; border-radius: 5px;">
-                            (123) <i class="bi bi-eye-fill fs-4"></i>
-                        </h5>
+
+    <section  class="container my-5 pt-5">
+         <div class="container bg-white p-4 rounded-lg shadow-lg">
+            <div class="row">
+                <!-- Product Image Section -->
+                <div class="col-lg-6 text-center">
+                    <img src="@Model.Image" class="img-fluid mb-4" width="400" height="400">
+                    <div class="d-flex justify-content-center">
+                        <img src="https://storage.googleapis.com/a1aa/image/LP2Vs4aTzHa7fd_FF7NutPkeEcc4ER-FeRdHCsuCCIA.jpg" alt="Thumbnail of blue hoodie" class="img-thumbnail mr-2" width="50" height="50">
+                        <img src="https://storage.googleapis.com/a1aa/image/LP2Vs4aTzHa7fd_FF7NutPkeEcc4ER-FeRdHCsuCCIA.jpg" alt="Thumbnail of blue hoodie" class="img-thumbnail mr-2" width="50" height="50">
+                        <img src="https://storage.googleapis.com/a1aa/image/LP2Vs4aTzHa7fd_FF7NutPkeEcc4ER-FeRdHCsuCCIA.jpg" alt="Thumbnail of blue hoodie" class="img-thumbnail mr-2" width="50" height="50">
+                        <img src="https://storage.googleapis.com/a1aa/image/LP2Vs4aTzHa7fd_FF7NutPkeEcc4ER-FeRdHCsuCCIA.jpg" alt="Thumbnail of blue hoodie" class="img-thumbnail mr-2" width="50" height="50">
+                        <img src="https://storage.googleapis.com/a1aa/image/LP2Vs4aTzHa7fd_FF7NutPkeEcc4ER-FeRdHCsuCCIA.jpg" alt="Thumbnail of blue hoodie" class="img-thumbnail" width="50" height="50">
                     </div>
                 </div>
-                <div class="d-flex mt-3">
-                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
-                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
-                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="row">
-
-                    <span  class="col h1">@Model.Name</span>
-                    <h3>(123)<i class="bi bi-eye-fill fs-4"></i></h3>
-                </div>
-                <div class="d-flex align-items-center mt-2">
-                    <div id="ratingStars" class="text-warning"></div>
-                   <span class="ms-2 text-muted">
-                        (@(Model.Reviews?.Count ?? 0) Reviews)
-                    </span>
-                </div>
-                <div class="mt-3">
-                    <span class="h3 text-orange">$@Model.Price</span>
-                    <span class="h5 text-muted ms-2"><del>$@Model.Price</del></span>
-                </div>
-                <p class="mt-4 text-muted">@Model.Description</p>
-
-                <div class="mt-4">
-                    <h5>Available Options</h5>
-                    <div class="mt-2">
-                        <span class="text-muted">Color</span>
-                        <div class="d-flex mt-2">
-                            <div class="bg-primary" style="width: 30px; height: 30px;"></div>
-                            <div class="bg-warning ms-2" style="width: 30px; height: 30px;"></div>
-                            <div class="bg-success ms-2" style="width: 30px; height: 30px;"></div>
+                <!-- Product Details Section -->
+                <div class="col-lg-6">
+                    <h1 class="h4 font-weight-bold mb-2">@Model.Name</h1>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
                         </div>
+                        <span class="ml-2 text-muted">4.5</span>
+                        <span class="ml-2 text-muted">154 orders</span>
+                        <span class="ml-2 text-success">In stock</span>
                     </div>
-                    <div class="mt-3">
-                        <span class="text-muted">Size</span>
-                        <div class="d-flex mt-2">
-                            <button class="btn btn-outline-secondary">S</button>
-                            <button class="btn btn-outline-secondary ms-2">M</button>
-                            <button class="btn btn-outline-secondary ms-2">L</button>
-                        </div>
+                    <p class="h5 font-weight-bold mb-4">@Model.Price <span class="text-muted">per box</span></p>
+                    <p class="text-muted mb-4">@Model.Description</p>
+                    <div class="mb-4">
+                        <p class="text-muted"><span class="font-weight-bold">Category:</span> @Model.Category</p>
+                        <p class="text-muted"><span class="font-weight-bold">Release:</span> @Model.DateSell.ToString("yyyy/MM/dd")</p>
+                        <p class="text-muted"><span class="font-weight-bold">Quanlity:</span> @Model.Quantity.ToString("yyyy/MM/dd")</p>
+                       
                     </div>
-                </div>
-
-                <div class="mt-4">
-                    <span class="text-muted">Quantity:</span>
-                    <div class="d-flex align-items-center mt-2">
-                        <button class="btn btn-outline-secondary">-</button>
-                        <input class="form-control text-center mx-2" style="width: 60px;" type="text" value="1">
-                        <button class="btn btn-outline-secondary">+</button>
-                    </div>
-                </div>
-
-                <div class="mt-4 d-flex">
-                    @* <form method="post" asp-action="CreatePaymentMomo" asp-controller="Payment">
-                        
-                        <input type="hidden" name="Amount"  value="@Model.Price" />
-                        <input type="hidden" name="OrderId"  value="@Guid.NewGuid().ToString()"/>
-                        <input type="hidden" name="OrderInfomation"value="thanh toan momo cho don hang tai iFood"  />
-                        <input type="hidden" accesskey=""name="FullName"value="kien ngo"  />
-
-
-                        <button class="btn btn-primary" name="PayUrl" type="submit">Pay with momo</button>
-                    </form> *@
-                    <button class="btn btn-primary"  onclick="BuyItems(this)" data-id="@Model.ProductID">
-                        Pay with momo
-                    </button>
-                    <a type="button" class="btn btn-sm btn-outline-info" asp-controller="Cart" asp-action="Create"
-                         asp-route-id="@Model.ProductID">
-                                        Add to cart
-                                    </a>
                     
-                    <button class="btn btn-outline-secondary ms-2"><i class="bi bi-heart"></i></button>
-                    <button class="btn btn-outline-secondary ms-2"><i class="bi bi-share"></i></button>
-                </div>
+                    <div class="d-flex m-4">
+                        <div class="d-flex">
+                                @if(@Model.Quantity <= 0)
+                                {
+                                    <p>Sold out</p>
+                                }
+                                else
+                                {
+                                    <a type="button" asp-controller="Cart" asp-action="Create"
+                                    asp-route-id="@Model.ProductID">
+                                    <button class="btn btn-light flex-fill mr-2"><i class="bi bi-bag-plus fs-5"></i>
+                                        Add Cart</button>
+                                    </a>
+                                    <button class="btn btn-primary flex-fill" onclick="BuyItems(this)"
+                                     data-id="@Model.ProductID"><i class="bi bi-piggy-bank fs-5"></i>Buy</button>
 
-                <div class="mt-4">
-                    <p class="text-muted">Category: <span class="fw-bold">@Model.Category</span></p>
-                    <p class="text-muted">Release: <span class="fw-bold">@Model.DateSell.ToString("yyyy/MM/dd")</span></p>
+                                }
+                            </div>
+                    </div>
                 </div>
             </div>
         </div>

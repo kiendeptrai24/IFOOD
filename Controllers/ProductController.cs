@@ -94,7 +94,7 @@ public class ProductController : Controller
             };
             TempData["SuccessMessage"] = "added "+productVM.Title+" to management";
             _productRepository.Add(product);
-            return RedirectToAction("Index");
+            return RedirectToAction("Index","Dashboard");
         }
         else
         {
@@ -116,8 +116,10 @@ public class ProductController : Controller
             Date = product.DateSell,
             Quantity = product.Quantity,
             Price = product.Price,
+            Status = product.Status,
             Category = product.Category,
             URL = product.Image
+            
         };
         return View(productVM);
     }
@@ -159,6 +161,7 @@ public class ProductController : Controller
                 DateSell = productVM.Date,
                 Image = photoResult.Url.ToString(),
                 URL = productVM.URL,
+                Status = productVM.Status,
                 Category = productVM.Category,
                 Quantity = productVM.Quantity,
                 Price = productVM.Price,
@@ -172,6 +175,7 @@ public class ProductController : Controller
                 Description = productVM.Description,
                 DateSell = productVM.Date,
                 Image = productVM.URL,
+                Status = productVM.Status,
                 Category = productVM.Category,
                 Quantity = productVM.Quantity,
                 Price = productVM.Price,
@@ -183,7 +187,7 @@ public class ProductController : Controller
 
         _productRepository.Update(product);
 
-        return RedirectToAction("Index");
+        return RedirectToAction("Index","Dashboard");
     }
     [HttpGet]
     public async Task<IActionResult> Delete(int id)

@@ -36,6 +36,7 @@ namespace iFood.Controllers
             _orderRepository = orderRepository;
             _cartRepository = cartRepository;
         }
+        [HttpGet]
         public async Task<IActionResult> PaymentCallBack()
         {
             var productToDeleteJson = HttpContext.Session.GetString("ProductToCallBack");
@@ -63,21 +64,10 @@ namespace iFood.Controllers
             await _orderRepository.AddAsync(order);
             if(requestQuery["resultCode"] != 0)
             {
-                var newMomoInsert = new MomoInfo
-                {
-                    FullName = User.FindFirstValue(ClaimTypes.Email),
-                    Price = decimal.Parse(requestQuery["Amount"]),
-                    OrderInfo = requestQuery["orderInfo"],
-                    DatePaid = DateTime.Now,
-                    MomoTransactionId = requestQuery["transId"],
-                    AppUserId = order.AppUserId,
-                    OrderId = order.Id,
-                    Order = order,
-                };
-                await _momoRepository.AddAsync(newMomoInsert);
-
+                order.TransactionId = requestQuery["transId"];
                 order.PaymentMethod = PaymentMethod.Momo;
-                order.MomoInfoId = newMomoInsert.Id;
+                order.Ordercode = requestQuery["orderId"];
+                order.status = Status.PendingConfirmation;
                 _orderRepository.Update(order);
 
                 if(carts.Any())
@@ -91,7 +81,7 @@ namespace iFood.Controllers
                 foreach (var product in products)
                 {
                     Product productToUpdate = await _productRepository.GetByIdAsync(product.ProductID);
-                    productToUpdate.Quantity = product.Quantity;
+                    productToUpdate.Quantity -= product.Quantity;
                     _productRepository.Update(productToUpdate);
                 }
                 _productRepository.UnTracking();
@@ -107,6 +97,20 @@ namespace iFood.Controllers
         [HttpPost]
         public async Task<IActionResult> PaymentCallBackZalo([FromBody] dynamic cbdata)
         {
+            var productToDeleteJson = HttpContext.Session.GetString("ProductToCallBack");
+            var cartToDeleteJson = HttpContext.Session.GetString("CartToCallBack");
+            var orderJson = HttpContext.Session.GetString("OrderToCallBack");
+
+            if (string.IsNullOrEmpty(productToDeleteJson))
+                return BadRequest("Product not found!");
+            List<Product> products = JsonConvert.DeserializeObject<List<Product>>(productToDeleteJson);
+            List<Cart> carts = string.IsNullOrEmpty(cartToDeleteJson)
+                ? new List<Cart>()
+                : JsonConvert.DeserializeObject<List<Cart>>(cartToDeleteJson);
+            Order order = string.IsNullOrEmpty(orderJson)
+                ? new Order()
+                : JsonConvert.DeserializeObject<Order>(orderJson);
+
             var result = new Dictionary<string, object>();
             try
             {
@@ -139,6 +143,37 @@ namespace iFood.Controllers
                     var dataJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(dataStr);
                     Console.WriteLine("update order's status = success where app_trans_id = {0}", dataJson["app_trans_id"]);
 
+
+                    foreach(var item in order.OrderDetails)
+                    {
+                        _productRepository.CheckAttackProduct(item.Product);
+                    }
+                    await _orderRepository.AddAsync(order);
+                    
+                    order.TransactionId = dataJson["app_trans_id"].ToString();
+                    order.PaymentMethod = PaymentMethod.Zalopay;
+                    order.Ordercode = Guid.NewGuid().ToString();
+                    order.OrderDate = DateTime.Now;
+                    order.status = Status.PendingConfirmation;
+                    _orderRepository.Update(order);
+
+                    if(carts.Any())
+                    {
+                        foreach (var cart in carts)
+                        {
+                            _cartRepository.Delete(cart);
+                            
+                        }
+                    }
+                    foreach (var product in products)
+                    {
+                        Product productToUpdate = await _productRepository.GetByIdAsync(product.ProductID);
+                        productToUpdate.Quantity = product.Quantity;
+                        _productRepository.Update(productToUpdate);
+                    }
+                    _productRepository.UnTracking();
+
+
                     result["return_code"] = 1;
                     result["return_message"] = "success";
                 }
@@ -152,5 +187,7 @@ namespace iFood.Controllers
 
             return Ok(result);
         }
+
+        
     }
 }

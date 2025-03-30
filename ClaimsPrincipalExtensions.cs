@@ -19,5 +19,10 @@ namespace iFood
             }
             return await userManager.FindByIdAsync(userId);
         }
+        public static async Task<string> GetAvatarUrl(this ClaimsPrincipal user, UserManager<AppUser> userManager)
+        {
+            var appUser = await user.GetUserById(userManager);
+            return appUser?.ProfileImageUrl ?? "https://placehold.co/30x30";
+        }
     }
 }

@@ -16,48 +16,164 @@
 }
 
 
-<section class="space-sm flush-with-above">
+<style>
+    #formContainer {
+    background-color: rgba(2, 28, 46, 0.395); /* Màu xanh dương */
+    padding: 20px;
+    border-radius: 10px;
+    }
+    #boderx
+    {
+        border-radius: 15px;
+    }
+    .portfolio-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 cột mỗi hàng */
+    gap: 15px; /* Khoảng cách giữa ảnh */
+    justify-content: center;
+    max-width: 800px;
+    margin: auto;
+    }
+
+    .portfolio-box img {
+        width: 100%; 
+        height: 300px; 
+        object-fit: cover;
+    }
+    .no-bullets {
+        list-style-type: none; /* Loại bỏ dấu chấm */
+        padding-left: 0; /* Xóa khoảng thụt lề mặc định */
+    }
+    .fixed-card {
+            height: 170px; /* Chiều cao cố định */
+            display: flex;
+            justify-content: center; /* Căn giữa theo chiều ngang */
+            align-items: center; /* Căn giữa theo chiều dọc */
+            overflow: hidden; /* Đảm bảo không bị tràn nội dung */
+    }
+    .fixed-card-img {
+        object-fit: scale-down; /* Cắt ảnh để vừa khung */
+        height: 100%; /* Ảnh full chiều cao */
+        width: 100%; /* Ảnh full chiều rộng */
+        display: block;
+    }
+
+}
+</style>
+
+
+
+<section class="space-sm flush-with-above page-section" id="product">
     <div class="container">
         <div class="row">
             <div class="col text-center">
-                <p>Product Categories</p>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+                        <h2 class="text-black mt-0">We've got what you need!</h2>
+                        <hr class="divider divider-light" />
+                    </div>
+                </div>
                 <div class="mb-3">
-                    <a type="button" class="btn btn-secondary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="-1">All</a>
+                    <a type="button" class="btn btn-primary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="-1">All</a>
                     @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
                     {
-                        <a type="button" class="btn btn-secondary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="@category.Value">@category.Text</a>
+                        <a type="button" class="btn btn-primary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="@category.Value">@category.Text</a>
                     }
                 </div>
             </div>
         </div>
     </div>
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                @if (isValidPage)
-                {
+        <div class="row">
+            @if (isValidPage)
+            {
+                <div class="d-flex justify-content-center align-items-center mt-4">
+
                     <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
-                   asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
-                        Prev
+                    asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
+                        <i class="bi bi-arrow-left-short fs-5"></i>
+
                     </a>
                     <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
-                   asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
-                        Next
+                    asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
+                        <i class="bi bi-arrow-right-short fs-5"></i>
                     </a>
-                    <span class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</span>
-                }
-            </div>
+                </div>
+                <div class="d-flex justify-content-center align-items-center mb-4">
+                    <div class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</div>
+                </div>
+            }
         </div>
         
-        <ul class="row feature-list feature-list-sm">
+        <ul class="row d-flex justify-content-center">
             @foreach (var product in Model.Products)
             {
+                @* <a type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID" > *@
+                    <div class="card m-2 col-12 col-md-4 col-lg-3 mt-2" style="width: 18rem;">
+                        <div class="card-body">
+                            @if(product.Status == null || product.Status == ProductStatus.Unknown)
+                            {
+                                    <span class="badge badge-pill badge-light text-purple-800 bg-purple-200 mb-2">
+                                        
+                                    </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-pill text-white mb-2"
+                                    style="background-color: 
+                                        @(product.Status switch
+                                        {
+                                            ProductStatus.Bestseller => "green",
+                                            ProductStatus.NewArrival => "blue",
+                                            ProductStatus.Featured => "purple",
+                                            ProductStatus.OutOfStock => "gray",
+                                            ProductStatus.Discounted => "red",
+                                            ProductStatus.LimitedEdition => "gold",
+                                            ProductStatus.ComingSoon => "orange",
+                                            _ => "brown" // Mặc định
+                                        });">
+                                    @product.Status
+                                </span>
+                            }
+                            <div>
+                                <a class="fixed-card" type="button" asp-controller="Product" asp-action="Detail"  asp-route-id="@product.ProductID" fixed-card>
+                                @if(@product.Image != null)
+                                {
+                                    <img class="card-img-top card-img-top mb-4 fixed-card-img" src="@product.Image" alt="Card image cap">   
+                                }
+                                else
+                                {
+                                    <img class="card-img-top card-img-top mb-4 fixed-card-img" src="/img/rungroopclub.png" alt="Card image cap">   
+                                }
+                                
+                                </a>
+                            </div>
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text text-muted">Shipped in 3-4 days</p>
+                            <p class="card-text text-muted">Quantity:  @product.Quantity</p>
+                            <p class="card-text font-weight-bold">$@product.Price</p>
+                            <div class="d-flex">
+                                @if(product.Quantity <= 0)
+                                {
+                                    <p>Sold out</p>
+                                }
+                                else
+                                {
+                                    <a type="button" asp-controller="Cart" asp-action="Create"
+                                    asp-route-id="@product.ProductID">
+                                    <button class="btn btn-light flex-fill mr-2"><i class="bi bi-bag-plus fs-5"></i>
+                                        Add Cart</button>
+                                    </a>
+                                    <button class="btn btn-primary flex-fill" onclick="BuyItems(this)" data-id="@product.ProductID"><i class="bi bi-piggy-bank fs-5"></i>Buy</button>
 
+                                }
+                            </div>
+                        </div>
+                    </div>
                 
-                    <li class="col-12 col-md-4 col-lg-3">
-                        <a type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID" >
+                    @* <li class="col-12 col-md-4 col-lg-3 mt-2"  style="height: 500px;" >
                         <div class="card">
-                            @* <a type="button" asp-controller="Club" asp-action="DetailClub" asp-route-runningClub="@club.Title.GenerateSlug()" asp-route-id="@club.Id"> *@
+                            <a type="button" asp-controller="Product" asp-action="Detail"  asp-route-id="@product.ProductID"  style="height: 300px;">
                                 @if(@product.Image != null)
                                 {
                                     <img class="card-img-top" src="@product.Image" alt="Card image cap">   
@@ -67,7 +183,7 @@
                                     <img class="card-img-top" src="/img/rungroopclub.png" alt="Card image cap">   
                                 }
                                 
-                            @* </a> *@
+                            </a>
                             <div class="card-body">
                                 <h4 class="card-title">@product.Name</h4>
                                 <p class="card-text">@product.Description</p>
@@ -87,159 +203,33 @@
                                             Delete
                                         </a>
                                     </div>
-                                }
+                         d-fle       }
                             </div>
                         </div>
-                        </a>
-                    </li>
+                    </li> *@
+                @* </a> *@
             }
         </ul>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
+        <div class="container">
+            <div class="row">
                 @if (isValidPage)
                 {
-                    <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
-                   asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
-                        Prev
-                    </a>
-                    <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
-                   asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
-                        Next
-                    </a>
-                    <span class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</span>
+                    <div class="d-flex justify-content-center align-items-center mt-4">
+                        <div class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</div>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center mb-4">
+                        <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
+                        asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
+                            <i class="bi bi-arrow-left-short fs-5"></i>
+
+                        </a>
+                        <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
+                        asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
+                            <i class="bi bi-arrow-right-short fs-5"></i>
+                        </a>
+                    </div>
                 }
             </div>
         </div>
     </div>
 </section>
-
-
-@* 
-
-<div class="album py-5 bg-body-tertiary">
-    <div class="container">
-        <div class="row">
-            @foreach(var item in Model)
-            {
-                <div class="col-3">
-                    <a asp-controller="Club" asp-action="Detail" asp-route-id="@item.Id"
-                                            class="btn btn-sm btn-outline-secondary">
-                        <div class="card" width="430" height="400">
-                            <img src="@item.Image" class="card-img-top" width="300" height="170">
-                            <div class="card-body">
-                                <h5 class="card-title">@item.Title</h5>
-                                <p class="card-text">@item.Description</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="h5 mb-0">$99.99</span>
-                                    <div>
-                                        <i class="bi bi-star-fill text-warning"></i>
-                                        <i class="bi bi-star-fill text-warning"></i>
-                                        <i class="bi bi-star-fill text-warning"></i>
-                                        <i class="bi bi-star-fill text-warning"></i>
-                                        <i class="bi bi-star-half text-warning"></i>
-                                        <small class="text-muted">(4.5)</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between bg-light">
-                                <button class="btn btn-primary btn-sm">Add to Cart</button>
-                                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-heart"></i></button>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col">
-                    <div class="card shadow-sm">
-                       <img class="card-img-top" src="@item.Image" width="100%" height="225" alt="Card image cap">
-                            <div class="card-body">
-                                <p class="card-text">@item.Title</p>
-                                <p class="card-text">@item.Description</p>
-
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <a asp-controller="Club" asp-action="Detail" asp-route-id="@item.Id"
-                                        class="btn btn-sm btn-outline-secondary">View</a>
-                                        <a asp-controller="Club" asp-action="Edit" asp-route-id="@item.Id"
-                                         class="btn btn-sm btn-outline-secondary">Edit</a>
-                                    </div>
-                                    <small class="text-body-secondary">@item.ClubCategory</small>
-                                </div>
-                            </div>
-                    </div>
-                </div> 
-            }
-        </div>
-    </div>
-</div> 
-*@
-
-<section class="container my-5 pt-5">
-        <div class="row">
-            <div class="col-lg-6">
-                <img class="img-fluid" src="https://storage.googleapis.com/a1aa/image/AbP7s-t6UYDnPFjrBoVtnffCJOhfCeCtt1_rpi1RXPM.jpg" alt="Product Image">
-                <div class="d-flex mt-3">
-                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
-                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
-                    <img class="img-thumbnail me-2" src="https://storage.googleapis.com/a1aa/image/igbTi0RFWBO9P0ZbOQaT8TCnqLYCJQmwR3wXHCwjYoQ.jpg" style="width: 100px; height: 100px;">
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <h1 class="h2">Nonstick Dishwasher PFOA</h1>
-                <div class="d-flex align-items-center mt-2">
-                    <div class="text-warning">
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-half"></i>
-                    </div>
-                    <span class="ms-2 text-muted">(102) Reviews</span>
-                </div>
-                <div class="mt-3">
-                    <span class="h3 text-orange">$70.00</span>
-                    <span class="h5 text-muted ms-2"><del>$80.00</del></span>
-                </div>
-                <p class="mt-4 text-muted">Mô tả sản phẩm của bạn ở đây...</p>
-
-                <div class="mt-4">
-                    <h5>Available Options</h5>
-                    <div class="mt-2">
-                        <span class="text-muted">Color</span>
-                        <div class="d-flex mt-2">
-                            <div class="bg-primary" style="width: 30px; height: 30px;"></div>
-                            <div class="bg-warning ms-2" style="width: 30px; height: 30px;"></div>
-                            <div class="bg-success ms-2" style="width: 30px; height: 30px;"></div>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <span class="text-muted">Size</span>
-                        <div class="d-flex mt-2">
-                            <button class="btn btn-outline-secondary">S</button>
-                            <button class="btn btn-outline-secondary ms-2">M</button>
-                            <button class="btn btn-outline-secondary ms-2">L</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4">
-                    <span class="text-muted">Quantity:</span>
-                    <div class="d-flex align-items-center mt-2">
-                        <button class="btn btn-outline-secondary">-</button>
-                        <input class="form-control text-center mx-2" style="width: 60px;" type="text" value="1">
-                        <button class="btn btn-outline-secondary">+</button>
-                    </div>
-                </div>
-
-                <div class="mt-4 d-flex">
-                    <button class="btn btn-dark">Add To Cart</button>
-                    <button class="btn btn-outline-secondary ms-2"><i class="bi bi-heart"></i></button>
-                    <button class="btn btn-outline-secondary ms-2"><i class="bi bi-share"></i></button>
-                </div>
-
-                <div class="mt-4">
-                    <p class="text-muted">Category: <span class="fw-bold">Clothing</span></p>
-                    <p class="text-muted">Availability: <span class="fw-bold">180 Products In Stock</span></p>
-                </div>
-            </div>
-        </div>
-    </section>

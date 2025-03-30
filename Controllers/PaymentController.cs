@@ -30,7 +30,8 @@ public class PaymentController : Controller
     {
         var productToDeleteJson = HttpContext.Session.GetString("ProductToDelete");
         var orderJson = HttpContext.Session.GetString("NewOrder");
-
+        if (string.IsNullOrEmpty(productToDeleteJson))
+            return BadRequest("Product not found!");
         if (string.IsNullOrEmpty(orderJson))
             return BadRequest("Order not found!");
         List<Product> products = JsonConvert.DeserializeObject<List<Product>>(productToDeleteJson);
@@ -48,11 +49,15 @@ public class PaymentController : Controller
             TempData["WarnMessage"] = "so tien hien tai qua lon khong the thuc hien giao dich";
             return RedirectToAction("Index","Cart");
         }
-
-        HttpContext.Session.SetString("NewOrder", JsonConvert.SerializeObject(newOrder));
-        HttpContext.Session.SetString("ProductToCallBack", JsonConvert.SerializeObject(products));
+        if(model.Amount <= 0)
+        {
+            TempData["WarnMessage"] = "so tien khong hop le";
+            return RedirectToAction("Index","Cart");
+        }
         var response = await _paymentToggle.Paymentstrategy(paymentMethod,model);
         
+        HttpContext.Session.SetString("ProductToCallBack", JsonConvert.SerializeObject(products));
+        HttpContext.Session.SetString("OrderToCallBack", JsonConvert.SerializeObject(newOrder));
         return Json(new { payUrl = response });
     }
     public async Task<IActionResult> CreatePaymentByCart(PaymentMethod paymentMethod)

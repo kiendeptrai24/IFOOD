@@ -224,4 +224,10 @@ public class CartController : Controller
         // _productRepository.Delete(productDetails);
         return RedirectToAction("Index");
     }
+    public async Task<IActionResult> DeleteAll()
+    {
+        var cart = await _cartRepository.GetAllByUserId();
+        _cartRepository.DeleteAll(cart);
+        return RedirectToAction("Index");
+    }
 }

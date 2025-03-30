@@ -11,6 +11,10 @@ public class ProfileUserViewModel
     [Required]
     public string? Name { get; set; }
 
+    public IFormFile? Avatar { get; set; }
+    public string? AvatarUrl { get; set; }
+
+
     [Required]
     [DataType(DataType.Password)]
     public string? Password { get; set; }
@@ -18,5 +22,4 @@ public class ProfileUserViewModel
     [Phone]
     public string? Phone { get; set; }
 
-    public IFormFile? Image { get; set; }
 }

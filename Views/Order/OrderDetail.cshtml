@@ -1,4 +1,8 @@
-﻿<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+﻿@using iFood.Data
+@using iFood.Data.Enum
+@model Order
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <head>
     <style>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -121,17 +125,26 @@
 </head>
 <body>
         <div class="card mt-3" >
-        <h5>ĐƠN HÀNG <span class="text-primary font-weight-bold">#Y34XDHR</span></h5>
-        <p>Ngày dự kiến giao: <strong>01/12/19</strong></p>
+        <h5>ĐƠN HÀNG <span class="text-primary font-weight-bold">@Model.TransactionId</span></h5>
         <p>Vận chuyển bởi: <strong>USPS - 234094567242423422898</strong></p>
 
         <!-- Thanh trạng thái đơn hàng -->
         <ul id="progressbar">
-            <li class="completed"><i class="fas fa-box"></i><br>Đã xử lý</li>
-            <li class="completed"><i class="fas fa-shipping-fast"></i><br>Đã gửi</li>
-            <li class="active"><i class="fas fa-truck"></i><br>Đang vận chuyển</li>
-            <li class=""><i class="fas fa-check-circle"></i><br>Đã nhận</li>
+            <li class="@(Model.status == Status.PendingConfirmation ? "active" : (Model.status > Status.PendingConfirmation ? "completed" : ""))">
+                <i class="fas fa-box"></i><br>Pending Confirmation
+            </li>
+            <li class="@(Model.status == Status.Shipping ? "active" : (Model.status > Status.Shipping ? "completed" : ""))">
+                <i class="fas fa-shipping-fast"></i><br> Shipping
+            </li>
+            <li class="@(Model.status == Status.Delivered ? "active" : (Model.status > Status.Delivered ? "completed" : ""))">
+                <i class="fas fa-truck"></i><br>Delivered
+            </li>
+            <li class="@(Model.status == Status.Completed ? "active" : (Model.status > Status.Completed ? "completed" : ""))">
+                <i class="fas fa-check-circle"></i><br>Completed
+            </li>
         </ul>
+
+
 
         <!-- Các trạng thái với icon -->
         <div class="icon-container">

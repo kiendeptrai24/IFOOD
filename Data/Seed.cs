@@ -11,7 +11,7 @@ namespace iFood.Data
             using (var serviceScope = applicationBuilder.ApplicationServices.CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetService<ApplicationDBContext>();
-
+                
                 if(context == null)
                     return;
                 context.Database.EnsureCreated();
