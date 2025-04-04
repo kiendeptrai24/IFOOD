@@ -64,6 +64,8 @@ public class ProductController : Controller
     public async Task<IActionResult> Detail(int id)
     {
         Product product = await _productRepository.GetByIdAsync(id);
+        product.View++;
+        _productRepository.Update(product);
         return View(product);
 
     }

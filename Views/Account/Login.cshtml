@@ -179,42 +179,6 @@
   }
 </style>
 
-
-@* <div class="row">
-    <div class="col-md-6 offset-3">
-        <p>
-            <h4>Log in to your account</h4>
-        </p>
-        @if(TempData["Error"] != null)
-        {
-            <div class="col-md-12 alert alert-danger">
-                <span><b>Sorry!</b> - @TempData["Error"]</span>
-            </div>
-        }
-        <div class="row">
-            <div class="col-md-8 offset-2">
-                <form asp-action="Login">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-group">
-                        <label asp-for="EmailAddress" class="control-label"></label>
-                        <input asp-for="EmailAddress" class="form-control">
-                        <span asp-validation-for="EmailAddress" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Password" class="control-label"></label>
-                        <input asp-for="Password" class="form-control" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <input class="btn btn-outline-success float right" type="submit" value="Log in" />
-                        <a class="btn btn-outline-secondary" asp-controller="Club" asp-action="Index">Cancel</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div> *@
-
 <section class="bg-primary py-3 py-md-5 py-xl-8">
    @if(TempData["Error"] != null)
     {
@@ -287,6 +251,8 @@
                         <div class="d-grid"><input class="btn btn-primary btn-xl" type="submit" value="Log in"></input></div>
                     </div>
                 </form>
+
+                
             <div class="row">
                 <div class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-end mt-4">
                   <a asp-controller="Account" asp-action="ForgetPassword">Forgot password</a>
@@ -342,6 +308,22 @@ var myCarousel = new bootstrap.Carousel(document.querySelector('#carouselExample
     wrap: true
 });
 
+</script>
+<script>
+  function showForm(formType) {
+      document.getElementById('loginForm').classList.remove('active');
+      document.getElementById('registerForm').classList.remove('active');
+      document.getElementById(formType + 'Form').classList.add('active');
+  }
+
+  function togglePassword(inputId) {
+      let input = document.getElementById(inputId);
+      input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  function submitForm(formType) {
+      alert(formType + " form submitted!");
+  }
 </script>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -48,7 +48,7 @@ namespace iFood.Service
             param.Add("app_id", app_id);
             param.Add("app_user", model.AppUserId);
             param.Add("app_time", Utils.GetTimeStamp().ToString());
-            param.Add("amount", "50000");
+            param.Add("amount", model.Amount.ToString());
             param.Add("app_trans_id", DateTime.Now.ToString("yyMMdd") + "_" + app_trans_id); // mã giao dich có định dạng yyMMdd_xxxx
             param.Add("embed_data", JsonConvert.SerializeObject(embed_data));
             param.Add("item", JsonConvert.SerializeObject(items));

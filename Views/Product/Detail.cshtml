@@ -68,69 +68,62 @@
 <div id="success-message" style="display:none; background-color: #4CAF50; color: white; padding: 10px; text-align: center; border-radius: 5px;"></div>
 <div id="error-message" style="display:none; background-color: #f44336; color: white; padding: 10px; text-align: center; border-radius: 5px;"></div>
 
-    <section  class="container my-5 pt-5">
-         <div class="container bg-white p-4 rounded-lg shadow-lg">
-            <div class="row">
-                <!-- Product Image Section -->
-                <div class="col-lg-6 text-center">
-                    <img src="@Model.Image" class="img-fluid mb-4" width="400" height="400">
-                    <div class="d-flex justify-content-center">
-                        <img src="https://storage.googleapis.com/a1aa/image/LP2Vs4aTzHa7fd_FF7NutPkeEcc4ER-FeRdHCsuCCIA.jpg" alt="Thumbnail of blue hoodie" class="img-thumbnail mr-2" width="50" height="50">
-                        <img src="https://storage.googleapis.com/a1aa/image/LP2Vs4aTzHa7fd_FF7NutPkeEcc4ER-FeRdHCsuCCIA.jpg" alt="Thumbnail of blue hoodie" class="img-thumbnail mr-2" width="50" height="50">
-                        <img src="https://storage.googleapis.com/a1aa/image/LP2Vs4aTzHa7fd_FF7NutPkeEcc4ER-FeRdHCsuCCIA.jpg" alt="Thumbnail of blue hoodie" class="img-thumbnail mr-2" width="50" height="50">
-                        <img src="https://storage.googleapis.com/a1aa/image/LP2Vs4aTzHa7fd_FF7NutPkeEcc4ER-FeRdHCsuCCIA.jpg" alt="Thumbnail of blue hoodie" class="img-thumbnail mr-2" width="50" height="50">
-                        <img src="https://storage.googleapis.com/a1aa/image/LP2Vs4aTzHa7fd_FF7NutPkeEcc4ER-FeRdHCsuCCIA.jpg" alt="Thumbnail of blue hoodie" class="img-thumbnail" width="50" height="50">
-                    </div>
+<section class="container my-5 pt-5">
+    <div class="container bg-white p-4 rounded-lg shadow-lg">
+        <div class="row">
+            <!-- Product Image Section -->
+            <div class="col-lg-6 text-center">
+                <img src="@Model.Image" class="img-fluid mb-4" width="400" height="400">
+                <div class="d-flex justify-content-center">
+                    <img src="@Model.Image" alt="" class="img-thumbnail mr-2" width="50" height="50">
+                    <img src="@Model.Image" alt="" class="img-thumbnail mr-2" width="50" height="50">
+                    <img src="@Model.Image" alt="" class="img-thumbnail mr-2" width="50" height="50">
+                    <img src="@Model.Image" alt="" class="img-thumbnail mr-2" width="50" height="50">
+                    <img src="@Model.Image" alt="" class="img-thumbnail" width="50" height="50">
                 </div>
-                <!-- Product Details Section -->
-                <div class="col-lg-6">
-                    <h1 class="h4 font-weight-bold mb-2">@Model.Name</h1>
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="text-warning">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
-                        <span class="ml-2 text-muted">4.5</span>
-                        <span class="ml-2 text-muted">154 orders</span>
-                        <span class="ml-2 text-success">In stock</span>
+            </div>
+            <!-- Product Details Section -->
+            <div class="col-lg-6">
+                <h1 class="h4 font-weight-bold mb-2">@Model.Name</h1>
+                <div class="d-flex align-items-center mb-2">
+                    <div id="ratingStars" class="text-warning">
+                        <!-- Stars will be dynamically generated here -->
                     </div>
-                    <p class="h5 font-weight-bold mb-4">@Model.Price <span class="text-muted">per box</span></p>
-                    <p class="text-muted mb-4">@Model.Description</p>
-                    <div class="mb-4">
-                        <p class="text-muted"><span class="font-weight-bold">Category:</span> @Model.Category</p>
-                        <p class="text-muted"><span class="font-weight-bold">Release:</span> @Model.DateSell.ToString("yyyy/MM/dd")</p>
-                        <p class="text-muted"><span class="font-weight-bold">Quanlity:</span> @Model.Quantity.ToString("yyyy/MM/dd")</p>
-                       
-                    </div>
-                    
-                    <div class="d-flex m-4">
-                        <div class="d-flex">
-                                @if(@Model.Quantity <= 0)
-                                {
-                                    <p>Sold out</p>
-                                }
-                                else
-                                {
-                                    <a type="button" asp-controller="Cart" asp-action="Create"
-                                    asp-route-id="@Model.ProductID">
-                                    <button class="btn btn-light flex-fill mr-2"><i class="bi bi-bag-plus fs-5"></i>
-                                        Add Cart</button>
-                                    </a>
-                                    <button class="btn btn-primary flex-fill" onclick="BuyItems(this)"
-                                     data-id="@Model.ProductID"><i class="bi bi-piggy-bank fs-5"></i>Buy</button>
+                    <span class="ml-2 text-muted" id="ratingValue">4.5</span> <!-- Rating value -->
+                    <span class="ml-2 text-muted">154 orders</span>
+                    <span class="ml-2 text-success">In stock</span>
+                </div>
+                <p class="h5 font-weight-bold mb-4">@Model.Price <span class="text-muted">per box</span></p>
+                <p class="text-muted mb-4">@Model.Description</p>
+                <div class="mb-4">
+                    <p class="text-muted"><span class="font-weight-bold">Category:</span> @Model.Category</p>
+                    <p class="text-muted"><span class="font-weight-bold">Release:</span> @Model.DateSell.ToString("yyyy/MM/dd")</p>
+                    <p class="text-muted"><span class="font-weight-bold">Quantity:</span> @Model.Quantity.ToString()</p>
+                </div>
 
-                                }
-                            </div>
+                <div class="d-flex m-4">
+                    <div class="d-flex">
+                        @if(@Model.Quantity <= 0)
+                        {
+                            <p>Sold out</p>
+                        }
+                        else
+                        {
+                            <a type="button" asp-controller="Cart" asp-action="Create" asp-route-id="@Model.ProductID">
+                                <button class="btn btn-light flex-fill mr-2"><i class="bi bi-bag-plus fs-5"></i>
+                                    Add Cart</button>
+                            </a>
+                            <button class="btn btn-primary flex-fill" onclick="BuyItems(this)" data-id="@Model.ProductID">
+                                <i class="bi bi-piggy-bank fs-5"></i> Buy</button>
+                        }
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <script>
+<script>
     function generateStars(rating) {
         let fullStar = '<i class="bi bi-star-fill"></i>';
         let halfStar = '<i class="bi bi-star-half"></i>';
@@ -140,55 +133,35 @@
         let roundedRating = Math.floor(rating);
         let hasHalfStar = rating % 1 >= 0.5;
 
-        // Thêm sao đầy
+        // Add full stars
         for (let i = 0; i < roundedRating; i++) {
             starsHTML += fullStar;
         }
-        // Thêm sao nửa nếu có
+        // Add half star if necessary
         if (hasHalfStar) {
             starsHTML += halfStar;
         }
-        // Thêm sao trống cho đủ 5 sao
-        while (starsHTML.split('i').length - 1 < 10) { // Mỗi `<i>` có 2 thẻ `i`
+        // Add empty stars to complete the 5 stars
+        while (starsHTML.split('i').length - 1 < 10) { // Each `<i>` tag has 2 "i" characters
             starsHTML += emptyStar;
         }
 
         document.getElementById("ratingStars").innerHTML = starsHTML;
+        document.getElementById("ratingValue").innerText = rating; // Display rating value
     }
 
-    // Gọi hàm với giá trị điểm đánh giá (Ví dụ: 4.5)
-    //generateStars("@Model.Rating");
-    generateStars(4.5);
-
-
-   
-    $(document).on("click", ".add-to-cart-btn", function (e) {
-    e.preventDefault();
-    var productId = $(this).data("id");
-
-    $.ajax({
-        url: "/Cart/Create",
-        type: "GET",
-        data: { id: productId },
-        success: function (response) {
-            if (response.success) {
-                $("#success-message").text(response.message).fadeIn().delay(2000).fadeOut();
-            } else {
-                $("#error-message").text(response.message).fadeIn().delay(2000).fadeOut();
-            }
-        }
-    });
-});
-
+    // Example of calling the function with the rating from the model
+    generateStars(4.5); // You can replace this with @Model.Rating if it's dynamic
 </script>
+
 
 <script>
     function BuyItems(button) {
-        let productId = button.getAttribute("data-id"); // Lấy ID sản phẩm
+        let productId = button.getAttribute("data-id"); // Get product ID
 
         Swal.fire({
-            title: "Chọn phương thức thanh toán",
-            text: "Vui lòng chọn phương thức thanh toán bạn muốn sử dụng.",
+            title: "Choose payment method",
+            text: "Please select the payment method you would like to use.",
             icon: "question",
             showCancelButton: true,
             confirmButtonText: "COD",
@@ -197,13 +170,13 @@
             denyButtonText: "ZaloPay",
             html: `
                 <button id="other-payment" class="swal2-confirm swal2-styled" style="margin-top: 10px;">
-                    Ví điện tử khác
+                    Other E-wallets
                 </button>
             `,
             didOpen: () => {
                 document.getElementById("other-payment").addEventListener("click", function () {
                     processOrder(productId, "Other");
-                    Swal.close(); // Đóng hộp thoại sau khi chọn
+                    Swal.close(); // Close the dialog after selection
                 });
             }
         }).then((result) => {
@@ -218,9 +191,9 @@
     }
 
     function processOrder(productId, paymentMethod) {
-        console.log("Đặt hàng với ProductID:", productId, "Thanh toán bằng:", paymentMethod);
+        console.log("Placing order with ProductID:", productId, "Payment method:", paymentMethod);
 
-        // Gửi request đến server xử lý
+        // Send request to server to process the order
         fetch('/Order/CreateOrder', {
             method: "POST",
             headers: {
@@ -231,10 +204,11 @@
         .then(response => response.json())
         .then(data => {
             if (data.payUrl) {
-                window.location.href = data.payUrl;  // Redirect ở FE
+                window.location.href = data.payUrl;  // Redirect on frontend
             }
         });
     }
+
 
 </script>
 

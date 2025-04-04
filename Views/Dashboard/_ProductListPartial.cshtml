@@ -1,0 +1,58 @@
+﻿@using iFood.ViewModels
+@model IndexProductViewModel
+
+<table class="table table-bordered">
+    <thead class="thead-light">
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Quality</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th>Release</th>
+        </tr>
+    </thead>
+    @foreach(var product in Model.Products)
+    {
+        <tbody>
+            <tr>
+                <td class="d-flex align-items-center">
+                    @if(@product.Image != null)
+                    {
+                        <img src="@product.Image" alt="Profile picture" class="rounded-circle mr-2" width="50" height="50">
+                    }
+                    else
+                    {
+                        <img src="https://placehold.co/50x50" alt="Profile picture" class="rounded-circle mr-2" width="50" height="50">
+                    }
+                    @product.Name
+                </td>
+                <td>@product.Description</td>
+                <td>@product.Category</td>
+                <td>@product.Quantity</td>
+                <td>@product.Price</td>
+                <td>@product.Total</td>
+                <td>@product.DateSell.ToString("yyyy/MM/dd")</td>
+
+                <td>
+                    <a type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID">
+                        <button class="btn btn-success btn-sm">
+                            <i class="bi bi-card-heading fs-2"></i>
+                        </button>
+                    </a>
+                    <a type="button" asp-controller="Product" asp-action="Edit" asp-route-id="@product.ProductID">
+                        <button class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil-square fs-2"></i>
+                        </button>
+                    </a>
+                    <a type="button" class="delete-button" data-id="@product.ProductID">
+                        <button class="btn btn-danger btn-sm">
+                            <i class="bi bi-calendar-x fs-2"></i>
+                        </button>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    }
+</table>

@@ -14,158 +14,193 @@
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
+<style>
+    .product-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #dee2e6;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .description-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+    .show-more {
+        color: #007bff;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+</style>
 
 <section>
     <div class="container mt-5">
-        <div class="bg-primary text-white p-4 rounded-top">
-            <h1 class="text-center">PHP CRUD Application Using jQuery Ajax</h1>
+        <div class="bg-primary text-white p-4 rounded-top text-center">
+            <h2>Product Management - Admin Panel</h2>
         </div>
-         <div class="container">
-            <div class="row">
-                <div class="col text-center">
-                    <p>Product Categories</p>
-                    <div class="mb-3">
-                        <a type="button" class="btn btn-secondary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="-1">All</a>
-                        @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
-                        {
-                            <a type="button" class="btn btn-secondary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="@category.Value">@category.Text</a>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-         <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <!-- Search -->
+        <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
             <div>
-                @if (isValidPage)
-                {
-                    <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
-                   asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
-                        Prev
-                    </a>
-                    <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
-                   asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
-                        Next
-                    </a>
-                    <span class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</span>
-                }
-            </div>
-        </div>
-        <div class="bg-white p-4 rounded-bottom shadow-sm">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <a type="button" asp-controller="Product" asp-action="Create">
-                    <button class="btn btn-primary d-flex align-items-center">
-                            <i class="bi bi-plus-circle fs-4"></i>
-                            <span class="ms-2">Add New</span>
-                    </button>
+                <a class="btn btn-success" asp-controller="Product" asp-action="Create">
+                    <i class="bi bi-plus-circle"></i> Add New Product
                 </a>
-                <div class="input-group w-25 ms-auto">
-                      <form method="get" class="form-inline my-2 my-lg-0">
-                        <div style="position: relative; width: 250px; background-color: rgb(227, 229, 210); border: 25px;">
-                            
-                            <input class="form-control" type="search" placeholder="Search" aria-label="Search"
-                            name="searchTerm"
-                                style="padding-right: 35px;">
-                            <button type="submit"
-                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: none;">
-                                <i class="bi bi-search"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
             </div>
+            <form method="get" class="d-flex" style="width: 250px;">
+                <input class="form-control" type="search" name="searchTerm" placeholder="Search..." value="@ViewBag.SearchTerm">
+                <button class="btn btn-outline-secondary" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
 
-            <table class="table table-bordered">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Category</th>
-                        <th>Quality</th>
-                        <th>Price</th>
-                        <th>Total</th>
-                        <th>Release</th>
+        <!-- Categories -->
+        <div class="text-center my-3">
+            <a class="btn btn-secondary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="-1">All</a>
+            @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
+            {
+                <a class="btn btn-secondary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="@category.Value">@category.Text</a>
+            }
+        </div>
 
-                    </tr>
-                </thead>
-                @foreach(var product in Model.Products)
-                {
-                   
-                    <tbody>
-                        <tr>
-                            <td class="d-flex align-items-center">
-                                @if(@product.Image != null)
-                                {
-                                    <img src="@product.Image" alt="Profile picture" class="rounded-circle mr-2" width="50" height="50">
-                                }
-                                else
-                                {
-                                    <img src="https://placehold.co/50x50" alt="Profile picture" class="rounded-circle mr-2" width="50" height="50">
-                                }
-                                @product.Name
-                            </td>
-                            <td>@product.Description</td>
-                            <td>@product.Category</td>
-                            <td>@product.Quantity</td>
-                            <td>@product.Price</td>
-                            <td>@product.Total</td>
-                            <td>@product.DateSell.ToString("yyyy/MM/dd")</td>
-
-
-                            <td>
-                                <a type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID">
-                                    <button class="btn btn-success btn-sm">
-                                        <i class="bi bi-card-heading fs-2"></i>
-                                    </button>
-                                </a>
-                                <a type="button" asp-controller="Product" asp-action="Edit" asp-route-id="@product.ProductID">
-                                    <button class="btn btn-warning btn-sm">
-                                            <i class="bi bi-pencil-square fs-2"></i>
-                                    </button>
-                                </a>
-                                <a type="button" class="delete-button" data-id="@product.ProductID">
-                                    <button class="btn btn-danger btn-sm">
-                                        <i class="bi bi-calendar-x fs-2"></i>
-                                    </button>
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                }
-            </table>
+        <!-- Product Cards -->
+        <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap">
+            <span class="text-muted">Showing @resultStart - @resultEnd of @Model.TotalProducts</span>
             <nav>
-                <ul class="pagination justify-content-center">
-                    <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                <ul class="pagination mb-0">
+                    <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-route-page="1" asp-route-category="@Model.Category">«</a>
+                    </li>
+                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                        <a class="page-link" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">‹</a>
+                    </li>
+
+                    @{
+                        var _start = Math.Max(1, Model.Page - 1);
+                        var _end = Math.Min(Model.TotalPages, Model.Page + 1);
+                        for (int i = _start; i <= _end; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" asp-route-page="@i" asp-route-category="@Model.Category">@i</a>
+                            </li>
+                        }
+                    }
+
+                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                        <a class="page-link" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">›</a>
+                    </li>
+                    <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-route-page="@Model.TotalPages" asp-route-category="@Model.Category">»</a>
+                    </li>
                 </ul>
             </nav>
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    @if (isValidPage)
-                    {
-                        <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
-                    asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
-                            Prev
-                        </a>
-                        <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
-                    asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
-                            Next
-                        </a>
-                        <span class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</span>
-                    }
-                </div>
-            </div>
         </div>
+        <div class="row">
+            @foreach (var product in Model.Products)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex gap-3 align-items-start">
+                                <img src="@product.Image" class="product-image" />
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title">@product.Name</h5>
+                                    <p class="text-muted mb-1"><strong>Category:</strong> @product.Category</p>
+                                    <p class="text-muted mb-1"><strong>Quantity:</strong> @product.Quantity</p>
+                                    <p class="text-muted mb-1"><strong>Price:</strong> $@product.Price</p>
+                                    <p class="text-muted mb-1"><strong>Total:</strong> $@product.Total</p>
+                                    <p class="text-muted mb-1"><strong>Release:</strong> @product.DateSell.ToString("yyyy/MM/dd")</p>
+
+                                    <p class="text-muted description-text" id="desc-@product.ProductID">@product.Description</p>
+                                    @if (product.Description?.Length > 120)
+                                    {
+                                        <span class="show-more" onclick="toggleDesc('@product.ProductID')">Xem thêm</span>
+                                    }
+
+                                    <div class="d-flex gap-2 mt-3">
+                                        <a class="btn btn-sm btn-outline-primary" asp-action="Detail" asp-controller="Product" asp-route-id="@product.ProductID">
+                                            <i class="bi bi-card-heading"></i> Detail
+                                        </a>
+                                        <a class="btn btn-sm btn-outline-warning" asp-action="Edit" asp-controller="Product" asp-route-id="@product.ProductID">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger delete-button" data-id="@product.ProductID">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap">
+            <span class="text-muted">Showing @resultStart - @resultEnd of @Model.TotalProducts</span>
+            <nav>
+                <ul class="pagination mb-0">
+                    <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-route-page="1" asp-route-category="@Model.Category">«</a>
+                    </li>
+                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                        <a class="page-link" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">‹</a>
+                    </li>
+
+                    @{
+                        var start = Math.Max(1, Model.Page - 1);
+                        var end = Math.Min(Model.TotalPages, Model.Page + 1);
+                        for (int i = start; i <= end; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" asp-route-page="@i" asp-route-category="@Model.Category">@i</a>
+                            </li>
+                        }
+                    }
+
+                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                        <a class="page-link" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">›</a>
+                    </li>
+                    <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-route-page="@Model.TotalPages" asp-route-category="@Model.Category">»</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </section>
+<!-- Toggle Description -->
+<script>
+    function toggleDesc(id) {
+        const desc = document.getElementById("desc-" + id);
+        if (desc.classList.contains("description-text")) {
+            desc.classList.remove("description-text");
+            event.target.innerText = "Show less";
+        } else {
+            desc.classList.add("description-text");
+            event.target.innerText = "Show more";
+        }
+    }
+</script>
+
+<!-- SweetAlert Delete -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".delete-button").forEach(button => {
             button.addEventListener("click", function (event) {
-                event.preventDefault(); // Ngăn điều hướng mặc định
-                let itemId = this.getAttribute("data-id"); // Lấy ID sản phẩm
+                event.preventDefault();
+                let itemId = this.getAttribute("data-id");
 
                 Swal.fire({
                     title: "Are you sure you want to delete?",
@@ -176,7 +211,6 @@
                     cancelButtonText: "Cancel"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Nếu người dùng xác nhận, chuyển hướng đến Controller để xóa
                         window.location.href = `/Product/DeleteAdmin/${itemId}`;
                     }
                 });

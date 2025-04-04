@@ -67,9 +67,9 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-   function calculateTotal() {
+    function calculateTotal() {
         let total = 0;
-        // Lấy tất cả checkbox đã được chọn
+        // Get all selected checkboxes
         document.querySelectorAll('.item-checkbox:checked').forEach(cb => {
             total += parseFloat(cb.dataset.price);
         });
@@ -83,14 +83,14 @@
         });
 
         if (selectedIds.length === 0) {
-            Swal.fire("Thông báo", "Vui lòng chọn ít nhất một sản phẩm!", "warning");
+            Swal.fire("Notification", "Please select at least one product!", "warning");
             return;
         }
 
-        // Hiển thị hộp thoại chọn phương thức thanh toán
+        // Display the payment method selection dialog
         Swal.fire({
-            title: "Chọn phương thức thanh toán",
-            text: "Vui lòng chọn phương thức thanh toán bạn muốn sử dụng.",
+            title: "Choose payment method",
+            text: "Please select the payment method you would like to use.",
             icon: "question",
             showCancelButton: true,
             confirmButtonText: "COD",
@@ -99,7 +99,7 @@
             denyButtonText: "ZaloPay",
             html: `
                 <button id="other-payment" class="swal2-confirm swal2-styled" style="margin-top: 10px;">
-                    Ví điện tử khác
+                    Other E-wallets
                 </button>
             `,
             didOpen: () => {
@@ -109,11 +109,11 @@
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                processOrder(selectedIds, 2);
+                processOrder(selectedIds, 2); // COD
             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                processOrder(selectedIds, 0);
+                processOrder(selectedIds, 0); // MoMo
             } else if (result.isDenied) {
-                processOrder(selectedIds, 1);
+                processOrder(selectedIds, 1); // ZaloPay
             }
         });
     }
@@ -126,11 +126,12 @@
         }).then(response => response.json())
         .then(data => {
             if (data.payUrl) {
-                window.location.href = data.payUrl;  // Redirect ở FE
+                window.location.href = data.payUrl;  // Redirect on frontend
             }
         });
     }
     window.onload = calculateTotal;
+
 </script>
 
 

@@ -1,8 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject UserManager<AppUser> UserManager
-
 @{
-
+    var appUser = User.Identity.IsAuthenticated ? await UserManager.GetUserAsync(User) : null;
+    var avatarUrl = appUser?.ProfileImageUrl ?? "https://placehold.co/30x30"; // Avatar mặc định nếu không có ảnh
+    @* var avatarUrl = Url.Content("~/uploads/avatars/" + avatarFileName); *@
+    var botAvatarUrl = Url.Content("~/Chatbot.jpg"); // Ảnh bot cố định
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +18,7 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MyMvcApp</title>
+    <title>iFood</title>
     <script type="importmap"></script>
     <link rel="icon" type="image/x-icon" href="@Url.Content("~/cutlery.png")" />
 
@@ -495,32 +497,30 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarResponsive">
                         <ul class="navbar-nav ms-auto my-2 my-lg-0" style="color: rgb(0, 0, 0); font-weight: bold;">
-                            <li class="nav-item pt-1"><a class="nav-link" href="#product">Product</a></li>
+                            <li class="nav-item pt-1"><a class="nav-link" asp-controller="Product" asp-action="Index">Product</a></li>
                             <li class="nav-item pt-1"><a class="nav-link" href="#services">Services</a></li>
                             <li class="nav-item pt-1"><a class="nav-link" href="#contact">Contact</a></li>
                             @if(User.Identity.IsAuthenticated)
                             {
-                                if(User.IsInRole("admin"))
+                                if(User.IsInRole("user"))
                                 {
-                                    <li class="nav-item pt-1"><a class="nav-link" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-area="" asp-controller="Cart" asp-action="Index">
+                                            <i class="bi bi-cart3 fs-5"></i> 
+                                        </a>
+                                    </li>
                                 }
-                                <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Logout"><i class="bi bi-box-arrow-in-right fs-5"></i></a></li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Cart" asp-action="Index">
-                                        <i class="bi bi-cart3 fs-5"></i> 
-                                    </a>
-                                </li>
                                 <li class="nav-item d-flex align-items-center">
                                     
                                     <div>
                                         
                                         @if (User.Identity.IsAuthenticated)
                                         {
-                                            var appUser = await UserManager.GetUserAsync(User);
-                                            var avatarUrl = appUser?.ProfileImageUrl ?? "https://placehold.co/30x30";
+                                            var appUsers = await UserManager.GetUserAsync(User);
+                                            var avatarUrls = appUsers?.ProfileImageUrl ?? "https://placehold.co/30x30";
                                             
                                             <a class="avatar" href="#" data-bs-toggle="dropdown" aria-expanded="false" id="avatarDropdown">
-                                                <img class="avatar" src="@avatarUrl" alt="User Avatar">
+                                                <img class="avatar" src="@avatarUrls" alt="User Avatar">
                                             </a>
                                         }
                                         else
@@ -558,9 +558,13 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item" asp-area="" asp-controller="Cart" asp-action="Index">
-                                                    <i class="bi bi-cart3 fs-5"></i> Your cart
-                                                </a>
+                                                @if(User.IsInRole("user"))
+                                                {
+                                                    <a class="dropdown-item" asp-area="" asp-controller="Cart" asp-action="Index">
+                                                        <i class="bi bi-cart3 fs-5"></i> Your cart
+                                                    </a>
+
+                                                }
                                             </li>
                                             <li>
                                                 <a class="dropdown-item" asp-area="" asp-controller="Order" asp-action="Index">
@@ -749,16 +753,22 @@
 
 
     </script>
+    <script>
+        var userAvatarUrl = "@avatarUrl";
+        var botAvatarUrl = "@botAvatarUrl";
+    </script>
      <script>
+
  function toggleChatbox() {
     $("#chatbox-container").toggle();
 }
+
 
 $(document).ready(function () {
     function appendMessage(sender, message, isBot = false) {
         const messageClass = isBot ? "bot" : "user";
         const messageBubbleClass = isBot ? "bot-message" : "user-message";
-        const avatarUrl = isBot ? "https://placehold.co/35x35" : "https://placehold.co/35x35";
+        const avatarUrl = isBot ? botAvatarUrl : userAvatarUrl;
         const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         const messageHtml = `
@@ -775,6 +785,26 @@ $(document).ready(function () {
         $("#chatlog").append(messageHtml);
         $("#chatbox-content").scrollTop($("#chatbox-content")[0].scrollHeight);
     }
+    const ProductCategory = [
+        "Boiled",
+        "Steamed",
+        "Fried",
+        "Grilled",
+        "Braised",
+        "Stirfried",
+        "Simmered",
+        "Salads"
+    ];
+    const ProductStatus = [
+        "Unknown",
+        "Bestseller",
+        "New Arrival",
+        "Featured",
+        "Out of Stock",
+        "Discounted",
+        "Limited Edition",
+        "Coming Soon"
+    ];
 
     function displayProducts(products) {
         let baseUrl = window.location.origin;
@@ -788,10 +818,11 @@ $(document).ready(function () {
                     <div class="product-card">
                         <img src="${product.img}" alt="${product.name}" class="product-image">
                         <div class="product-info">
-                            <h4>${product.name}</h4>
-                            <p>${product.description}</p>
+                            <h5>${product.name.length > 15 ? product.name.slice(0, 15) + "..." : product.name}</h5>
+                             <p>${ProductCategory[product.category]}</p>
+                              <p>${ProductStatus[product.status] || "Unknown"}</p>
                             <p><strong>${product.price}</strong></p>
-                            <a href="${baseUrl}/Product/Detail/${product.id}" class="product-button">🔍 Xem Chi Tiết</a>
+                            <a href="${baseUrl}/Product/Detail/${product.id}" class="product-button">🔍 Detail</a>
                         </div>
                     </div>
                 `;

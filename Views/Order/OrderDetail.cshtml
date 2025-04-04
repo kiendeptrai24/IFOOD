@@ -121,12 +121,33 @@
         .font-weight-bold {
             font-weight: bold;
         }
+    .order-status-box {
+        text-align: center;
+        padding: 10px;
+        transition: transform 0.3s, background-color 0.3s;
+        border-radius: 10px;
+    }
+
+    .order-status-box.active {
+        background-color: #e0f7fa;
+        border: 2px solid #007bff;
+        transform: scale(1.05);
+    }
+
+    .order-status-icon {
+        width: 50px;
+        height: 50px;
+    }
+
+
     </style>
 </head>
 <body>
         <div class="card mt-3" >
-        <h5>ĐƠN HÀNG <span class="text-primary font-weight-bold">@Model.TransactionId</span></h5>
-        <p>Vận chuyển bởi: <strong>USPS - 234094567242423422898</strong></p>
+        <h5>ORDER CODE: <span class="text-primary font-weight-bold">@Model.Ordercode</span></h5>
+        <p>Shipped by: <strong>USPS - 234094567242423422898</strong></p>
+        <p>Trans: <strong> @Model.TransactionId</strong></p>
+
 
         <!-- Thanh trạng thái đơn hàng -->
         <ul id="progressbar">
@@ -145,26 +166,26 @@
         </ul>
 
 
-
-        <!-- Các trạng thái với icon -->
-        <div class="icon-container">
-            <div class="icon-box">
-                <img class="icon" src="https://i.imgur.com/9nnc9Et.png">
-                <p class="font-weight-bold">Đã xử lý</p>
-            </div>
-            <div class="icon-box">
-                <img class="icon" src="https://i.imgur.com/u1AzR7w.png">
-                <p class="font-weight-bold">Đã gửi</p>
-            </div>
-            <div class="icon-box">
-                <img class="icon" src="https://i.imgur.com/TkPm63y.png">
-                <p class="font-weight-bold">Đang vận chuyển</p>
-            </div>
-            <div class="icon-box">
-                <img class="icon" src="https://i.imgur.com/HdsziHP.png">
-                <p class="font-weight-bold">Đã nhận</p>
-            </div>
+      <div class="icon-container">
+        <div class="order-status-box @(Model.status >= Status.PendingConfirmation ? "active" : "")">
+            <img class="order-status-icon" src="https://i.imgur.com/9nnc9Et.png">
+            <p class="font-weight-bold">Processed</p>
         </div>
+        <div class="order-status-box @(Model.status >= Status.Shipping ? "active" : "")">
+            <img class="order-status-icon" src="https://i.imgur.com/u1AzR7w.png">
+            <p class="font-weight-bold">Shipping</p>
+        </div>
+        <div class="order-status-box @(Model.status >= Status.Delivered ? "active" : "")">
+            <img class="order-status-icon" src="https://i.imgur.com/TkPm63y.png">
+            <p class="font-weight-bold">Delivered</p>
+        </div>
+        <div class="order-status-box @(Model.status == Status.Completed ? "active" : "")">
+            <img class="order-status-icon" src="https://i.imgur.com/HdsziHP.png">
+            <p class="font-weight-bold">Completed</p>
+        </div>
+    </div>
+
+
 
     </div>
 </body>

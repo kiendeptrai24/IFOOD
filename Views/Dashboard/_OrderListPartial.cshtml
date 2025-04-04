@@ -1,0 +1,222 @@
+﻿@using iFood.ViewModels
+@model IndexOrderViewModel
+@{
+    bool isAuthenticated = User.Identity?.IsAuthenticated == true;
+
+    int resultStart = ((Model.Page - 1) * Model.PageSize) + 1;
+    int resultEnd = Math.Min(resultStart + Model.PageSize - 1, Model.TotalProducts);
+    bool isValidPage = resultStart <= Model.TotalProducts;
+
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+
+
+}
+@functions {
+    public string GetStatusColor(iFood.Data.Enum.Status status)
+    {
+        return status switch
+        {
+            iFood.Data.Enum.Status.PendingConfirmation => "orange", 
+            iFood.Data.Enum.Status.Shipping => "blue", 
+            iFood.Data.Enum.Status.Delivered => "green", 
+            iFood.Data.Enum.Status.Completed => "purple", 
+            iFood.Data.Enum.Status.Canceled => "red", 
+            iFood.Data.Enum.Status.ReturnedOrRefunded => "gray", 
+            _ => "lightgray" 
+        };
+    }
+
+    public string GetStatusIcon(iFood.Data.Enum.Status status)
+    {
+        return status switch
+        {
+            iFood.Data.Enum.Status.PendingConfirmation => "bi-clock", 
+            iFood.Data.Enum.Status.Shipping => "bi-truck", 
+            iFood.Data.Enum.Status.Delivered => "bi-check-circle", 
+            iFood.Data.Enum.Status.Completed => "bi-check-all", 
+            iFood.Data.Enum.Status.Canceled => "bi-x-circle", 
+            iFood.Data.Enum.Status.ReturnedOrRefunded => "bi-arrow-repeat", 
+            _ => "bi-question-circle" 
+        };
+    }
+}
+  
+
+
+<div class="bg-white p-4 rounded-bottom shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <form method="get" class="form-inline my-2 my-lg-0 d-flex">
+            <input class="form-control me-2" type="search" placeholder="Search" name="searchTerm">
+            <button class="btn btn-outline-secondary" type="submit">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+    </div>
+    <!-- Phân trang -->
+    <nav>
+        <ul class="pagination justify-content-center">
+            <!-- Trang đầu (<<) -->
+            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="OrderIndex" asp-route-page="1" asp-route-category="@Model.Category">&laquo;&laquo;</a>
+            </li>
+
+            <!-- Trang gần hiện tại -->
+            @for (int i = Math.Max(1, Model.Page - 1); i <= Math.Min(Model.TotalPages, Model.Page + 1); i++)
+            {
+                <li class="page-item @(i == Model.Page ? "active" : "")">
+                    <a class="page-link" asp-action="OrderIndex" asp-route-page="@i" asp-route-category="@Model.Category">@i</a>
+                </li>
+            }
+
+            <!-- Trang cuối (>>) -->
+            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="OrderIndex" asp-route-page="@Model.TotalPages" asp-route-category="@Model.Category">&raquo;&raquo;</a>
+            </li>
+        </ul>
+    </nav>
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    @foreach (var order in Model.Orders)
+    {
+        <div class="col">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">Order Code: @order.Ordercode</h5>
+                        <small>Transaction ID: @order.TransactionId</small>
+                    </div>
+                    <span class="badge" 
+                        style="background-color: @(GetStatusColor(order.status))">
+                        <i class="bi @(GetStatusIcon(order.status))"></i> @order.status
+                    </span>
+                </div>
+
+                <div class="card-body">
+                    <p><strong>User ID:</strong> @order.AppUserId</p>
+                    <p><strong>Order Date:</strong> @order.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p><strong>Payment Method:</strong> @order.PaymentMethod</p>
+                    <hr />
+                    <h6>Products:</h6>
+                    <ul class="list-group mb-3">
+                        @foreach (var product in order.OrderDetails)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">@product.Product.Name</div>
+                                    Quantity: @product.Quantity
+                                </div>
+                                <span>$@((product.Quantity * (product.Product?.Price ?? 0)).ToString("0.00"))</span>
+                            </li>
+                        }
+                    </ul>
+
+                    <div class="d-flex justify-content-between">
+                        <span><strong>Total:</strong></span>
+                        <span class="fw-bold text-success">$@order.TotalPrice</span>
+                    </div>
+                </div>
+
+                <div class="card-footer d-flex justify-content-between">
+                    <a asp-controller="Order" asp-action="OrderDetail" asp-route-id="@order.Id" class="btn btn-success btn-sm">
+                        <i class="bi bi-card-heading"></i> Detail
+                    </a>
+                    <a asp-controller="Order" asp-action="UpdateStateForOrder" asp-route-id="@order.Id" class="btn btn-warning btn-sm">
+                        <i class="bi bi-arrow-right-square-fill"></i> Update
+                    </a>
+                    <button class="btn btn-secondary btn-sm" onclick="showStatusSelection(@order.Id)">
+                        Change Status
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Phân trang AJAX -->
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+            <a class="page-link" href="#" onclick="loadOrders(1)">&laquo;&laquo;</a>
+        </li>
+
+        @for (int i = Math.Max(1, Model.Page - 1); i <= Math.Min(Model.TotalPages, Model.Page + 1); i++)
+        {
+            <li class="page-item @(i == Model.Page ? "active" : "")">
+                <a class="page-link" href="#" onclick="loadOrders(@i)">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" href="#" onclick="loadOrders(@Model.TotalPages)">&raquo;&raquo;</a>
+        </li>
+    </ul>
+</nav>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Mapping trạng thái từ chữ sang số
+    const statusMapping = {
+        "PendingConfirmation": 0,
+        "Shipping": 1,
+        "Delivered": 2,
+        "Completed": 3,
+        "Canceled": 4,
+        "ReturnedOrRefunded": 5,
+    };
+
+    // Mở popup chọn trạng thái mới
+    function showStatusSelection(orderId) {
+        Swal.fire({
+            title: `Chọn trạng thái mới cho Order #${orderId}`,
+            input: "select",
+            inputOptions: {
+                "PendingConfirmation": "PendingConfirmation",
+                "Shipping": "Shipping",
+                "Delivered": "Delivered",
+                "Completed": "Completed",
+                "Canceled": "Canceled",
+                "ReturnedOrRefunded": "ReturnedOrRefunded"
+            },
+            inputPlaceholder: "Chọn trạng thái",
+            showCancelButton: true
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                sendData(orderId, result.value);
+            }
+        });
+    }
+
+    // Gửi yêu cầu cập nhật trạng thái đến API
+    function sendData(orderId, status) {
+        fetch('/Dashboard/UpdateOrderStatus', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: orderId, status: statusMapping[status] }) // Chuyển trạng thái sang số
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.fire("Thành công", `Cập nhật: ${data.message}`, "success")
+            .then(() => {
+                location.reload(); // Tải lại trang sau khi người dùng nhấn "OK"
+            });
+        })
+        .catch(error => Swal.fire("Lỗi", "Không thể cập nhật!", "error"));
+    }
+</script>
+<script>
+    $(document).on("click", ".pagination-link", function (e) {
+        e.preventDefault();
+        const url = $(this).attr("href");
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (data) {
+                $('#order-container').html($(data).find('#order-container').html());
+            }
+        });
+    });
+</script>
+

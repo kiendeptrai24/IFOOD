@@ -161,19 +161,17 @@ public class DashboardController : Controller
         return RedirectToAction("Index");
     }
 
-    public async Task<IActionResult> OrderIndex(string searchTerm,int category = -1, int page = 1, int pageSize = 6)
+    public async Task<IActionResult> OrderIndex(string searchTerm, int category = -1, int page = 1, int pageSize = 6)
     {
         if (page < 1 || pageSize < 1)
-        {
             return NotFound();
-        }
 
-       
         var orders = category switch
         {
             -1 => await _orderRepository.GetSliceAsync((page - 1) * pageSize, pageSize),
             _ => await _orderRepository.GetProductsByCategoryAndSliceAsync((ProductCategory)category, (page - 1) * pageSize, pageSize),
         };
+
         if (!string.IsNullOrEmpty(searchTerm))
         {
             orders = await _orderRepository.SearchAsync(searchTerm);
@@ -194,6 +192,7 @@ public class DashboardController : Controller
             TotalPages = (int)Math.Ceiling(count / (double)pageSize),
             Category = category,
         };
+
         foreach (Order order in ordersViewModel.Orders)
         {
             foreach (var orderDetail in order.OrderDetails)
@@ -202,8 +201,14 @@ public class DashboardController : Controller
             }
         }
 
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            return PartialView("_OrderListPartial", ordersViewModel);
+        }
+
         return View(ordersViewModel);
     }
+
     [HttpPost]
     [Consumes("application/json")]
     public async Task<IActionResult> UpdateOrderStatus([FromBody] OrderStatusUpdateModel model)

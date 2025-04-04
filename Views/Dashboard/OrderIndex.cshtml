@@ -4,207 +4,52 @@
 @using iFood.Models
 @model IndexOrderViewModel
 
-@{
-    bool isAuthenticated = User.Identity?.IsAuthenticated == true;
 
-    int resultStart = ((Model.Page - 1) * Model.PageSize) + 1;
-    int resultEnd = Math.Min(resultStart + Model.PageSize - 1, Model.TotalProducts);
-    bool isValidPage = resultStart <= Model.TotalProducts;
+@functions {
+    public string GetStatusColor(iFood.Data.Enum.Status status)
+    {
+        return status switch
+        {
+            iFood.Data.Enum.Status.PendingConfirmation => "orange", 
+            iFood.Data.Enum.Status.Shipping => "blue", 
+            iFood.Data.Enum.Status.Delivered => "green", 
+            iFood.Data.Enum.Status.Completed => "purple", 
+            iFood.Data.Enum.Status.Canceled => "red", 
+            iFood.Data.Enum.Status.ReturnedOrRefunded => "gray", 
+            _ => "lightgray" 
+        };
+    }
 
-    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    public string GetStatusIcon(iFood.Data.Enum.Status status)
+    {
+        return status switch
+        {
+            iFood.Data.Enum.Status.PendingConfirmation => "bi-clock", 
+            iFood.Data.Enum.Status.Shipping => "bi-truck", 
+            iFood.Data.Enum.Status.Delivered => "bi-check-circle", 
+            iFood.Data.Enum.Status.Completed => "bi-check-all", 
+            iFood.Data.Enum.Status.Canceled => "bi-x-circle", 
+            iFood.Data.Enum.Status.ReturnedOrRefunded => "bi-arrow-repeat", 
+            _ => "bi-question-circle" 
+        };
+    }
 }
+
+
 
 <section>
     <div class="container mt-5">
         <div class="bg-primary text-white p-4 rounded-top">
             <h1 class="text-center">Order List</h1>
         </div>
+
         <div class="container">
-            <div class="row">
-                <div class="col text-center">
-                    <p>Product Categories</p>
-                    <div class="mb-3">
-                        <a class="btn btn-secondary mb-1" asp-action="OrderIndex" asp-route-page="1" asp-route-category="-1">All</a>
-                        @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
-                        {
-                            <a class="btn btn-secondary mb-1" asp-action="OrderIndex" asp-route-page="1" asp-route-category="@category.Value">@category.Text</a>
-                        }
-                    </div>
-                </div>
+       
+           <div id="order-container">
+                @await Html.PartialAsync("_OrderListPartial", Model)
             </div>
-        </div>
-        
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                @if (isValidPage)
-                {
-                    <a class="btn btn-sm btn-outline-primary @prevDisabled" asp-action="OrderIndex" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">Prev</a>
-                    <a class="btn btn-sm btn-outline-primary @nextDisabled" asp-action="OrderIndex" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">Next</a>
-                    <span class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</span>
-                }
-            </div>
-            
-            <div class="bg-white p-4 rounded-bottom shadow-sm">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <a asp-controller="Product" asp-action="Create" class="btn btn-primary">
-                        <i class="bi bi-plus-circle fs-4"></i>
-                        <span class="ms-2">Add New</span>
-                    </a>
-                    
-                    <form method="get" class="form-inline my-2 my-lg-0 d-flex">
-                        <input class="form-control me-2" type="search" placeholder="Search" name="searchTerm">
-                        <button class="btn btn-outline-secondary" type="submit">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </form>
-                </div>
-                <div class="table-responsive" style="overflow-x: auto;">
 
-                <table class="table table-bordered table-striped table-hover">
-                    <thead class="table-dark text-center">
-                        <tr>
-                            <th>#</th>
-                            <th>Order Code</th>
-                            <th>Transaction Id</th>
-                            <th>Status</th>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Total</th>
-                            <th>Order Date</th>
-                            <th>Payment Method</th>
-                            <th>Order Total</th>
-                            <th>Custem</th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            int count = 1;
-
-                            @foreach (var order in Model.Orders)
-                            {
-                                var firstRow = true;
-                                // Đánh số thứ tự đơn hàng
-                                <a type="button" asp-controller="Order" asp-action="OrderDetail" asp-route-id="@order.Id">
-                                @foreach (var product in order.OrderDetails)
-                                {
-                                    
-                                    <tr>
-                                        
-                                        @if (firstRow) 
-                                        {
-                                            <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@count</td>
-                                            <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@order.Ordercode</td>
-                                            <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@order.TransactionId</td>
-                                            <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@order.status</td>
-                                        }
-                                        <td>@(product.Product?.Name ?? "N/A")</td>
-                                        <td class="text-center">@product.Quantity</td>
-                                        <td class="text-end">$@product.Product?.Price</td>
-                                        <td class="text-end">$@((product.Quantity * (product.Product?.Price ?? 0)).ToString("0.00"))</td>
-                                        @if (firstRow)
-                                        {
-                                            <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
-                                            <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@order.PaymentMethod</td>
-                                            <td rowspan="@order.OrderDetails.Count" class="text-end align-middle">$@order.TotalPrice</td>
-                                            firstRow = false;
-                                            <td rowspan="@order.OrderDetails.Count">
-                                                <a type="button" asp-controller="Order" asp-action="OrderDetail" asp-route-id="@order.Id">
-                                                    <button class="btn btn-success btn-sm">
-                                                        <i class="bi bi-card-heading fs-1"></i>
-                                                    </button>
-                                                </a>
-                                                <a type="button" asp-controller="Order" asp-action="UpdateStateForOrder" asp-route-id="@order.Id">
-                                                    <button class="btn btn-warning btn-sm">
-                                                        <i class="bi bi-arrow-right-square-fill fs-1"></i>
-                                                    </button>
-                                                </a>
-
-                                                <div class="mb-3">
-                                                
-
-                                                    <button class="btn btn-warning mt-2" onclick="showStatusSelection(@order.Id)">Đổi Trạng Thái</button>
-                                                </div>
-                                            </td>
-                                        }
-                                    </tr>
-                                }
-                                </a>
-                                count++;
-                            }
-                        }
-
-
-                    </tbody>
-                </table>
-                
-                </div>
-                <nav>
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item @prevDisabled"><a class="page-link" asp-action="OrderIndex" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">&laquo;</a></li>
-                        @for (int i = 1; i <= Model.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link" asp-action="OrderIndex" asp-route-page="@i" asp-route-category="@Model.Category">@i</a>
-                            </li>
-                        }
-                        <li class="page-item @nextDisabled"><a class="page-link" asp-action="OrderIndex" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">&raquo;</a></li>
-                    </ul>
-                </nav>
-            </div>
         </div>
     </div>
 </section>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    // Mapping trạng thái từ chữ sang số
-    const statusMapping = {
-        "PendingConfirmation": 0,
-        "Shipping": 1,
-        "Delivered": 2,
-        "Completed": 3,
-        "Canceled": 4,
-        "ReturnedOrRefunded": 5,
-    };
 
-    // Mở popup chọn trạng thái mới
-    function showStatusSelection(orderId) {
-        Swal.fire({
-            title: `Chọn trạng thái mới cho Order #${orderId}`,
-            input: "select",
-            inputOptions: {
-                "PendingConfirmation": "PendingConfirmation",
-                "Shipping": "Shipping",
-                "Delivered": "Delivered",
-                "Completed": "Completed",
-                "Canceled": "Canceled",
-                "ReturnedOrRefunded": "ReturnedOrRefunded"
-            },
-            inputPlaceholder: "Chọn trạng thái",
-            showCancelButton: true
-        }).then((result) => {
-            if (result.isConfirmed && result.value) {
-                sendData(orderId, result.value);
-            }
-        });
-    }
-
-    // Gửi yêu cầu cập nhật trạng thái đến API
-    function sendData(orderId, status) {
-        fetch('/Dashboard/UpdateOrderStatus', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: orderId, status: statusMapping[status] }) // Chuyển trạng thái sang số
-        })
-        .then(response => response.json())
-        .then(data => {
-            Swal.fire("Thành công", `Cập nhật: ${data.message}`, "success")
-            .then(() => {
-                location.reload(); // Tải lại trang sau khi người dùng nhấn "OK"
-            });
-        })
-        .catch(error => Swal.fire("Lỗi", "Không thể cập nhật!", "error"));
-    }
-</script>

@@ -15,53 +15,63 @@
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
-
 <style>
     #formContainer {
-    background-color: rgba(2, 28, 46, 0.395); /* Màu xanh dương */
-    padding: 20px;
-    border-radius: 10px;
+        background-color: rgba(2, 28, 46, 0.395);
+        padding: 20px;
+        border-radius: 10px;
     }
-    #boderx
-    {
+    #boderx {
         border-radius: 15px;
     }
     .portfolio-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 cột mỗi hàng */
-    gap: 15px; /* Khoảng cách giữa ảnh */
-    justify-content: center;
-    max-width: 800px;
-    margin: auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        justify-content: center;
+        max-width: 800px;
+        margin: auto;
     }
-
     .portfolio-box img {
         width: 100%; 
         height: 300px; 
         object-fit: cover;
     }
     .no-bullets {
-        list-style-type: none; /* Loại bỏ dấu chấm */
-        padding-left: 0; /* Xóa khoảng thụt lề mặc định */
+        list-style-type: none;
+        padding-left: 0;
     }
     .fixed-card {
-            height: 170px; /* Chiều cao cố định */
-            display: flex;
-            justify-content: center; /* Căn giữa theo chiều ngang */
-            align-items: center; /* Căn giữa theo chiều dọc */
-            overflow: hidden; /* Đảm bảo không bị tràn nội dung */
+        height: 170px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
     }
     .fixed-card-img {
-        object-fit: scale-down; /* Cắt ảnh để vừa khung */
-        height: 100%; /* Ảnh full chiều cao */
-        width: 100%; /* Ảnh full chiều rộng */
+        object-fit: scale-down;
+        height: 100%;
+        width: 100%;
         display: block;
     }
-
-}
+    .card {
+        transition: transform 0.3s ease-in-out;
+        position: relative;
+    }
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .card-body {
+        transition: opacity 0.3s ease-in-out;
+    }
+    .card:hover .card-body {
+        opacity: 1;
+    }
+    .btn:hover {
+        opacity: 0.8;
+    }
 </style>
-
-
 
 <section class="space-sm flush-with-above page-section" id="product">
     <div class="container">
@@ -88,11 +98,9 @@
             @if (isValidPage)
             {
                 <div class="d-flex justify-content-center align-items-center mt-4">
-
                     <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
                     asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
                         <i class="bi bi-arrow-left-short fs-5"></i>
-
                     </a>
                     <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
                     asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
@@ -108,128 +116,67 @@
         <ul class="row d-flex justify-content-center">
             @foreach (var product in Model.Products)
             {
-                @* <a type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID" > *@
-                    <div class="card m-2 col-12 col-md-4 col-lg-3 mt-2" style="width: 18rem;">
-                        <div class="card-body">
-                            @if(product.Status == null || product.Status == ProductStatus.Unknown)
-                            {
-                                    <span class="badge badge-pill badge-light text-purple-800 bg-purple-200 mb-2">
-                                        
+                <div class="card m-2 col-12 col-md-4 col-lg-3 mt-2" style="width: 18rem;">
+                    <div class="card-body">
+                        @if(product.Status == null || product.Status == ProductStatus.Unknown)
+                                {
+                                        <span class="badge badge-pill badge-light text-purple-800 bg-purple-200 mb-2">
+                                            
+                                        </span>
+                                }
+                                else
+                                {
+                                     <span class="badge badge-pill text-white mb-2"
+                                        style="background-color: 
+                                            @(product.Status switch
+                                            {
+                                                ProductStatus.Bestseller => "green",
+                                                ProductStatus.NewArrival => "blue",
+                                                ProductStatus.Featured => "purple",
+                                                ProductStatus.OutOfStock => "gray",
+                                                ProductStatus.Discounted => "red",
+                                                ProductStatus.LimitedEdition => "gold",
+                                                ProductStatus.ComingSoon => "orange",
+                                                _ => "brown" // Mặc định
+                                            });">
+                                        @product.Status
                                     </span>
+                                }
+                        <div>
+                            <a class="fixed-card" type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID">
+                            @if(@product.Image != null)
+                            {
+                                <img class="card-img-top card-img-top mb-4 fixed-card-img" src="@product.Image" alt="Card image cap">   
                             }
                             else
                             {
-                                <span class="badge badge-pill text-white mb-2"
-                                    style="background-color: 
-                                        @(product.Status switch
-                                        {
-                                            ProductStatus.Bestseller => "green",
-                                            ProductStatus.NewArrival => "blue",
-                                            ProductStatus.Featured => "purple",
-                                            ProductStatus.OutOfStock => "gray",
-                                            ProductStatus.Discounted => "red",
-                                            ProductStatus.LimitedEdition => "gold",
-                                            ProductStatus.ComingSoon => "orange",
-                                            _ => "brown" // Mặc định
-                                        });">
-                                    @product.Status
-                                </span>
+                                <img class="card-img-top card-img-top mb-4 fixed-card-img" src="/img/rungroopclub.png" alt="Card image cap">   
                             }
-                            <div>
-                                <a class="fixed-card" type="button" asp-controller="Product" asp-action="Detail"  asp-route-id="@product.ProductID" fixed-card>
-                                @if(@product.Image != null)
-                                {
-                                    <img class="card-img-top card-img-top mb-4 fixed-card-img" src="@product.Image" alt="Card image cap">   
-                                }
-                                else
-                                {
-                                    <img class="card-img-top card-img-top mb-4 fixed-card-img" src="/img/rungroopclub.png" alt="Card image cap">   
-                                }
-                                
+                            </a>
+                        </div>
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text text-muted">Shipped in 3-4 days</p>
+                        <p class="card-text text-muted">Quantity: @product.Quantity</p>
+                        <p class="card-text font-weight-bold">$@product.Price</p>
+                        <div class="d-flex">
+                            @if(product.Quantity <= 0)
+                            {
+                                <p>Sold out</p>
+                            }
+                            else
+                            {
+                                <a type="button" asp-controller="Cart" asp-action="Create"
+                                asp-route-id="@product.ProductID">
+                                    <button class="btn btn-light flex-fill mr-2"><i class="bi bi-bag-plus fs-5"></i> Add Cart</button>
                                 </a>
-                            </div>
-                            <h5 class="card-title">@product.Name</h5>
-                            <p class="card-text text-muted">Shipped in 3-4 days</p>
-                            <p class="card-text text-muted">Quantity:  @product.Quantity</p>
-                            <p class="card-text font-weight-bold">$@product.Price</p>
-                            <div class="d-flex">
-                                @if(product.Quantity <= 0)
-                                {
-                                    <p>Sold out</p>
-                                }
-                                else
-                                {
-                                    <a type="button" asp-controller="Cart" asp-action="Create"
-                                    asp-route-id="@product.ProductID">
-                                    <button class="btn btn-light flex-fill mr-2"><i class="bi bi-bag-plus fs-5"></i>
-                                        Add Cart</button>
-                                    </a>
-                                    <button class="btn btn-primary flex-fill" onclick="BuyItems(this)" data-id="@product.ProductID"><i class="bi bi-piggy-bank fs-5"></i>Buy</button>
-
-                                }
-                            </div>
+                                <button class="btn btn-primary flex-fill" onclick="BuyItems(this)" data-id="@product.ProductID">
+                                    <i class="bi bi-piggy-bank fs-5"></i> Buy
+                                </button>
+                            }
                         </div>
                     </div>
-                
-                    @* <li class="col-12 col-md-4 col-lg-3 mt-2"  style="height: 500px;" >
-                        <div class="card">
-                            <a type="button" asp-controller="Product" asp-action="Detail"  asp-route-id="@product.ProductID"  style="height: 300px;">
-                                @if(@product.Image != null)
-                                {
-                                    <img class="card-img-top" src="@product.Image" alt="Card image cap">   
-                                }
-                                else
-                                {
-                                    <img class="card-img-top" src="/img/rungroopclub.png" alt="Card image cap">   
-                                }
-                                
-                            </a>
-                            <div class="card-body">
-                                <h4 class="card-title">@product.Name</h4>
-                                <p class="card-text">@product.Description</p>
-                                <p class="card-text">@product.Quantity, @product.Price</p>Price
-                            </div>
-                            <div class="card-footer card-footer-borderless d-flex justify-content-between">
-                                <div>
-                                    <small>@product.Category</small>
-                                </div>
-                                @if (isAuthenticated && User.IsInRole("admin"))
-                                {
-                                    <div>
-                                        <a type="button" class="btn btn-sm btn-outline-info" asp-controller="Product" asp-action="Edit" asp-route-id="@product.ProductID">
-                                            Edit
-                                        </a>
-                                        <a type="button" class="btn btn-sm btn-outline-danger" asp-controller="Product" asp-action="Delete" asp-route-id="@product.ProductID">
-                                            Delete
-                                        </a>
-                                    </div>
-                         d-fle       }
-                            </div>
-                        </div>
-                    </li> *@
-                @* </a> *@
+                </div>
             }
         </ul>
-        <div class="container">
-            <div class="row">
-                @if (isValidPage)
-                {
-                    <div class="d-flex justify-content-center align-items-center mt-4">
-                        <div class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</div>
-                    </div>
-                    <div class="d-flex justify-content-center align-items-center mb-4">
-                        <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
-                        asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
-                            <i class="bi bi-arrow-left-short fs-5"></i>
-
-                        </a>
-                        <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
-                        asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
-                            <i class="bi bi-arrow-right-short fs-5"></i>
-                        </a>
-                    </div>
-                }
-            </div>
-        </div>
     </div>
 </section>

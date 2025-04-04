@@ -7,129 +7,127 @@ using iFood.Data;
 using Microsoft.EntityFrameworkCore;
 using iFood.Models;
 
-namespace iFood.Controllers          // Định nghĩa namespace cho Controller.
+namespace iFood.Controllers
 {
-    public class ChatbotController : Controller  // Định nghĩa controller tên ChatbotController.
+    public class ChatbotController : Controller
     {
         private readonly HttpClient _httpClient;
         private readonly string _geminiApiKey;
         private readonly ApplicationDBContext _dbContext;
 
-
         public ChatbotController(IHttpClientFactory httpClientFactory, IConfiguration configuration, ApplicationDBContext dbContext)
         {
-            _httpClient = httpClientFactory.CreateClient();       // Tạo HttpClient từ factory.
-            _geminiApiKey = configuration.GetValue<string>("GeminiApiKey");  // Đọc API Key từ cấu hình (có vẻ code này đang làm sai, đáng lẽ nên truyền vào key string từ appsettings).
+            _httpClient = httpClientFactory.CreateClient();
+            _geminiApiKey = configuration.GetValue<string>("GeminiApiKey");
             _dbContext = dbContext;
         }
-      [HttpPost]
-public async Task<IActionResult> GetResponse(string message)
-{
-    if (string.IsNullOrEmpty(message))
-    {
-        return Json(new { response = "Vui lòng nhập câu hỏi!" });
-    }
 
-    // Tách từ khóa tìm kiếm
-    var keywords = message.ToLower().Split(' ');
+        [HttpPost]
+        public async Task<IActionResult> GetResponse(string message)
+        {
+            if (string.IsNullOrEmpty(message))
+            {
+                return Json(new { response = "Please enter your question!" });
+            }
 
-    // Lọc sản phẩm theo từ khóa
-    var relevantProducts = await _dbContext.Products
-        .Where(p => keywords.Any(k => p.Name.ToLower().Contains(k) || p.Description.ToLower().Contains(k)))
-        .Select(p => new 
-        { 
-            p.ProductID, 
-            p.Name, 
-            p.Quantity,
-            p.Price, 
-            p.Description, 
-            p.SoldOut,
-            p.Image
-        })
-        .ToListAsync();
+            // Extract keywords from the message
+            var keywords = message.ToLower().Split(' ');
 
-    // Nếu không tìm thấy sản phẩm phù hợp, lấy tất cả sản phẩm
-    if (!relevantProducts.Any())
-    {
-        relevantProducts = await _dbContext.Products
-            .Select(p => new { p.ProductID, p.Name,p.Quantity, p.Price, p.Description, p.SoldOut, p.Image })
-            .ToListAsync();
-    }
+            // Filter products based on keywords
+            var relevantProducts = await _dbContext.Products
+                .Where(p => keywords.Any(k =>
+                    p.Name.ToLower().Contains(k) ||
+                    p.Category.ToString().ToLower().Contains(k) ||
+                    p.Price.ToString().ToLower().Contains(k) ||
+                    p.Quantity.ToString().ToLower().Contains(k) ||
+                    p.Status.ToString().ToLower().Contains(k) // Convert Enum to String
+                )) 
+                .Select(p => new
+                {
+                    p.ProductID,
+                    p.Name,
+                    p.Quantity,
+                    p.Category,
+                    p.Price,
+                    p.Image,
+                    p.Status
+                })
+                .Take(3)
+                .ToListAsync();
 
-    // Chuẩn bị danh sách sản phẩm dưới dạng JSON
-    var productsResponse = relevantProducts.Select(p => new
-    {
-        id = p.ProductID,
-        name = p.Name,
-        price = $"{p.Price} VND",
-        description = p.Description,
-        soldout = p.SoldOut,
-        qualiti = p.Quantity ,
-        img = p.Image,
-    }).ToList();
-    string productContext = "Danh sách sản phẩm:\n";
-    foreach (var product in productsResponse)
-    {
-        productContext += $"- {product.name} (ID: {product}): Giá {product.price} USDUSD, {product.description}, {(product.qualiti > 0 ? "còn hàng" : "hết hàng")}\n";
-    }
+            // If no relevant product found, return default top 4 products
+            if (!relevantProducts.Any())
+            {
+                relevantProducts = await _dbContext.Products
+                    .Select(p => new { p.ProductID, p.Name, p.Quantity, p.Category, p.Price, p.Image, p.Status })
+                    .Take(4)
+                    .ToListAsync();
+            }
 
-                // ---- Bước 3: Tạo prompt cho Gemini AI ----
-            string fullMessage = $"  Bạn là chatbot bán hàng. Dữ liệu sản phẩm:\n{productContext}\nHãy trả lời câu hỏi: '{message}' bằng tiếng Việt một cách chính xác và dễ hiểu." ;
+            // Prepare product list in JSON
+            var productsResponse = relevantProducts.Select(p => new
+            {
+                id = p.ProductID,
+                name = p.Name,
+                price = $"{p.Price}",
+                category = p.Category,
+                qualiti = p.Quantity,
+                img = p.Image,
+                status = p.Status,
+            }).ToList();
 
-            // ---- Bước 4: Chuẩn bị payload gửi tới Gemini ----
+            // Format product list as plain text
+            StringBuilder productContext = new StringBuilder("Here are some products you might be interested in:\r\n\r\n");
+            foreach (var product in relevantProducts)
+            {
+                productContext.AppendLine($" **Product Name**: {product.Name}\r\n");
+                productContext.AppendLine($" **Product ID**: {product.ProductID}\r\n");
+                productContext.AppendLine($" **Price**: {product.Price} VND\r\n");
+                productContext.AppendLine($" **Category**: {product.Category}\r\n");
+                productContext.AppendLine($" **Availability**: {(product.Quantity > 0 ? "In stock" : "Out of stock")}\r\n");
+                productContext.AppendLine($" **Status**: {product.Status}\r\n");
+                productContext.AppendLine("------------------------------------------------\r\n");
+            }
+
+            // Compose full message for Gemini with instruction to avoid using Markdown
+            string fullMessage = "You are a sales chatbot. Provide a clear response and do not use Markdown. Below is the product information:\r\n\r\n"
+                                 + productContext.ToString()
+                                 + $"(If the question is in a language, answer in that language.)"
+                                 + $"Please answer the question or suggest relevant products: '{message}'. Ensure each product detail is separated correctly by line breaks.";
+
+            // Prepare payload for Gemini API
             var payload = new
             {
-                contents = new[] { new { parts = new[] { new { text = fullMessage } } } }  // Định dạng JSON yêu cầu của Gemini.
+                contents = new[] { new { parts = new[] { new { text = fullMessage } } } }
             };
 
-    // 🔴 Thay đổi: Yêu cầu Gemini trả về JSON, không trả về Markdown/text.
-    // var payload = new
-    // {
-    //     contents = new[]
-    //     {
-    //         new
-    //         {
-    //             parts = new[]
-    //             {
-    //                 new
-    //                 {
-    //                     text = "Hãy trả về danh sách JSON không Markdown, không có dấu *, không có ký tự thừa:\n" +
-    //                            JsonConvert.SerializeObject(productsResponse)
-    //                 }
-    //             }
-    //         }
-    //     }
-    // };
+            var jsonPayload = JsonConvert.SerializeObject(payload, Formatting.Indented);
+            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+            var requestUrl = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={_geminiApiKey}";
 
-    var jsonPayload = JsonConvert.SerializeObject(payload);
-    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-    var requestUrl = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={_geminiApiKey}";
+            try
+            {
+                var response = await _httpClient.PostAsync(requestUrl, content);
+                response.EnsureSuccessStatusCode();
+                var responseString = await response.Content.ReadAsStringAsync();
 
-    try
-    {
-        var response = await _httpClient.PostAsync(requestUrl, content);
-        response.EnsureSuccessStatusCode();
-        var responseString = await response.Content.ReadAsStringAsync();
+                dynamic result = JsonConvert.DeserializeObject(responseString);
+                string botResponse = "Sorry, I couldn't process your request at the moment.";
 
-        dynamic result = JsonConvert.DeserializeObject(responseString);
-        string botResponse = "Xin lỗi, tôi không thể xử lý yêu cầu của bạn ngay lúc này.";
+                // Parse response from Gemini
+                if (result?.candidates != null && result.candidates.Count > 0 &&
+                    result.candidates[0]?.content?.parts != null && result.candidates[0].content.parts.Count > 0)
+                {
+                    botResponse = result.candidates[0].content.parts[0].text;
+                }
 
-        // 🔴 Kiểm tra dữ liệu trước khi truy xuất
-        if (result?.candidates != null && result.candidates.Count > 0 &&
-            result.candidates[0]?.content?.parts != null && result.candidates[0].content.parts.Count > 0)
-        {
-            botResponse = result.candidates[0].content.parts[0].text;
+                // Return JSON with bot response and product list
+                return Json(new { response = botResponse, products = productsResponse });
+            }
+            catch
+            {
+                return Json(new { response = "Sorry, there was an error processing your request. Please try again!" });
+            }
         }
-        
-
-        // Trả về JSON chứa phản hồi và danh sách sản phẩm
-        return Json(new { response = botResponse, products = productsResponse });
-    }
-    catch
-    {
-        return Json(new { response = "Xin lỗi, tôi gặp sự cố khi xử lý yêu cầu. Vui lòng thử lại!" });
-    }
-}
-
     }
 }

@@ -104,7 +104,6 @@ public class OrderController : Controller
         products.Add(product);
         HttpContext.Session.SetString("ProductToDelete", JsonConvert.SerializeObject(products));
         HttpContext.Session.SetString("NewOrder", JsonConvert.SerializeObject(newOrder));
-        
         return RedirectToAction("CreatePayment", "Payment",new { paymentMethod = model.paymentMethod });
     }
     
@@ -170,7 +169,7 @@ public class OrderController : Controller
         }
         newOrder.OrderDetails.AddRange(newOrderDetails);
 
-        //_cartRepository.DeleteAll(cartsToDeleteFromProduct);
+
         
         HttpContext.Session.SetString("ProductToDelete", JsonConvert.SerializeObject(productsToDeletes));
         HttpContext.Session.SetString("CartToDelete", JsonConvert.SerializeObject(cartsToOrder));

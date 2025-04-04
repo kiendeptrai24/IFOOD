@@ -17,102 +17,252 @@
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
+
 <style>
     #formContainer {
-    background-color: rgba(2, 28, 46, 0.395); /* Màu xanh dương */
-    padding: 20px;
-    border-radius: 10px;
+        background-color: rgba(2, 28, 46, 0.395);
+        padding: 20px;
+        border-radius: 10px;
     }
-    #boderx
-    {
+    #boderx {
         border-radius: 15px;
     }
     .portfolio-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 cột mỗi hàng */
-    gap: 15px; /* Khoảng cách giữa ảnh */
-    justify-content: center;
-    max-width: 800px;
-    margin: auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        justify-content: center;
+        max-width: 800px;
+        margin: auto;
     }
-
     .portfolio-box img {
         width: 100%; 
         height: 300px; 
         object-fit: cover;
     }
     .no-bullets {
-        list-style-type: none; /* Loại bỏ dấu chấm */
-        padding-left: 0; /* Xóa khoảng thụt lề mặc định */
+        list-style-type: none;
+        padding-left: 0;
     }
     .fixed-card {
-            height: 170px; /* Chiều cao cố định */
-            display: flex;
-            justify-content: center; /* Căn giữa theo chiều ngang */
-            align-items: center; /* Căn giữa theo chiều dọc */
-            overflow: hidden; /* Đảm bảo không bị tràn nội dung */
+        height: 170px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
     }
     .fixed-card-img {
-        object-fit: scale-down; /* Cắt ảnh để vừa khung */
-        height: 100%; /* Ảnh full chiều cao */
-        width: 100%; /* Ảnh full chiều rộng */
+        object-fit: scale-down;
+        height: 100%;
+        width: 100%;
         display: block;
     }
+    .card {
+        transition: transform 0.3s ease-in-out;
+        position: relative;
+    }
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .card-body {
+        transition: opacity 0.3s ease-in-out;
+    }
+    .card:hover .card-body {
+        opacity: 1;
+    }
+    .btn:hover {
+        opacity: 0.8;
+    }
+</style>
+<style>
+    #carouselContainer::-webkit-scrollbar {
+        display: none;
+    }
 
-}
+    #carouselContainer {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 </style>
 
 
-<section class="container">
-    <div class="d-flex justify-content-center">
-        <div id="carouselExampleIndicators" class="carousel slide mx-auto"  style="width: 60%;" data-bs-ride="carousel">
-            
-            <div class="carousel-inner" id="boderx">
-                <ol class="carousel-indicators">
-                    <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></li>
-                    <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></li>
-                    <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></li>
-                </ol>
-                <div class="carousel-item active">
-                    <img class="d-block w-100 " id="boderx" src="~/img/Foot/11.jpg" alt="First slide">
-                    <div class="carousel-caption d-none d-md-block">
-                        <h5>Third slide kien</h5>
-                        <p>Praesent commodo cursus magna, vel scelerisque nisl.</p>
+ <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+
+        /* Container chính */
+        .sectionMenu {
+            padding: 50px 0;
+
+        }
+
+        .menu-container {
+            background:  #B71C1C;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Tiêu đề */
+        .special-font {
+            font-family: 'Great Vibes', cursive;
+            font-size: 4rem;
+            color: #FFC107;
+        }
+
+        /* Logo */
+        .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #FFC107;
+        }
+
+        /* Huy hiệu giảm giá */
+        .save-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #B71C1C;
+            color: #FFC107;
+            padding: 12px;
+            border-radius: 50%;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Nút đặt hàng */
+        .order-now {
+            background-color: #FFC107;
+            color: #7B1E1E;
+            font-weight: bold;
+            border-radius: 50px;
+            padding: 12px 25px;
+            border: none;
+            font-size: 1.2rem;
+        }
+
+        .order-now:hover {
+            background-color: #ffca28;
+        }
+
+        /* Thông tin giao hàng */
+        .delivery-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+
+        .delivery-info i {
+            color: #FFC107;
+            font-size: 1.5rem;
+        }
+
+        /* Căn giữa ảnh trong cột */
+        .image-container {
+            text-align: center;
+            position: relative;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+    </style>
+
+
+<section>
+    <div class="container mt-5">
+        <div class="row align-items-center menu-container">
+            <!-- Cột nội dung (bên trái) -->
+            <div class="col-md-6 text-start">
+                <div class="logo">LOGO HERE</div>
+                <h1 class="display-4 fw-bold">TODAY'S</h1>
+                <h2 class="special-font">Special</h2>
+                <h3 class="display-4 text-warning">Menu</h3>
+                <p class="mt-4" style="max-width: 500px;">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.
+                </p>
+                <div class="d-flex align-items-center gap-4 mt-4">
+                    <a href="#product">
+                        <button class="order-now">ORDER NOW</button>
+                    </a>
+                    <div class="delivery-info">
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <p class="mb-0">FOR DELIVERY</p>
+                            <p class="mb-0 fs-4 fw-bold">098-654-828</p>
+                        </div>
                     </div>
-                
                 </div>
-                <div class="carousel-item">
-                    <img class="d-block w-100" id="boderx" src="~/img/Foot/3.webp" alt="Second slide">
-                    <div class="carousel-caption d-none d-md-block">
-                        <h5>Third slide kien</h5>
-                        <p>Praesent commodo cursus magna, vel scelerisque nisl.</p>
-                    </div>
-                
-                </div>
-                <div class="carousel-item">
-                    <img class="d-block w-100" id="boderx" src="~/img/Foot/9.jpg" alt="Third slide">
-                    <div class="carousel-caption d-none d-md-block">
-                    <h5>Third slide kien</h5>
-                        <p>Praesent commodo cursus magna, vel scelerisque nisl.</p>
-                    </div>
-                </div>
-                <a class="carousel-control-prev align-items-center" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </a>
-                <a class="carousel-control-next align-items-center" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </a>
             </div>
+
+         
+            <!-- Cột hình ảnh (bên phải) -->
+            <div class="col-md-6 image-container">
+                <div class="row">
+                    <div class="row">
+                        <div class="d-flex justify-content-center">
+                            <div id="carouselExampleIndicators" class="carousel slide mx-auto"  style="width: 60%;" data-bs-ride="carousel">
+                                
+                                <div class="carousel-inner" id="boderx">
+                                    <ol class="carousel-indicators">
+                                        <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></li>
+                                        <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></li>
+                                        <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></li>
+                                    </ol>
+                                    <div class="carousel-item active">
+                                        <img class="d-block w-100 " id="boderx" src="~/menu1.png" alt="First slide">
+                                        <div class="carousel-caption d-none d-md-block">
+                                          
+                                        </div>
+                                    
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img class="d-block w-100" id="boderx" src="~/menu2.png" alt="Second slide">
+                                        <div class="carousel-caption d-none d-md-block">
+                                           
+                                        </div>
+                                    
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img class="d-block w-100" id="boderx" src="~/menu3.png" alt="Third slide">
+                                        <div class="carousel-caption d-none d-md-block">
+                                       
+                                        </div>
+                                    </div>
+                                    <a class="carousel-control-prev align-items-center" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </a>
+                                    <a class="carousel-control-next align-items-center" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row"></div>
+                        <div class="extra-info text-center mt-3"></div>
+                            <h4 class="special-font">Today's Special Deal</h4>
+                            <p>Order now and get a 50% discount on our exclusive menu!</p>
+                        </div>
+                    </div>
+                </div>
+
         </div>
     </div>
+</section>
+<section class="container">
+   
 </section>
 
 
         
-
-
 <section class="space-sm flush-with-above page-section" id="product">
     <div class="container">
         <div class="row">
@@ -138,11 +288,9 @@
             @if (isValidPage)
             {
                 <div class="d-flex justify-content-center align-items-center mt-4">
-
                     <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
                     asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
                         <i class="bi bi-arrow-left-short fs-5"></i>
-
                     </a>
                     <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
                     asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
@@ -158,11 +306,9 @@
         <ul class="row d-flex justify-content-center">
             @foreach (var product in Model.Products)
             {
-                @* <a type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID" > *@
-                    <div class="card m-2 col-12 col-md-4 col-lg-3 mt-2" style="width: 18rem;">
-                        <div class="card-body">
-
-                             @if(product.Status == null || product.Status == ProductStatus.Unknown)
+                <div class="card m-2 col-12 col-md-4 col-lg-4 mt-2" style="width: 18rem;">
+                    <div class="card-body">
+                        @if(product.Status == null || product.Status == ProductStatus.Unknown)
                                 {
                                         <span class="badge badge-pill badge-light text-purple-800 bg-purple-200 mb-2">
                                             
@@ -186,144 +332,145 @@
                                         @product.Status
                                     </span>
                                 }
-                         
-                            <div>
-                                <a class="fixed-card" type="button" asp-controller="Product" asp-action="Detail"  asp-route-id="@product.ProductID" fixed-card>
-                                @if(@product.Image != null)
-                                {
-                                    <img class="card-img-top card-img-top mb-4 fixed-card-img" src="@product.Image" alt="Card image cap">   
-                                }
-                                else
-                                {
-                                    <img class="card-img-top card-img-top mb-4 fixed-card-img" src="/img/rungroopclub.png" alt="Card image cap">   
-                                }
-                                
+                        <div>
+                            <a class="fixed-card" type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID">
+                            @if(@product.Image != null)
+                            {
+                                <img class="card-img-top card-img-top mb-4 fixed-card-img" src="@product.Image" alt="Card image cap">   
+                            }
+                            else
+                            {
+                                <img class="card-img-top card-img-top mb-4 fixed-card-img" src="/img/rungroopclub.png" alt="Card image cap">   
+                            }
+                            </a>
+                        </div>
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text text-muted">Shipped in 3-4 days</p>
+                        <p class="card-text text-muted">Quantity: @product.Quantity</p>
+                        <p class="card-text font-weight-bold">$@product.Price</p>
+                        <div class="d-flex">
+                            @if(product.Quantity <= 0)
+                            {
+                                <p>Sold out</p>
+                            }
+                            else
+                            {
+                                <a type="button" asp-controller="Cart" asp-action="Create"
+                                asp-route-id="@product.ProductID">
+                                    <button class="btn btn-light flex-fill mr-2"><i class="bi bi-bag-plus fs-5"></i> Add Cart</button>
                                 </a>
-                            </div>
-                            <h5 class="card-title">@product.Name</h5>
-                            <p class="card-text text-muted">Shipped in 3-4 days</p>
-                            <p class="card-text text-muted">Quantity:  @product.Quantity</p>
-                            <p class="card-text font-weight-bold">$@product.Price</p>
-                            <div class="d-flex">
-                                @if(product.Quantity <= 0)
-                                {
-                                    <p>Sold out</p>
-                                }
-                                else
-                                {
-                                    <a type="button" asp-controller="Cart" asp-action="Create"
-                                    asp-route-id="@product.ProductID">
-                                    <button class="btn btn-light flex-fill mr-2"><i class="bi bi-bag-plus fs-5"></i>
-                                        Add Cart</button>
-                                    </a>
-                                    <button class="btn btn-primary flex-fill" onclick="BuyItems(this)" data-id="@product.ProductID"><i class="bi bi-piggy-bank fs-5"></i>Buy</button>
-
-                                }
-                            </div>
+                                <button class="btn btn-primary flex-fill" onclick="BuyItems(this)" data-id="@product.ProductID">
+                                    <i class="bi bi-piggy-bank fs-5"></i> Buy
+                                </button>
+                            }
                         </div>
                     </div>
-                
-                    @* <li class="col-12 col-md-4 col-lg-3 mt-2"  style="height: 500px;" >
-                        <div class="card">
-                            <a type="button" asp-controller="Product" asp-action="Detail"  asp-route-id="@product.ProductID"  style="height: 300px;">
-                                @if(@product.Image != null)
-                                {
-                                    <img class="card-img-top" src="@product.Image" alt="Card image cap">   
-                                }
-                                else
-                                {
-                                    <img class="card-img-top" src="/img/rungroopclub.png" alt="Card image cap">   
-                                }
-                                
-                            </a>
-                            <div class="card-body">
-                                <h4 class="card-title">@product.Name</h4>
-                                <p class="card-text">@product.Description</p>
-                                <p class="card-text">@product.Quantity, @product.Price</p>Price
-                            </div>
-                            <div class="card-footer card-footer-borderless d-flex justify-content-between">
-                                <div>
-                                    <small>@product.Category</small>
-                                </div>
-                                @if (isAuthenticated && User.IsInRole("admin"))
-                                {
-                                    <div>
-                                        <a type="button" class="btn btn-sm btn-outline-info" asp-controller="Product" asp-action="Edit" asp-route-id="@product.ProductID">
-                                            Edit
-                                        </a>
-                                        <a type="button" class="btn btn-sm btn-outline-danger" asp-controller="Product" asp-action="Delete" asp-route-id="@product.ProductID">
-                                            Delete
-                                        </a>
-                                    </div>
-                         d-fle       }
-                            </div>
-                        </div>
-                    </li> *@
-                @* </a> *@
+                </div>
             }
         </ul>
-        <div class="container">
-            <div class="row">
-                @if (isValidPage)
-                {
-                    <div class="d-flex justify-content-center align-items-center mt-4">
-                        <div class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</div>
-                    </div>
-                    <div class="d-flex justify-content-center align-items-center mb-4">
-                        <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
-                        asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
-                            <i class="bi bi-arrow-left-short fs-5"></i>
+    </div>
+</section>
 
-                        </a>
-                        <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
-                        asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
-                            <i class="bi bi-arrow-right-short fs-5"></i>
-                        </a>
+
+<section class="my-5">
+    <div class="container">
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8 text-center">
+                <h2 class="special-font">Best Seller</h2>
+                <hr class="divider divider-light" />
+            </div>
+        </div>
+
+        <div class="position-relative">
+            <!-- Nút trái -->
+            <button id="carouselBtnLeft"
+                    class="btn btn-light shadow-sm position-absolute top-50 start-0 translate-middle-y z-3"
+                    onclick="slideCarousel(-1)">
+                <i class="bi bi-chevron-left fs-4"></i>
+            </button>
+
+            <!-- Nút phải -->
+            <button id="carouselBtnRight"
+                    class="btn btn-light shadow-sm position-absolute top-50 end-0 translate-middle-y z-3"
+                    onclick="slideCarousel(1)">
+                <i class="bi bi-chevron-right fs-4"></i>
+            </button>
+
+            <!-- Danh sách sản phẩm -->
+            <div id="carouselContainer" class="d-flex overflow-auto px-2 gap-3" style="scroll-behavior: smooth;">
+                @foreach (var Bestseller in Model.BestSellerProducts)
+                {
+                    <div class="card" style="min-width: 250px; flex: 0 0 auto;">
+                    <a asp-controller="Product" asp-action="Detail" asp-route-id="@Bestseller.ProductID">
+                        <img src="@Bestseller.Image"
+                            class="card-img-top mx-auto"
+                            alt="@Bestseller.Name"
+                            style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+                    </a>
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            @(Bestseller.Name.Length > 22 ? Bestseller.Name.Substring(0, 22) + "..." : Bestseller.Name)
+                        </h6>
+                        <p class="mb-1 text-muted" style="font-size: 0.9rem;">
+                            Sold out: @Bestseller.SoldOut | View: @Bestseller.View
+                        </p>
+                        <p class="mb-2" style="font-size: 0.9rem;">
+                            @(Bestseller.Description.Length > 40 ? Bestseller.Description.Substring(0, 40) + "..." : Bestseller.Description)
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">@Bestseller.Price$</span>
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
                     </div>
+                </div>
                 }
             </div>
         </div>
     </div>
 </section>
 
-   
-        <section class="page-section" id="services">
-            <div class="container px-4 px-lg-5">
-                <h2 class="text-center mt-0">At Your Service</h2>
-                <hr class="divider" />
-                <div class="row gx-4 gx-lg-5">
-                    <div class="col-lg-3 col-md-6 text-center">
-                        <div class="mt-5">
-                            <div class="mb-2"><i class="bi-gem fs-1 text-primary"></i></div>
-                            <h3 class="h4 mb-2">Sturdy Themes</h3>
-                            <p class="text-muted mb-0">Our themes are updated regularly to keep them bug free!</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 text-center">
-                        <div class="mt-5">
-                            <div class="mb-2"><i class="bi-laptop fs-1 text-primary"></i></div>
-                            <h3 class="h4 mb-2">Up to Date</h3>
-                            <p class="text-muted mb-0">All dependencies are kept current to keep things fresh.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 text-center">
-                        <div class="mt-5">
-                            <div class="mb-2"><i class="bi-globe fs-1 text-primary"></i></div>
-                            <h3 class="h4 mb-2">Ready to Publish</h3>
-                            <p class="text-muted mb-0">You can use this design as is, or you can make changes!</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 text-center">
-                        <div class="mt-5">
-                            <div class="mb-2"><i class="bi-heart fs-1 text-primary"></i></div>
-                            <h3 class="h4 mb-2">Made with Love</h3>
-                            <p class="text-muted mb-0">Is it really open source if it's not made with love?</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
+<script>
+    function updateCarouselNavButtons() {
+        const container = document.getElementById("carouselContainer");
+        const leftBtn = document.getElementById("carouselBtnLeft");
+        const rightBtn = document.getElementById("carouselBtnRight");
+
+        if (container.scrollWidth > container.clientWidth) {
+            leftBtn.style.display = "block";
+            rightBtn.style.display = "block";
+        } else {
+            leftBtn.style.display = "none";
+            rightBtn.style.display = "none";
+        }
+    }
+
+    function slideCarousel(direction) {
+        const container = document.getElementById("carouselContainer");
+        const card = container.querySelector(".card");
+        const scrollAmount = card.offsetWidth + 16; // Khoảng cách giữa các card
+        container.scrollBy({
+            left: direction * scrollAmount * 2,
+            behavior: "smooth"
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        updateCarouselNavButtons();
+        window.addEventListener("resize", updateCarouselNavButtons);
+    });
+</script>
+
+
+<script>
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', () => {
+            document.getElementById('cartContainer').classList.add('active');
+        });
+    });
+</script>
 <script>
     document.getElementById('productImage').addEventListener('change', function(event) {
         const file = event.target.files[0]; // Lấy file từ input
@@ -350,11 +497,11 @@
 </script>
 <script>
     function BuyItems(button) {
-        let productId = button.getAttribute("data-id"); // Lấy ID sản phẩm
+        let productId = button.getAttribute("data-id"); // Get Product ID
 
         Swal.fire({
-            title: "Chọn phương thức thanh toán",
-            text: "Vui lòng chọn phương thức thanh toán bạn muốn sử dụng.",
+            title: "Choose payment method",
+            text: "Please select the payment method you would like to use.",
             icon: "question",
             showCancelButton: true,
             confirmButtonText: "COD",
@@ -363,13 +510,13 @@
             denyButtonText: "ZaloPay",
             html: `
                 <button id="other-payment" class="swal2-confirm swal2-styled" style="margin-top: 10px;">
-                    Ví điện tử khác
+                    Other E-wallets
                 </button>
             `,
             didOpen: () => {
                 document.getElementById("other-payment").addEventListener("click", function () {
                     processOrder(productId, "Other");
-                    Swal.close(); // Đóng hộp thoại sau khi chọn
+                    Swal.close(); // Close the modal after selecting
                 });
             }
         }).then((result) => {
@@ -384,9 +531,9 @@
     }
 
     function processOrder(productId, paymentMethod) {
-        console.log("Đặt hàng với ProductID:", productId, "Thanh toán bằng:", paymentMethod);
+        console.log("Placing order with ProductID:", productId, "Payment method:", paymentMethod);
 
-        // Gửi request đến server xử lý
+        // Send request to server to process
         fetch('/Order/CreateOrder', {
             method: "POST",
             headers: {
@@ -397,9 +544,10 @@
         .then(response => response.json())
         .then(data => {
             if (data.payUrl) {
-                window.location.href = data.payUrl;  // Redirect ở FE
+                window.location.href = data.payUrl;  // Redirect on frontend
             }
         });
     }
+
 
 </script>

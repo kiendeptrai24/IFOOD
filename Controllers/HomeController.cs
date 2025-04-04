@@ -42,10 +42,13 @@ public class HomeController : Controller
             -1 => await _productRepository.GetCountAsync(),
             _ => await _productRepository.GetCountByCategoryAsync((ProductCategory)category),
         };
+        var bestSellerProducts = await _productRepository.GetBestSellerProductsAsync();
 
+        
         var homeViewModel = new HomeViewModel
         {
             Products = products,
+            BestSellerProducts = bestSellerProducts,
             Page = page,
             PageSize = pageSize,
             TotalProducts = count,

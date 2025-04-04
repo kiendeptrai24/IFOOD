@@ -12,6 +12,7 @@ public class HomeViewModel
     public int TotalPages { get; set; }
     public int TotalProducts { get; set; }
     public int Category { get; set; }
+    public IEnumerable<Product>? BestSellerProducts {get; set;}
     public bool HasPreviousPage => Page > 1;
 
     public bool HasNextPage => Page < TotalPages;

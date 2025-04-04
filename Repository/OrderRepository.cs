@@ -44,10 +44,15 @@ public class OrderRepository : IOrderRepository
     public async Task<List<Order>> GetAllByUserId()
     {
         var curUser = _httpContextAccessor.HttpContext?.User.GetUserId();
-        var userOrders = _context.Orders.Include(o => o.OrderDetails).ThenInclude(od => od.Product) 
-        .Where(r => r.AppUserId == curUser);
+        var userOrders = _context.Orders
+            .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.Product)
+            .Where(o => o.AppUserId == curUser)
+            .OrderByDescending(o => o.OrderDate); // Sắp xếp giảm dần theo ngày đặt hàng
+
         return await userOrders.ToListAsync();
     }
+
 
     public async Task<Order> GetByIdAsync(int id)
     {
@@ -89,11 +94,14 @@ public class OrderRepository : IOrderRepository
 
     public async Task<IEnumerable<Order>> GetSliceAsync(int offset, int size)
     {
-        return await _context.Orders.Include(i => i.OrderDetails)
-        .OrderByDescending(o => o.OrderDate) // Sắp xếp theo ngày đặt hàng mới nhất
-        .Skip(offset) // Bỏ qua số lượng đơn hàng đầu tiên
-        .Take(size) // Lấy số lượng đơn hàng theo yêu cầu
-        .ToListAsync();
+        return await _context.Orders
+            .Include(i => i.OrderDetails)
+            .OrderBy(o => o.status == Status.Completed) // false < true => chưa hoàn thành lên trước
+            .ThenBy(o => o.OrderDate) // sắp xếp tăng dần theo OrderDate
+            .Skip(offset)
+            .Take(size)
+            .ToListAsync();
+
     }
 
     public bool Save()
@@ -119,7 +127,9 @@ public class OrderRepository : IOrderRepository
                 o.Ordercode.Contains(searchTerm) || // Tìm theo mã đơn hàng
                 o.AppUserId.Contains(searchTerm) || // Tìm theo ID người mua
                 o.status.ToString().Contains(searchTerm)) // Tìm theo trạng thái đơn hàng
-            .OrderByDescending(o => o.OrderDate) // Sắp xếp theo ngày đặt hàng mới nhất
+            .Include(i => i.OrderDetails)
+            .OrderBy(o => o.status == Status.Completed) // false < true => chưa hoàn thành lên trước
+            .ThenBy(o => o.OrderDate)  // Sắp xếp theo ngày đặt hàng mới nhất
             .ToListAsync();
     }
 

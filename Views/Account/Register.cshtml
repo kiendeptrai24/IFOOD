@@ -1,114 +1,150 @@
 ﻿@using iFood.ViewModels
-
 @model RegisterViewModel
 
 @{
   ViewData["Title"] = "Sign up";
 }
+
 <head>
     <!-- Thêm Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 </head>
+
 <style>
-  .position-relative {
-      position: relative;
-  }
+  /* Căn giữa form và tạo khung */
+    body{
+        background: rgba(147, 33, 33, 1);
+    }
+    
+    .register-container {
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.3);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    margin: auto;
+    margin-top: 50px;
+    text-align: center;
+    }
 
-  /* Định vị biểu tượng mắt bên trong input */
-  .field-icon {
-    position: absolute;
-    top: 50%;
-    right: 10px; /* Điều chỉnh khoảng cách của icon từ cạnh phải */
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 18px; /* Điều chỉnh kích thước biểu tượng mắt */
-  }
+    .register-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
 
-  /* Đảm bảo input không bị che phủ bởi icon */
-  .form-control {
-    padding-right: 40px; /* Cung cấp khoảng trống cho biểu tượng mắt bên trong */
-  }
+    .divider {
+        height: 3px;
+        width: 50px;
+        background-color: #007bff;
+        margin: auto;
+        margin-bottom: 20px;
+    }
 
-  .button-container {
-    display: flex;
-    gap: 10px;
-}
+    /* Định vị biểu tượng mắt bên trong input */
+    .position-relative {
+        position: relative;
+    }
 
-.arrow-button {
-    width: 60px;
-    height: 60px;
-    background-color: #ccc;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    position: relative;
-    transition: background-color 0.3s;
-}
+    .field-icon {
+        position: absolute;
+        top: 50%;
+        right: 10px; 
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 18px; 
+    }
 
-.arrow-button:hover {
-    background-color: #2196F3;
-}
+    /* Đảm bảo input không bị che phủ bởi icon */
+    .form-control {
+        padding-right: 40px; 
+        border-radius: 8px;
+    }
 
+    /* Hiệu ứng khi nhập vào input */
+    .form-control:focus {
+        border-color: rgb(244,98,58);
+        box-shadow: 0px 0px 5px rgba(rgb(49, 14, 5));
+    }
+
+    /* Tùy chỉnh nút bấm */
+    .btn-xl {
+        padding: 12px 20px;
+        font-size: 18px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+
+    .btn-primary:hover {
+        background-color:rgb(244,98,58);
+        border-color:rgb(49, 14, 5);
+    }
+
+    .btn-secondary:hover {
+        background-color: #545b62;
+        border-color:rgb(49, 14, 5);
+    }
+
+    /* Tạo hiệu ứng thông báo lỗi */
+    .alert-danger {
+        font-size: 14px;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
 </style>
-<div class="row">
-    <div class="col-md-6 offset-3">
-        <div class="row">
-          <div class="col-12">
-            <div class="mb-4">
-              <div class = "text-center">
-                  <h2>Sign up</h2>
-                  <hr class="divider"/>
-              </div>
-              
-            </div>
-          </div>
+
+<section>
+
+<div class="register-container">
+    <div class="register-title">Sign Up</div>
+    <div class="divider"></div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            <span><b>Sorry!</b> - @TempData["Error"]</span>
+        </div>
+    }
+
+    <form asp-action="Register">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <!-- Email Address -->
+        <div class="form-floating mb-3">
+            <input asp-for="EmailAddress" class="form-control" type="email"/>
+            <label asp-for="EmailAddress">Email address</label>
+            <span asp-validation-for="EmailAddress" class="text-danger"></span>
         </div>
 
-        @if (TempData["Error"] != null)
-        {
-          <div class="col-md-12 alert alert-danger">
-              <span><b>Sorry!</b> - @TempData["Error"] </span>
-          </div>
-        }
-        <div class="row">
-            <div class="col-md-8 offset-2">
-                <form asp-action="Register">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                    <div class="form-floating mb-3">
-                        <input asp-for="EmailAddress" class="form-control" type="email"/>
-                        <label asp-for="EmailAddress" >Email address</label>
-                        <span asp-validation-for="EmailAddress" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating mb-3 position-relative">
-                        <input asp-for="Password" id="password-field" class="form-control" type="password" />
-                        <label asp-for="Password">Password</label>
-                        <div class="invalid-feedback" data-sb-feedback="password-field:required">A password is required.</div>
-                        <span class="fa fa-fw fa-eye field-icon toggle-password" data-toggle="password-field"></span>
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-floating mb-3 position-relative">
-                        <input asp-for="ConfirmPassword" id="confirmpassword-field" class="form-control" type="password" />
-                        <label asp-for="ConfirmPassword">Confirm Password</label>
-                        <div class="invalid-feedback" data-sb-feedback="ConfirmPassword:required">A password is required.</div>
-                        <span class="fa fa-fw fa-eye field-icon toggle-password" data-toggle="confirmpassword-field"></span>
-                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                      <div class="d-flex justify-content-center gap-3 m-1">
-                            <input class="btn btn-primary btn-xl" type="submit" value="Sign up">
-                            <a class="btn btn-secondary btn-xl" asp-controller="Home" asp-action="Index">Cancel</a>
-                      </div>
-                    </div>
-
-                </form>
-            </div>
+        <!-- Password -->
+        <div class="form-floating mb-3 position-relative">
+            <input asp-for="Password" id="password-field" class="form-control" type="password" />
+            <label asp-for="Password">Password</label>
+            <span class="fa fa-fw fa-eye field-icon toggle-password" data-toggle="password-field"></span>
+            <span asp-validation-for="Password" class="text-danger"></span>
         </div>
-    </div>
+
+        <!-- Confirm Password -->
+        <div class="form-floating mb-3 position-relative">
+            <input asp-for="ConfirmPassword" id="confirmpassword-field" class="form-control" type="password" />
+            <label asp-for="ConfirmPassword">Confirm Password</label>
+            <span class="fa fa-fw fa-eye field-icon toggle-password" data-toggle="confirmpassword-field"></span>
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex justify-content-center gap-3 mt-3">
+            <input class="btn btn-primary btn-xl" type="submit" value="Sign up">
+            <a class="btn btn-secondary btn-xl" asp-controller="Home" asp-action="Index">Cancel</a>
+        </div>
+    </form>
 </div>
+</section>
 
 <script>
+    // Toggle password visibility
     document.querySelectorAll('.toggle-password').forEach(item => {
         item.addEventListener('click', function () {
             var passwordField = document.getElementById(this.getAttribute('data-toggle'));
@@ -119,6 +155,4 @@
             }
         });
     });
-
-
 </script>

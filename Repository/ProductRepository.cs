@@ -104,4 +104,13 @@ public class ProductRepository : IProductRepository
             entry.State = EntityState.Detached;
         }
     }
+
+    public async Task<IEnumerable<Product>> GetBestSellerProductsAsync()
+    {
+        return await _context.Products
+                .Where(p => p.Status == ProductStatus.Bestseller)
+                .OrderByDescending(p => p.SoldOut)  // Sắp xếp theo số lượng đã bán
+                .Take(10) // Lấy 10 sản phẩm bán chạy nhất
+                .ToListAsync();
+    }
 }
