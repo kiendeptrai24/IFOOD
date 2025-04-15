@@ -36,10 +36,28 @@ public class ProductRepository : IProductRepository
     }
     public async Task<IEnumerable<Product>> SearchAsync(string searchTerm)
     {
-        var products = await _context.Products
-            .Where(p => p.Name.Contains(searchTerm) || p.Category.ToString().Contains(searchTerm))
-            .ToListAsync();
-        return products;
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        return await _context.Products.ToListAsync();
+
+    var query = _context.Products.AsQueryable();
+
+    // Chuẩn hóa đầu vào
+    searchTerm = searchTerm.Trim().ToLower();
+
+    // Cố gắng parse sang các kiểu dữ liệu khác
+    bool isDecimal = decimal.TryParse(searchTerm, out decimal price);
+    bool isInt = int.TryParse(searchTerm, out int quantity);
+    bool isDate = DateTime.TryParse(searchTerm, out DateTime date);
+
+    query = query.Where(p =>
+        p.Name.ToLower().Contains(searchTerm) ||
+        p.Category.ToString().ToLower().Contains(searchTerm) ||
+        (isDecimal && p.Price == price) ||
+        (isInt && p.Quantity == quantity) ||
+        (isDate && p.DateSell.Date == date.Date)
+    );
+
+    return await query.ToListAsync();
     }
 
     public async Task<Product> GetByIdAsync(int id)

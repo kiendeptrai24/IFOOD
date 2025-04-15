@@ -88,6 +88,25 @@ public class AccountController : Controller
         var userName = email.Split('@')[0];
 
         var existingUser = await _userManager.FindByEmailAsync(email);
+        if (existingUser != null)
+        {
+            // Lấy các roles mà user này đã có
+            var roles = await _userManager.GetRolesAsync(existingUser);
+
+            // Kiểm tra xem người dùng có một role cụ thể nào không
+            if (roles.Contains(UserRoles.User))
+            {
+                // Người dùng có role "User"
+                Console.WriteLine("User has the 'User' role.");
+            }
+            else
+            {
+                // Người dùng không có role "User"
+                Console.WriteLine("User does not have the 'User' role.");
+                await _userManager.AddToRoleAsync(existingUser, UserRoles.User);
+
+            }
+        }
 
         if (existingUser == null)
         {
@@ -95,8 +114,10 @@ public class AccountController : Controller
             var hashedPassword = passwordHasher.HashPassword(null,"123456789"); 
 
             var newUser = new AppUser {UserName = userName,Email = email};
+            // await _userManager.AddToRoleAsync(newUser, UserRoles.User);
 
             newUser.PasswordHash = hashedPassword;
+            await _userManager.AddToRoleAsync(newUser, UserRoles.User);
             var createUserResult = await _userManager.CreateAsync(newUser);
             if(!createUserResult.Succeeded)
             {

@@ -353,6 +353,10 @@
                             {
                                 <p>Sold out</p>
                             }
+                            else if(product.Status == ProductStatus.ComingSoon)
+                            {
+                                <p>Comming soon</p>
+                            }
                             else
                             {
                                 <a type="button" asp-controller="Cart" asp-action="Create"
@@ -419,9 +423,10 @@
                         </p>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="fw-bold">@Bestseller.Price$</span>
-                            <button class="btn btn-outline-primary btn-sm">
+                            <a class="btn btn-outline-primary btn-sm" type="button" asp-controller="Cart" asp-action="Create"
+                                asp-route-id="@Bestseller.ProductID">
                                 <i class="bi bi-plus-lg"></i>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

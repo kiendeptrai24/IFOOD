@@ -163,6 +163,10 @@
                             {
                                 <p>Sold out</p>
                             }
+                            else if(product.Status == ProductStatus.ComingSoon)
+                            {
+                                <p>Comming soon</p>
+                            }
                             else
                             {
                                 <a type="button" asp-controller="Cart" asp-action="Create"

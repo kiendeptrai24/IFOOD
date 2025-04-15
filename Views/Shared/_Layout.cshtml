@@ -194,12 +194,12 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        box-shadow: 0 6px 15px rgba(0, 200, 83, 0.3);
+        box-shadow: 0 6px 15px rgb(244, 98, 58,0.3);
     }
     #chatbox-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 200, 83, 0.4);
-        background: linear-gradient(135deg, #00a843, #388e3c);
+        box-shadow: 0 8px 20px rgb(244, 98, 58,0.3);
+        background: linear-gradient(135deg,rgb(244, 98, 58,1),rgb(230, 112, 22));
     }
 
     #chatbox-container {
@@ -245,13 +245,13 @@
         overflow-y: auto;
         background: #f0f2f5;
         scrollbar-width: thin;
-        scrollbar-color: #00c853 #f0f2f5;
+        scrollbar-color: rgb(244, 98, 58,1) #f0f2f5;
     }
     #chatbox-content::-webkit-scrollbar {
         width: 6px;
     }
     #chatbox-content::-webkit-scrollbar-thumb {
-        background: #00c853;
+        background: rgb(244, 98, 58,1);
         border-radius: 10px;
     }
     #chatbox-content::-webkit-scrollbar-track {
@@ -277,12 +277,12 @@
         transition: border-color 0.3s ease;
     }
     #chatbox-input input:focus {
-        border-color: #00c853;
+        border-color: rgb(244, 98, 58,1);
         box-shadow: 0 0 5px rgba(0, 200, 83, 0.2);
     }
 
     #chatbox-input button#sendButton {
-        background: #00c853;
+        background:rgb(244, 98, 58,1);
         color: white;
         border: none;
         border-radius: 50%;
@@ -297,7 +297,7 @@
         justify-content: center;
     }
     #chatbox-input button#sendButton:hover {
-        background: #00a843;
+        background:rgb(244, 98, 58,1);
     }
 
     /* Chat messages */
@@ -336,7 +336,7 @@
     }
 
     #chatlog p.user-message {
-        background: #00c853;
+        background: rgb(244, 98, 58,1);
         color: white;
         border-radius: 15px 15px 0 15px;
     }
@@ -372,7 +372,7 @@
     }
 
     #chatlog .message-actions span:hover {
-        color: #00c853;
+        color:rgb(244, 98, 58,1);
     }
 
     .product-card {
@@ -758,120 +758,121 @@
         var botAvatarUrl = "@botAvatarUrl";
     </script>
      <script>
-
- function toggleChatbox() {
-    $("#chatbox-container").toggle();
-}
+    function toggleChatbox() {
+        $("#chatbox-container").toggle();
+    }
 
 
 $(document).ready(function () {
-    function appendMessage(sender, message, isBot = false) {
-        const messageClass = isBot ? "bot" : "user";
-        const messageBubbleClass = isBot ? "bot-message" : "user-message";
-        const avatarUrl = isBot ? botAvatarUrl : userAvatarUrl;
-        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const ProductCategory = [
+            "Boiled", "Steamed", "Fried", "Grilled", "Braised", "Stirfried", "Simmered", "Salads"
+        ];
+        const ProductStatus = [
+            "Unknown", "Bestseller", "New Arrival", "Featured", "Out of Stock",
+            "Discounted", "Limited Edition", "Coming Soon"
+        ];
 
-        const messageHtml = `
-            <div class="message-container ${messageClass}">
-                <img src="${avatarUrl}" class="avatar" alt="Avatar">
-                <div class="message-content">
-                    <p class="${messageBubbleClass}">${message}</p>
-                    <div class="message-time">${currentTime}</div>
-                    ${isBot ? '<div class="message-actions"><span>Được tạo bởi AI</span> • <span>😊</span></div>' : ''}
-                </div>
-            </div>
-        `;
+        function appendMessage(sender, message, isBot = false) {
+            const messageClass = isBot ? "bot" : "user";
+            const messageBubbleClass = isBot ? "bot-message" : "user-message";
+            const avatarUrl = isBot ? botAvatarUrl : userAvatarUrl;
+            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        $("#chatlog").append(messageHtml);
-        $("#chatbox-content").scrollTop($("#chatbox-content")[0].scrollHeight);
-    }
-    const ProductCategory = [
-        "Boiled",
-        "Steamed",
-        "Fried",
-        "Grilled",
-        "Braised",
-        "Stirfried",
-        "Simmered",
-        "Salads"
-    ];
-    const ProductStatus = [
-        "Unknown",
-        "Bestseller",
-        "New Arrival",
-        "Featured",
-        "Out of Stock",
-        "Discounted",
-        "Limited Edition",
-        "Coming Soon"
-    ];
-
-    function displayProducts(products) {
-        let baseUrl = window.location.origin;
-        if (products.length > 0) {
-            let productList = '<div class="product-list"></div>';
-            $("#chatlog").append(productList);
-
-            products.forEach(product => {
-
-                let productCard = `
-                    <div class="product-card">
-                        <img src="${product.img}" alt="${product.name}" class="product-image">
-                        <div class="product-info">
-                            <h5>${product.name.length > 15 ? product.name.slice(0, 15) + "..." : product.name}</h5>
-                             <p>${ProductCategory[product.category]}</p>
-                              <p>${ProductStatus[product.status] || "Unknown"}</p>
-                            <p><strong>${product.price}</strong></p>
-                            <a href="${baseUrl}/Product/Detail/${product.id}" class="product-button">🔍 Detail</a>
-                        </div>
+            const messageHtml = `
+                <div class="message-container ${messageClass}">
+                    <img src="${avatarUrl}" class="avatar" alt="Avatar">
+                    <div class="message-content">
+                        <p class="${messageBubbleClass}">${message}</p>
+                        <div class="message-time">${currentTime}</div>
+                        ${isBot ? '<div class="message-actions"><span>Được tạo bởi AI</span> • <span>😊</span></div>' : ''}
                     </div>
-                `;
-                $(".product-list").append(productCard);
-            });
+                </div>
+            `;
 
-            $(".product-card").hide().fadeIn(500);
-        } else {
-            appendMessage("Bot", "Không có sản phẩm nào phù hợp.", true);
+            $("#chatlog").append(messageHtml);
+            $("#chatbox-content").scrollTop($("#chatbox-content")[0].scrollHeight);
         }
-    }
 
-    function sendMessage() {
-        const userMessage = $("#userInput").val().trim();
-        if (!userMessage) return;
+        function displayProducts(products) {
+            let baseUrl = window.location.origin;
+            if (products.length > 0) {
+                let productList = '<div class="product-list"></div>';
+                $("#chatlog").append(productList);
 
-        appendMessage("Bạn", userMessage);
-        $("#userInput").val("");
-        $("#sendButton").prop("disabled", true);
+                products.forEach(product => {
+                    let productCard = `
+                        <div class="product-card">
+                            <img src="${product.img}" alt="${product.name}" class="product-image">
+                            <div class="product-info">
+                                <h5>${product.name.length > 15 ? product.name.slice(0, 15) + "..." : product.name}</h5>
+                                <p>${ProductCategory[product.category]}</p>
+                                <p>${ProductStatus[product.status] || "Unknown"}</p>
+                                <p><strong>${product.price}</strong></p>
+                                <a href="${baseUrl}/Product/Detail/${product.id}" class="product-button">🔍 Detail</a>
+                            </div>
+                        </div>
+                    `;
+                    $(".product-list").append(productCard);
+                });
 
-        $.post('@Url.Action("GetResponse", "Chatbot")', { message: userMessage }, function (data) {
-            appendMessage("Bot", data.response || "Đây là danh sách sản phẩm tôi tìm thấy:", true);
-            if (data.products) displayProducts(data.products);
-        }).fail(function () {
-            appendMessage("Bot", "Lỗi hệ thống, vui lòng thử lại sau.", true);
-        }).always(function () {
-            $("#sendButton").prop("disabled", false);
+                $(".product-card").hide().fadeIn(500);
+            } else {
+                appendMessage("Bot", "Không có sản phẩm nào phù hợp.", true);
+            }
+        }
+
+        function sendMessage() {
+            const userMessage = $("#userInput").val().trim();
+            if (!userMessage) return;
+
+            appendMessage("Bạn", userMessage);
+            $("#userInput").val("");
+            $("#sendButton").prop("disabled", true);
+
+            $.post('@Url.Action("GetResponse", "Chatbot")', { message: userMessage }, function (data) {
+                appendMessage("Bot", data.response || "Đây là danh sách sản phẩm tôi tìm thấy:", true);
+                if (data.products) displayProducts(data.products);
+            }).fail(function () {
+                appendMessage("Bot", "Lỗi hệ thống, vui lòng thử lại sau.", true);
+            }).always(function () {
+                $("#sendButton").prop("disabled", false);
+            });
+        }
+
+        function loadChatHistory() {
+             $.get('/ChatHistory/Get', function (history) {
+                history.forEach(msg => {
+                    appendMessage(msg.sender === "bot" ? "Bot" : "Bạn", msg.message, msg.sender === "bot");
+                });
+            });
+        }
+
+        // Event binding
+        $("#sendButton").click(sendMessage);
+        $("#userInput").keypress(function (e) {
+            if (e.which === 13) sendMessage();
         });
-    }
 
-    $("#sendButton").click(sendMessage);
-    $("#userInput").keypress(function (e) {
-        if (e.which === 13) sendMessage();
+        // Load history on page load
+        loadChatHistory();
     });
-});
 
-document.addEventListener("DOMContentLoaded", function () {
-    const productList = document.querySelector(".product-list");
-
-    productList.addEventListener("wheel", function (event) {
-        event.preventDefault(); // Ngăn cuộn dọc mặc định
-        productList.scrollLeft += event.deltaY * 2; // Chuyển động cuộn dọc thành cuộn ngang
+    // Cuộn ngang danh sách sản phẩm
+    document.addEventListener("DOMContentLoaded", function () {
+        const productList = document.querySelector(".product-list");
+        if (productList) {
+            productList.addEventListener("wheel", function (event) {
+                event.preventDefault();
+                productList.scrollLeft += event.deltaY * 2;
+            });
+        }
     });
-});
-
 
     </script>
 
-    @* test *@
+
+
+
 
 
     @await RenderSectionAsync("Scripts", required: false)

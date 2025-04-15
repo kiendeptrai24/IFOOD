@@ -1,5 +1,5 @@
 ﻿
-
+@using iFood.Data.Enum
 @model Product
 <style>
         .product-card {
@@ -106,6 +106,10 @@
                         @if(@Model.Quantity <= 0)
                         {
                             <p>Sold out</p>
+                        }
+                        else if(@Model.Status == ProductStatus.ComingSoon)
+                        {
+                            <p>Comming soon</p>
                         }
                         else
                         {

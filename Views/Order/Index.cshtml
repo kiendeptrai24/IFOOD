@@ -1,70 +1,121 @@
 ﻿@model IEnumerable<Order>
 
 <div class="container">
-    <h2 class="mt-4 mb-3">Order History</h2>
+    <h2 class="mt-4 mb-4 text-center">Order History</h2>
+    
+    <div class="list-group" id="orderContainer">
+        @foreach (var order in Model)
+        {
+            <div class="list-group-item list-group-item-action mb-3">
+                <div class="d-flex justify-content-between">
+                    <div><strong>Order #@order.Id</strong></div>
+                    <div>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <table class="table table-bordered table-striped table-hover">
-                <thead class="table-dark text-center">
-                    <tr>
-                        <th>#</th>
-                        <th>Product Name</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Total</th>
-                        <th>Order Date</th>
-                        <th>Payment Method</th>
-                        <th>Order Total</th>
-                        <th>details</th>
-
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var order in Model)
+                <ul class="list-group mt-3">
+                    @foreach (var item in order.OrderDetails)
                     {
-
-
-                        var firstRow = true;
-                        int count = 0;
-                            @foreach (var product in order.OrderDetails)
-                            {
-                                <tr>
-               
-                                    @if (firstRow) 
-                                    {
-                                        <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@count</td>
-                                    }
-
-                                    <td>@(product.Product?.Name ?? "N/A")</td>
-                                    <td class="text-center">@product.Quantity</td>
-                                    <td class="text-end">$@product.Product?.Price</td>
-                                    <td class="text-end">$@((product.Quantity * (product.Product?.Price ?? 0)).ToString("0.00"))</td>
-
-                                    @if (firstRow) 
-                                    {
-                                        <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">
-                                            @order.OrderDate.ToString("dd/MM/yyyy HH:mm") 
-                                        </td>
-                                        <td rowspan="@order.OrderDetails.Count" class="text-center align-middle">@order.PaymentMethod</td>
-                                        <td rowspan="@order.OrderDetails.Count" class="text-end align-middle">$@order.TotalPrice</td>
-                                        <td rowspan="@order.OrderDetails.Count" class="text-end align-middle">
-                                            <a type="button" asp-controller="Order" asp-action="OrderDetail" asp-route-id="@order.Id">
-                                                <i class="bi bi-pencil-square fs-1"></i>    
-                                            </a>
-                                        </td>
-                                        
-                                        firstRow = false; 
-                                    }
-                                    
-                        
-                                </tr>
-                                count++;
-                            }
+                        <li class="list-group-item">
+                            <div>
+                                <strong>@(item.Product?.Name ?? "N/A")</strong>
+                                <span class="text-muted">x @item.Quantity</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-end">$@((item.Quantity * (item.Product?.Price ?? 0)).ToString("0.00"))</span>
+                            </div>
+                        </li>
                     }
+                </ul>
 
-                </tbody>
-            </table>
-        </div>
+                <div class="d-flex justify-content-between mt-3">
+                    <div><small><strong>Payment:</strong> @order.PaymentMethod</small></div>
+                    <div class="fw-bold text-danger">
+                        Total: $@order.TotalPrice
+                    </div>
+                    <a asp-controller="Order" asp-action="OrderDetail" asp-route-id="@order.Id" class="btn btn-sm btn-primary">
+                        <i class="bi bi-eye"></i> Details
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination controls -->
+    <div class="d-flex justify-content-center mt-4">
+        <nav>
+            <ul class="pagination" id="pagination"></ul>
+        </nav>
     </div>
 </div>
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const cardsPerPage = 4;
+        const orderCards = document.querySelectorAll(".list-group-item");
+        const totalPages = Math.ceil(orderCards.length / cardsPerPage);
+        const pagination = document.getElementById("pagination");
+        let currentPage = 1;
+
+        function showPage(page) {
+            currentPage = page;
+
+            // Hiển thị card phù hợp
+            orderCards.forEach((card, index) => {
+                card.style.display = (index >= (page - 1) * cardsPerPage && index < page * cardsPerPage)
+                    ? "block" : "none";
+            });
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            pagination.innerHTML = "";
+
+            // Helper function
+            function createPageItem(label, page, isDisabled = false, isActive = false) {
+                const li = document.createElement("li");
+                li.className = `page-item ${isDisabled ? 'disabled' : ''} ${isActive ? 'active' : ''}`;
+                li.dataset.page = page;
+
+                const a = document.createElement("a");
+                a.className = "page-link";
+                a.href = "#";
+                a.innerText = label;
+
+                a.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (!isDisabled && page !== currentPage) {
+                        showPage(page);
+                    }
+                });
+
+                li.appendChild(a);
+                pagination.appendChild(li);
+            }
+
+            // << First
+            createPageItem("<<", 1, currentPage === 1);
+
+            // < Previous
+            createPageItem("<", currentPage - 1, currentPage === 1);
+
+            // Show 3 pages: current, current-1, current+1
+            const start = Math.max(1, currentPage - 1);
+            const end = Math.min(totalPages, currentPage + 1);
+
+            for (let i = start; i <= end; i++) {
+                createPageItem(i, i, false, i === currentPage);
+            }
+
+            // > Next
+            createPageItem(">", currentPage + 1, currentPage === totalPages);
+
+            // >> Last
+            createPageItem(">>", totalPages, currentPage === totalPages);
+        }
+
+        // Init
+        showPage(1);
+    });
+</script>
+}

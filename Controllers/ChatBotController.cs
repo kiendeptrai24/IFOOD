@@ -6,6 +6,8 @@ using Newtonsoft.Json;
 using iFood.Data;
 using Microsoft.EntityFrameworkCore;
 using iFood.Models;
+using System.Text.RegularExpressions;
+
 
 namespace iFood.Controllers
 {
@@ -21,7 +23,6 @@ namespace iFood.Controllers
             _geminiApiKey = configuration.GetValue<string>("GeminiApiKey");
             _dbContext = dbContext;
         }
-
         [HttpPost]
         public async Task<IActionResult> GetResponse(string message)
         {
@@ -32,15 +33,13 @@ namespace iFood.Controllers
 
             // Extract keywords from the message
             var keywords = message.ToLower().Split(' ');
-
-            // Filter products based on keywords
             var relevantProducts = await _dbContext.Products
                 .Where(p => keywords.Any(k =>
                     p.Name.ToLower().Contains(k) ||
                     p.Category.ToString().ToLower().Contains(k) ||
                     p.Price.ToString().ToLower().Contains(k) ||
                     p.Quantity.ToString().ToLower().Contains(k) ||
-                    p.Status.ToString().ToLower().Contains(k) // Convert Enum to String
+                    p.Status.ToString().ToLower().Contains(k) 
                 )) 
                 .Select(p => new
                 {
@@ -53,14 +52,12 @@ namespace iFood.Controllers
                     p.Status
                 })
                 .Take(3)
-                .ToListAsync();
-
+                .ToListAsync(); 
             // If no relevant product found, return default top 4 products
             if (!relevantProducts.Any())
             {
                 relevantProducts = await _dbContext.Products
                     .Select(p => new { p.ProductID, p.Name, p.Quantity, p.Category, p.Price, p.Image, p.Status })
-                    .Take(4)
                     .ToListAsync();
             }
 
@@ -75,6 +72,7 @@ namespace iFood.Controllers
                 img = p.Image,
                 status = p.Status,
             }).ToList();
+
 
             // Format product list as plain text
             StringBuilder productContext = new StringBuilder("Here are some products you might be interested in:\r\n\r\n");
@@ -120,9 +118,65 @@ namespace iFood.Controllers
                 {
                     botResponse = result.candidates[0].content.parts[0].text;
                 }
+                List<int> productIds = new List<int>();
+                if (!string.IsNullOrEmpty(botResponse))
+                {
+                    var matches = Regex.Matches(botResponse, @"Product ID:\s*(\d+)");
+                    foreach (Match match in matches)
+                    {
+                        if (int.TryParse(match.Groups[1].Value, out int id))
+                        {
+                            productIds.Add(id);
+                        }
+                    }
+                }
+
+                // B2: Truy vấn sản phẩm từ cơ sở dữ liệu theo danh sách ID
+                var matchedProducts = new List<Product>();
+                if (productIds.Any())
+                {
+                    matchedProducts = await _dbContext.Products
+                        .Where(p => productIds.Contains(p.ProductID))
+                        .ToListAsync();
+                }
+
+                // B3: Chuẩn hóa dữ liệu sản phẩm trả về cho phía client
+                var resultProductsResponse = matchedProducts.Select(p => new
+                {
+                    id = p.ProductID,
+                    name = p.Name,
+                    price = $"{p.Price}",
+                    category = p.Category,
+                    qualiti = p.Quantity,
+                    img = p.Image,
+                    status = p.Status
+                }).ToList();
+                var history = HttpContext.Session.GetObjectFromJson<List<ChatMessage>>("ChatHistory") ?? new List<ChatMessage>();
+
+                // Add user message
+                history.Add(new ChatMessage
+                {
+                    Sender = "user",
+                    Message = message,
+                    Timestamp = DateTime.Now
+                });
+
+                // Add bot response
+                history.Add(new ChatMessage
+                {
+                    Sender = "bot",
+                    Message = botResponse,
+                    Timestamp = DateTime.Now
+                });
+                string userId = "chatbot";
+                if(User.Identity.IsAuthenticated)
+                {
+                    userId = User?.GetUserId();
+                }
+                HttpContext.Session.SetObjectAsJson(userId, history);
 
                 // Return JSON with bot response and product list
-                return Json(new { response = botResponse, products = productsResponse });
+                return Json(new { response = botResponse, products = resultProductsResponse });
             }
             catch
             {
