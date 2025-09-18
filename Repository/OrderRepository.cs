@@ -97,7 +97,7 @@ public class OrderRepository : IOrderRepository
         return await _context.Orders
             .Include(i => i.OrderDetails)
             .OrderBy(o => o.status == Status.Completed) // false < true => chưa hoàn thành lên trước
-            .ThenBy(o => o.OrderDate) // sắp xếp tăng dần theo OrderDate
+            .ThenByDescending(o => o.OrderDate) // sắp xếp tăng dần theo OrderDate
             .Skip(offset)
             .Take(size)
             .ToListAsync();

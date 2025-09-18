@@ -829,7 +829,7 @@ $(document).ready(function () {
             $("#userInput").val("");
             $("#sendButton").prop("disabled", true);
 
-            $.post('@Url.Action("GetResponse", "Chatbot")', { message: userMessage }, function (data) {
+            $.post('@Url.Action("GetResponse", "ChatBot")', { message: userMessage }, function (data) {
                 appendMessage("Bot", data.response || "Đây là danh sách sản phẩm tôi tìm thấy:", true);
                 if (data.products) displayProducts(data.products);
             }).fail(function () {
@@ -838,23 +838,27 @@ $(document).ready(function () {
                 $("#sendButton").prop("disabled", false);
             });
         }
-
         function loadChatHistory() {
-             $.get('/ChatHistory/Get', function (history) {
+            $.get('/ChatHistory/Get', function (history) {
                 history.forEach(msg => {
                     appendMessage(msg.sender === "bot" ? "Bot" : "Bạn", msg.message, msg.sender === "bot");
+                    if (msg.products && msg.products.length > 0) displayProducts(msg.products);
                 });
             });
         }
 
-        // Event binding
+     
+
+
+        // Gắn sự kiện
         $("#sendButton").click(sendMessage);
         $("#userInput").keypress(function (e) {
             if (e.which === 13) sendMessage();
         });
 
-        // Load history on page load
+        // Tải lịch sử khi trang load
         loadChatHistory();
+
     });
 
     // Cuộn ngang danh sách sản phẩm

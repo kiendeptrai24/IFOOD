@@ -72,7 +72,7 @@ namespace iFood.Controllers
                 img = p.Image,
                 status = p.Status,
             }).ToList();
-
+            
 
             // Format product list as plain text
             StringBuilder productContext = new StringBuilder("Here are some products you might be interested in:\r\n\r\n");
@@ -80,7 +80,7 @@ namespace iFood.Controllers
             {
                 productContext.AppendLine($" **Product Name**: {product.Name}\r\n");
                 productContext.AppendLine($" **Product ID**: {product.ProductID}\r\n");
-                productContext.AppendLine($" **Price**: {product.Price} VND\r\n");
+                productContext.AppendLine($" **Price**: {product.Price} USD\r\n");
                 productContext.AppendLine($" **Category**: {product.Category}\r\n");
                 productContext.AppendLine($" **Availability**: {(product.Quantity > 0 ? "In stock" : "Out of stock")}\r\n");
                 productContext.AppendLine($" **Status**: {product.Status}\r\n");
@@ -131,7 +131,6 @@ namespace iFood.Controllers
                     }
                 }
 
-                // B2: Truy vấn sản phẩm từ cơ sở dữ liệu theo danh sách ID
                 var matchedProducts = new List<Product>();
                 if (productIds.Any())
                 {
@@ -140,7 +139,7 @@ namespace iFood.Controllers
                         .ToListAsync();
                 }
 
-                // B3: Chuẩn hóa dữ liệu sản phẩm trả về cho phía client
+                // B3: Tạo danh sách trả về cho client
                 var resultProductsResponse = matchedProducts.Select(p => new
                 {
                     id = p.ProductID,
@@ -151,31 +150,34 @@ namespace iFood.Controllers
                     img = p.Image,
                     status = p.Status
                 }).ToList();
-                var history = HttpContext.Session.GetObjectFromJson<List<ChatMessage>>("ChatHistory") ?? new List<ChatMessage>();
 
-                // Add user message
+                // B4: Lưu lịch sử
+                string userId = "chatbot";
+                if (User.Identity.IsAuthenticated)
+                {
+                    userId = User?.GetUserId(); // Đảm bảo bạn có phương thức GetUserId()
+                }
+
+                var history = HttpContext.Session.GetObjectFromJson<List<ChatMessage>>(userId) ?? new List<ChatMessage>();
+
                 history.Add(new ChatMessage
                 {
                     Sender = "user",
                     Message = message,
+                    Products = resultProductsResponse.Cast<object>().ToList(),
                     Timestamp = DateTime.Now
                 });
 
-                // Add bot response
                 history.Add(new ChatMessage
                 {
                     Sender = "bot",
                     Message = botResponse,
                     Timestamp = DateTime.Now
                 });
-                string userId = "chatbot";
-                if(User.Identity.IsAuthenticated)
-                {
-                    userId = User?.GetUserId();
-                }
+
                 HttpContext.Session.SetObjectAsJson(userId, history);
 
-                // Return JSON with bot response and product list
+                // B5: Trả kết quả
                 return Json(new { response = botResponse, products = resultProductsResponse });
             }
             catch
