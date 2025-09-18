@@ -100,10 +100,14 @@ app.UseAuthentication(); //  Đăng nhập
 app.UseAuthorization();  //  Xác thực quyền truy cập
 
 // Định tuyến và tĩnh
-app.MapStaticAssets();
+// app.MapStaticAssets();
+// app.MapControllerRoute(
+//     name: "default",
+//     pattern: "{controller=Home}/{action=Index}/{id?}"
+// ).WithStaticAssets();
+app.UseStaticFiles();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"
-).WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

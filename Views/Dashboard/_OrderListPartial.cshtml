@@ -9,21 +9,20 @@
 
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-
-
 }
+
 @functions {
     public string GetStatusColor(iFood.Data.Enum.Status status)
     {
         return status switch
         {
-            iFood.Data.Enum.Status.PendingConfirmation => "orange", 
-            iFood.Data.Enum.Status.Shipping => "blue", 
-            iFood.Data.Enum.Status.Delivered => "green", 
-            iFood.Data.Enum.Status.Completed => "purple", 
-            iFood.Data.Enum.Status.Canceled => "red", 
-            iFood.Data.Enum.Status.ReturnedOrRefunded => "gray", 
-            _ => "lightgray" 
+            iFood.Data.Enum.Status.PendingConfirmation => "warning", 
+            iFood.Data.Enum.Status.Shipping => "primary", 
+            iFood.Data.Enum.Status.Delivered => "success", 
+            iFood.Data.Enum.Status.Completed => "info", 
+            iFood.Data.Enum.Status.Canceled => "danger", 
+            iFood.Data.Enum.Status.ReturnedOrRefunded => "secondary", 
+            _ => "light" 
         };
     }
 
@@ -31,145 +30,512 @@
     {
         return status switch
         {
-            iFood.Data.Enum.Status.PendingConfirmation => "bi-clock", 
+            iFood.Data.Enum.Status.PendingConfirmation => "bi-clock-history", 
             iFood.Data.Enum.Status.Shipping => "bi-truck", 
-            iFood.Data.Enum.Status.Delivered => "bi-check-circle", 
-            iFood.Data.Enum.Status.Completed => "bi-check-all", 
-            iFood.Data.Enum.Status.Canceled => "bi-x-circle", 
-            iFood.Data.Enum.Status.ReturnedOrRefunded => "bi-arrow-repeat", 
+            iFood.Data.Enum.Status.Delivered => "bi-check-circle-fill", 
+            iFood.Data.Enum.Status.Completed => "bi-patch-check-fill", 
+            iFood.Data.Enum.Status.Canceled => "bi-x-circle-fill", 
+            iFood.Data.Enum.Status.ReturnedOrRefunded => "bi-arrow-counterclockwise", 
             _ => "bi-question-circle" 
         };
     }
 }
-  
-
 
 <style>
-    .status-badge { border-radius: 20px; padding: .25rem .6rem; color: #fff; font-size: .85rem; }
-    .status-pending { background: orange; }
-    .status-shipping { background: #0d6efd; }
-    .status-delivered { background: #198754; }
-    .status-completed { background: #6f42c1; }
-    .status-canceled { background: #dc3545; }
-    .status-returned { background: #6c757d; }
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --danger-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        --card-shadow-hover: 0 15px 40px rgba(0,0,0,0.15);
+        --border-radius: 15px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        min-height: 100vh;
+    }
+
+    .main-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(50%, -50%);
+    }
+
+    .search-section {
+        padding: 1.5rem 2rem;
+        background: rgba(248, 249, 250, 0.5);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .search-container {
+        max-width: 500px;
+        position: relative;
+    }
+
+    .search-input {
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        padding: 12px 20px 12px 50px;
+        font-size: 1rem;
+        transition: var(--transition);
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .search-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+        outline: none;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    .search-btn {
+        border-radius: 50px;
+        padding: 12px 25px;
+        border: none;
+        background: var(--primary-gradient);
+        color: white;
+        transition: var(--transition);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .order-card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        background: white;
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .order-card-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1.5rem;
+        border: none;
+        position: relative;
+    }
+
+    .order-card-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    }
+
+    .status-badge {
+        border-radius: 25px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .order-card-body {
+        padding: 1.5rem;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0;
+    }
+
+    .info-icon {
+        width: 20px;
+        text-align: center;
+        margin-right: 12px;
+        color: #6c757d;
+    }
+
+    .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e9ecef, transparent);
+        margin: 1.5rem 0;
+    }
+
+    .product-list {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .product-item {
+        border: none;
+        border-bottom: 1px solid #f8f9fa;
+        padding: 1rem;
+        transition: var(--transition);
+    }
+
+    .product-item:hover {
+        background: #f8f9fa;
+    }
+
+    .product-item:last-child {
+        border-bottom: none;
+    }
+
+    .total-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        margin-top: 1rem;
+    }
+
+    .action-buttons {
+        padding: 1.5rem;
+        background: #f8f9fa;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-modern {
+        border-radius: 25px;
+        padding: 10px 20px;
+        border: none;
+        font-weight: 600;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        justify-content: center;
+        min-width: 0;
+    }
+
+    .btn-detail {
+        background: var(--success-gradient);
+        color: white;
+        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    }
+
+    .btn-update {
+        background: var(--warning-gradient);
+        color: white;
+        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+    }
+
+    .btn-status {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        color: #495057;
+        box-shadow: 0 4px 15px rgba(168, 237, 234, 0.3);
+    }
+
+    .btn-modern:hover {
+        transform: translateY(-2px);
+        text-decoration: none;
+        color: white;
+    }
+
+    .pagination-modern {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .page-link {
+        border: none;
+        border-radius: 10px;
+        margin: 0 2px;
+        padding: 12px 16px;
+        transition: var(--transition);
+        background: white;
+        color: #6c757d;
+    }
+
+    .page-link:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .page-item.active .page-link {
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .page-item.disabled .page-link {
+        background: #f8f9fa;
+        color: #adb5bd;
+    }
+
+
+
+    .stats-card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+        
+        .search-section {
+            padding: 1rem;
+        }
+        
+        .action-buttons {
+            padding: 1rem;
+        }
+        
+        .btn-modern {
+            font-size: 0.875rem;
+            padding: 8px 16px;
+        }
+    }
 </style>
-<div class="bg-white p-4 rounded-bottom shadow-sm">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <form method="get" class="form-inline my-2 my-lg-0 d-flex">
-            <input class="form-control me-2" type="search" placeholder="Search" name="searchTerm">
-            <button class="btn btn-outline-secondary" type="submit">
-                <i class="bi bi-search"></i>
-            </button>
-        </form>
-    </div>
-    <!-- Phân trang -->
-    <nav>
-        <ul class="pagination justify-content-center">
-            <!-- Trang đầu (<<) -->
-            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                <a class="page-link" asp-action="OrderIndex" asp-route-page="1" asp-route-category="@Model.Category">&laquo;&laquo;</a>
-            </li>
 
-            <!-- Trang gần hiện tại -->
-            @for (int i = Math.Max(1, Model.Page - 1); i <= Math.Min(Model.TotalPages, Model.Page + 1); i++)
-            {
-                <li class="page-item @(i == Model.Page ? "active" : "")">
-                    <a class="page-link" asp-action="OrderIndex" asp-route-page="@i" asp-route-category="@Model.Category">@i</a>
-                </li>
-            }
-
-            <!-- Trang cuối (>>) -->
-            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-                <a class="page-link" asp-action="OrderIndex" asp-route-page="@Model.TotalPages" asp-route-category="@Model.Category">&raquo;&raquo;</a>
-            </li>
-        </ul>
-    </nav>
-<div class="row row-cols-1 row-cols-md-2 g-4">
-    @foreach (var order in Model.Orders)
-    {
-        <div class="col">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-0">Order Code: @order.Ordercode</h5>
-                        <small>Transaction ID: @order.TransactionId</small>
-                    </div>
-                    <span class="status-badge @(order.status == iFood.Data.Enum.Status.PendingConfirmation ? "status-pending" :
-                                                order.status == iFood.Data.Enum.Status.Shipping ? "status-shipping" :
-                                                order.status == iFood.Data.Enum.Status.Delivered ? "status-delivered" :
-                                                order.status == iFood.Data.Enum.Status.Completed ? "status-completed" :
-                                                order.status == iFood.Data.Enum.Status.Canceled ? "status-canceled" :
-                                                "status-returned")">
-                        <i class="bi @(GetStatusIcon(order.status))"></i> @order.status
-                    </span>
+<div class="container-fluid py-4">
+    <div class="main-container fade-in">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="mb-2">
+                        <i class="bi bi-box-seam me-3"></i>
+                        Order Management
+                    </h2>
+                    <p class="mb-0 opacity-75">Manage and track all orders efficiently</p>
                 </div>
-
-                <div class="card-body">
-                    <p class="mb-1"><strong>User:</strong> @order.AppUserId</p>
-                    <p><strong>Order Date:</strong> @order.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
-                    <p><strong>Payment Method:</strong> @order.PaymentMethod</p>
-                    <hr />
-                    <h6>Products:</h6>
-                    <ul class="list-group mb-3">
-                        @foreach (var product in order.OrderDetails)
-                        {
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <div class="ms-2 me-auto">
-                                    <div class="fw-bold">@product.Product.Name</div>
-                                    Quantity: @product.Quantity
-                                </div>
-                                <span>$@((product.Quantity * (product.Product?.Price ?? 0)).ToString("0.00"))</span>
-                            </li>
-                        }
-                    </ul>
-
-                    <div class="d-flex justify-content-between">
-                        <span><strong>Total:</strong></span>
-                        <span class="fw-bold text-success">$@order.TotalPrice</span>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <h4 class="mb-1">@Model.TotalProducts</h4>
+                        <small>Total Orders</small>
                     </div>
-                </div>
-
-                <div class="card-footer d-flex justify-content-between">
-                    <a asp-controller="Order" asp-action="OrderDetail" asp-route-id="@order.Id" class="btn btn-success btn-sm">
-                        <i class="bi bi-card-heading"></i> Detail
-                    </a>
-                    <a asp-controller="Order" asp-action="UpdateStateForOrder" asp-route-id="@order.Id" class="btn btn-warning btn-sm">
-                        <i class="bi bi-arrow-right-square-fill"></i> Update
-                    </a>
-                    <button class="btn btn-secondary btn-sm" onclick="showStatusSelection(@order.Id)">
-                        Change Status
-                    </button>
                 </div>
             </div>
         </div>
-    }
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-container mx-auto">
+                <form method="get" class="position-relative">
+                    <i class="bi bi-search search-icon"></i>
+                    <input class="form-control search-input" 
+                           type="search" 
+                           placeholder="Search orders, transaction ID, or user..." 
+                           name="searchTerm"
+                           value="@(Context.Request.Query["searchTerm"])">
+                    <button class="btn search-btn ms-3" type="submit">
+                        <i class="bi bi-search me-2"></i>
+                        Search
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Orders Grid -->
+        <div class="p-4" id="order-container">
+            <div class="row g-4">
+                @foreach (var order in Model.Orders)
+                {
+                    <div class="col-lg-6 col-xl-4">
+                        <div class="card order-card">
+                            <div class="order-card-header">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="mb-2">
+                                            <i class="bi bi-receipt me-2"></i>
+                                            @order.Ordercode
+                                        </h5>
+                                        <small class="opacity-75">
+                                            <i class="bi bi-credit-card me-1"></i>
+                                            @order.TransactionId
+                                        </small>
+                                    </div>
+                                    <span class="badge bg-@(GetStatusColor(order.status)) status-badge">
+                                        <i class="@GetStatusIcon(order.status) me-1"></i>
+                                        @order.status.ToString()
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="order-card-body">
+                                <div class="info-row">
+                                    <i class="bi bi-person-circle info-icon"></i>
+                                    <div>
+                                        <strong>Customer:</strong>
+                                        <span class="ms-1">@order.AppUserId</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-row">
+                                    <i class="bi bi-calendar-event info-icon"></i>
+                                    <div>
+                                        <strong>Order Date:</strong>
+                                        <span class="ms-1">@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-row">
+                                    <i class="bi bi-credit-card-2-front info-icon"></i>
+                                    <div>
+                                        <strong>Payment:</strong>
+                                        <span class="ms-1">@order.PaymentMethod</span>
+                                    </div>
+                                </div>
+
+                                <div class="divider"></div>
+
+                                <h6 class="mb-3">
+                                    <i class="bi bi-basket3 me-2"></i>
+                                    Order Items
+                                </h6>
+                                
+                                <div class="product-list">
+                                    @foreach (var product in order.OrderDetails)
+                                    {
+                                        <div class="product-item d-flex justify-content-between align-items-center">
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold text-truncate">@product.Product.Name</div>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-x me-1"></i>@product.Quantity
+                                                </small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="fw-bold text-success">
+                                                    $@((product.Quantity * (product.Product?.Price ?? 0)).ToString("0.00"))
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="total-section">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold">
+                                            <i class="bi bi-cash-stack me-2"></i>
+                                            Total Amount:
+                                        </span>
+                                        <span class="h5 mb-0 text-success fw-bold">
+                                            $@order.TotalPrice.ToString("0.00")
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <a asp-controller="Order" 
+                                   asp-action="OrderDetail" 
+                                   asp-route-id="@order.Id" 
+                                   class="btn btn-modern btn-detail">
+                                    <i class="bi bi-eye-fill"></i>
+                                    <span>View Details</span>
+                                </a>
+                                
+                                <a asp-controller="Order" 
+                                   asp-action="UpdateStateForOrder" 
+                                   asp-route-id="@order.Id" 
+                                   class="btn btn-modern btn-update">
+                                    <i class="bi bi-pencil-square"></i>
+                                    <span>Update</span>
+                                </a>
+                                
+                                <button class="btn btn-modern btn-status" 
+                                        onclick="showStatusSelection(@order.Id)">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    <span>Change Status</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="p-4">
+            <nav class="pagination-modern">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                        <a class="page-link" href="#" onclick="loadOrders(1)">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+
+                    @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                    {
+                        <li class="page-item @(i == Model.Page ? "active" : "")">
+                            <a class="page-link" href="#" onclick="loadOrders(@i)">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" href="#" onclick="loadOrders(@Model.TotalPages)">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>
-
-<!-- Phân trang AJAX -->
-<nav class="mt-4">
-    <ul class="pagination justify-content-center">
-        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-            <a class="page-link" href="#" onclick="loadOrders(1)">&laquo;&laquo;</a>
-        </li>
-
-        @for (int i = Math.Max(1, Model.Page - 1); i <= Math.Min(Model.TotalPages, Model.Page + 1); i++)
-        {
-            <li class="page-item @(i == Model.Page ? "active" : "")">
-                <a class="page-link" href="#" onclick="loadOrders(@i)">@i</a>
-            </li>
-        }
-
-        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" href="#" onclick="loadOrders(@Model.TotalPages)">&raquo;&raquo;</a>
-        </li>
-    </ul>
-</nav>
-
-
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Mapping trạng thái từ chữ sang số
+    // Enhanced status mapping and UI
     const statusMapping = {
         "PendingConfirmation": 0,
         "Shipping": 1,
@@ -179,57 +545,131 @@
         "ReturnedOrRefunded": 5,
     };
 
-    // Mở popup chọn trạng thái mới
+    const statusConfig = {
+        "PendingConfirmation": { icon: "⏳", color: "#ffc107", label: "Pending Confirmation" },
+        "Shipping": { icon: "🚚", color: "#0d6efd", label: "Shipping" },
+        "Delivered": { icon: "✅", color: "#198754", label: "Delivered" },
+        "Completed": { icon: "🎉", color: "#20c997", label: "Completed" },
+        "Canceled": { icon: "❌", color: "#dc3545", label: "Canceled" },
+        "ReturnedOrRefunded": { icon: "↩️", color: "#6c757d", label: "Returned/Refunded" }
+    };
+
     function showStatusSelection(orderId) {
+        const inputOptions = {};
+        Object.keys(statusConfig).forEach(key => {
+            const config = statusConfig[key];
+            inputOptions[key] = `${config.icon} ${config.label}`;
+        });
+
         Swal.fire({
-            title: `Chọn trạng thái mới cho Order #${orderId}`,
+            title: '🔄 Update Order Status',
+            html: `<p class="text-muted">Select new status for Order #<strong>${orderId}</strong></p>`,
             input: "select",
-            inputOptions: {
-                "PendingConfirmation": "PendingConfirmation",
-                "Shipping": "Shipping",
-                "Delivered": "Delivered",
-                "Completed": "Completed",
-                "Canceled": "Canceled",
-                "ReturnedOrRefunded": "ReturnedOrRefunded"
+            inputOptions: inputOptions,
+            inputPlaceholder: "Choose status...",
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            confirmButtonText: 'Update Status',
+            customClass: {
+                popup: 'animated fadeIn',
+                confirmButton: 'btn btn-primary',
+                cancelButton: 'btn btn-secondary'
             },
-            inputPlaceholder: "Chọn trạng thái",
-            showCancelButton: true
+            buttonsStyling: false,
+            background: '#fff',
+            backdrop: 'rgba(0,0,0,0.4)'
         }).then((result) => {
             if (result.isConfirmed && result.value) {
-                sendData(orderId, result.value);
+                updateOrderStatus(orderId, result.value);
             }
         });
     }
 
-    // Gửi yêu cầu cập nhật trạng thái đến API
-    function sendData(orderId, status) {
+    function updateOrderStatus(orderId, status) {
+        // Show loading
+        Swal.fire({
+            title: 'Updating...',
+            html: 'Please wait while we update the order status.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         fetch('/Dashboard/UpdateOrderStatus', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: orderId, status: statusMapping[status] }) // Chuyển trạng thái sang số
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ 
+                id: orderId, 
+                status: statusMapping[status] 
+            })
         })
         .then(response => response.json())
         .then(data => {
-            Swal.fire("Thành công", `Cập nhật: ${data.message}`, "success")
-            .then(() => {
-                location.reload(); // Tải lại trang sau khi người dùng nhấn "OK"
+            const config = statusConfig[status];
+            Swal.fire({
+                icon: 'success',
+                title: 'Status Updated!',
+                html: `Order #${orderId} status changed to <br><strong>${config.icon} ${config.label}</strong>`,
+                confirmButtonText: 'Great!',
+                customClass: {
+                    confirmButton: 'btn btn-success'
+                },
+                buttonsStyling: false
+            }).then(() => {
+                // Add smooth reload animation
+                document.body.style.opacity = '0.7';
+                setTimeout(() => {
+                    location.reload();
+                }, 300);
             });
         })
-        .catch(error => Swal.fire("Lỗi", "Không thể cập nhật!", "error"));
-    }
-</script>
-<script>
-    $(document).on("click", ".pagination-link", function (e) {
-        e.preventDefault();
-        const url = $(this).attr("href");
-
-        $.ajax({
-            url: url,
-            type: 'GET',
-            success: function (data) {
-                $('#order-container').html($(data).find('#order-container').html());
-            }
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Update Failed',
+                text: 'Unable to update order status. Please try again.',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            });
         });
+    }
+
+    function loadOrders(page) {
+        // Thay vì AJAX, sử dụng page reload với URL mới để đảm bảo CSS được load đúng
+        const searchTerm = new URLSearchParams(window.location.search).get('searchTerm') || '';
+        const category = new URLSearchParams(window.location.search).get('category') || '';
+        
+        let url = `/Dashboard/OrderIndex?page=${page}`;
+        if (searchTerm) url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+        if (category) url += `&category=${encodeURIComponent(category)}`;
+        
+        // Smooth transition trước khi chuyển trang
+        document.body.style.transition = 'opacity 0.3s ease';
+        document.body.style.opacity = '0.8';
+        
+        // Chuyển trang với delay nhỏ để có hiệu ứng mượt
+        setTimeout(() => {
+            window.location.href = url;
+        }, 200);
+    }
+
+    // Add smooth scroll to top when pagination changes
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add entrance animation
+        const cards = document.querySelectorAll('.order-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+            card.classList.add('fade-in');
+        });
+        
+        // Restore opacity after page load
+        document.body.style.opacity = '1';
     });
 </script>
-
