@@ -21,7 +21,7 @@
                                 <span class="text-muted">x @item.Quantity</span>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <span class="text-end">$@((item.Quantity * (item.Product?.Price ?? 0)).ToString("0.00"))</span>
+                                <span class="text-end fw-semibold">$@((item.Quantity * (item.Product?.Price ?? 0)).ToString("0.00"))</span>
                             </div>
                         </li>
                     }
@@ -29,9 +29,7 @@
 
                 <div class="d-flex justify-content-between mt-3">
                     <div><small><strong>Payment:</strong> @order.PaymentMethod</small></div>
-                    <div class="fw-bold text-danger">
-                        Total: $@order.TotalPrice
-                    </div>
+                    <div class="fw-bold text-success">Total: $@order.TotalPrice</div>
                     <a asp-controller="Order" asp-action="OrderDetail" asp-route-id="@order.Id" class="btn btn-sm btn-primary">
                         <i class="bi bi-eye"></i> Details
                     </a>
@@ -50,7 +48,7 @@
 @section Scripts {
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const cardsPerPage = 4;
+        const cardsPerPage = 5;
         const orderCards = document.querySelectorAll(".list-group-item");
         const totalPages = Math.ceil(orderCards.length / cardsPerPage);
         const pagination = document.getElementById("pagination");

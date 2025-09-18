@@ -116,70 +116,7 @@
         <ul class="row d-flex justify-content-center">
             @foreach (var product in Model.Products)
             {
-                <div class="card m-2 col-12 col-md-4 col-lg-3 mt-2" style="width: 18rem;">
-                    <div class="card-body">
-                        @if(product.Status == null || product.Status == ProductStatus.Unknown)
-                                {
-                                        <span class="badge badge-pill badge-light text-purple-800 bg-purple-200 mb-2">
-                                            
-                                        </span>
-                                }
-                                else
-                                {
-                                     <span class="badge badge-pill text-white mb-2"
-                                        style="background-color: 
-                                            @(product.Status switch
-                                            {
-                                                ProductStatus.Bestseller => "green",
-                                                ProductStatus.NewArrival => "blue",
-                                                ProductStatus.Featured => "purple",
-                                                ProductStatus.OutOfStock => "gray",
-                                                ProductStatus.Discounted => "red",
-                                                ProductStatus.LimitedEdition => "gold",
-                                                ProductStatus.ComingSoon => "orange",
-                                                _ => "brown" // Mặc định
-                                            });">
-                                        @product.Status
-                                    </span>
-                                }
-                        <div>
-                            <a class="fixed-card" type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID">
-                            @if(@product.Image != null)
-                            {
-                                <img class="card-img-top card-img-top mb-4 fixed-card-img" src="@product.Image" alt="Card image cap">   
-                            }
-                            else
-                            {
-                                <img class="card-img-top card-img-top mb-4 fixed-card-img" src="/img/rungroopclub.png" alt="Card image cap">   
-                            }
-                            </a>
-                        </div>
-                        <h5 class="card-title">@product.Name</h5>
-                        <p class="card-text text-muted">Shipped in 3-4 days</p>
-                        <p class="card-text text-muted">Quantity: @product.Quantity</p>
-                        <p class="card-text font-weight-bold">$@product.Price</p>
-                        <div class="d-flex">
-                            @if(product.Quantity <= 0)
-                            {
-                                <p>Sold out</p>
-                            }
-                            else if(product.Status == ProductStatus.ComingSoon)
-                            {
-                                <p>Comming soon</p>
-                            }
-                            else
-                            {
-                                <a type="button" asp-controller="Cart" asp-action="Create"
-                                asp-route-id="@product.ProductID">
-                                    <button class="btn btn-light flex-fill mr-2"><i class="bi bi-bag-plus fs-5"></i> Add Cart</button>
-                                </a>
-                                <button class="btn btn-primary flex-fill" onclick="BuyItems(this)" data-id="@product.ProductID">
-                                    <i class="bi bi-piggy-bank fs-5"></i> Buy
-                                </button>
-                            }
-                        </div>
-                    </div>
-                </div>
+                @await Html.PartialAsync("_ProductCard", product)
             }
         </ul>
     </div>

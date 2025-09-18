@@ -43,140 +43,91 @@
     }
 </style>
 
+<style>
+    .dash-hero { background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); }
+    .dash-stat { border-left: 4px solid rgba(0,0,0,.1); }
+    .product-image { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #f1f1f1; }
+    .description-text { overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+    .show-more { color: #7b4397; cursor: pointer; font-size: .9rem; }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important; }
+</style>
 <section>
-    <div class="container mt-5">
-        <div class="bg-primary text-white p-4 rounded-top text-center">
-            <h2>Product Management - Admin Panel</h2>
-        </div>
-
-        <!-- Search -->
-        <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
-            <div>
-                <a class="btn btn-success" asp-controller="Product" asp-action="Create">
-                    <i class="bi bi-plus-circle"></i> Add New Product
-                </a>
+    <div class="container mt-4">
+        <div class="dash-hero text-white p-4 rounded-3 shadow-sm">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h2 class="mb-1">Admin Dashboard</h2>
+                    <p class="mb-0 opacity-75">Manage products, categories and inventory</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-light" asp-controller="Product" asp-action="Create"><i class="bi bi-plus-circle"></i> New Product</a>
+                </div>
             </div>
-            <form method="get" class="d-flex" style="width: 250px;">
-                <input class="form-control" type="search" name="searchTerm" placeholder="Search..." value="@ViewBag.SearchTerm">
-                <button class="btn btn-outline-secondary" type="submit">
-                    <i class="bi bi-search"></i>
-                </button>
-            </form>
         </div>
 
-        <!-- Categories -->
-        <div class="text-center my-3">
-            <a class="btn btn-secondary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="-1">All</a>
-            @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
-            {
-                <a class="btn btn-secondary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="@category.Value">@category.Text</a>
-            }
-        </div>
-
-        <!-- Product Cards -->
-        <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap">
-            <span class="text-muted">Showing @resultStart - @resultEnd of @Model.TotalProducts</span>
-            <nav>
-                <ul class="pagination mb-0">
-                    <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                        <a class="page-link" asp-route-page="1" asp-route-category="@Model.Category">«</a>
-                    </li>
-                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
-                        <a class="page-link" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">‹</a>
-                    </li>
-
-                    @{
-                        var _start = Math.Max(1, Model.Page - 1);
-                        var _end = Math.Min(Model.TotalPages, Model.Page + 1);
-                        for (int i = _start; i <= _end; i++)
-                        {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link" asp-route-page="@i" asp-route-category="@Model.Category">@i</a>
-                            </li>
-                        }
+        <div class="bg-white rounded-bottom shadow-sm p-3 mt-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <form method="get" class="d-flex" style="max-width: 320px;">
+                    <input class="form-control me-2" type="search" name="searchTerm" placeholder="Search products..." value="@ViewBag.SearchTerm">
+                    <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                </form>
+                <div class="text-nowrap">
+                    <a class="btn btn-outline-secondary btn-sm me-1" asp-action="Index" asp-route-page="1" asp-route-category="-1">All</a>
+                    @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
+                    {
+                        <a class="btn btn-outline-secondary btn-sm me-1 mb-1" asp-action="Index" asp-route-page="1" asp-route-category="@category.Value">@category.Text</a>
                     }
+                </div>
+            </div>
 
-                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
-                        <a class="page-link" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">›</a>
-                    </li>
-                    <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-                        <a class="page-link" asp-route-page="@Model.TotalPages" asp-route-category="@Model.Category">»</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-        <div class="row">
-            @foreach (var product in Model.Products)
-            {
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex gap-3 align-items-start">
-                                <img src="@product.Image" class="product-image" />
-                                <div class="flex-grow-1">
-                                    <h5 class="card-title">@product.Name</h5>
-                                    <p class="text-muted mb-1"><strong>Category:</strong> @product.Category</p>
-                                    <p class="text-muted mb-1"><strong>Quantity:</strong> @product.Quantity</p>
-                                    <p class="text-muted mb-1"><strong>Price:</strong> $@product.Price</p>
-                                    <p class="text-muted mb-1"><strong>Total:</strong> $@product.Total</p>
-                                    <p class="text-muted mb-1"><strong>Release:</strong> @product.DateSell.ToString("yyyy/MM/dd")</p>
+            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
+                <span class="text-muted">Showing @resultStart - @resultEnd of @Model.TotalProducts</span>
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")"><a class="page-link" asp-route-page="1" asp-route-category="@Model.Category">«</a></li>
+                        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")"><a class="page-link" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">‹</a></li>
+                        @{
+                            var _start = Math.Max(1, Model.Page - 1);
+                            var _end = Math.Min(Model.TotalPages, Model.Page + 1);
+                            for (int i = _start; i <= _end; i++)
+                            {
+                                <li class="page-item @(i == Model.Page ? "active" : "")"><a class="page-link" asp-route-page="@i" asp-route-category="@Model.Category">@i</a></li>
+                            }
+                        }
+                        <li class="page-item @(Model.HasNextPage ? "" : "disabled")"><a class="page-link" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">›</a></li>
+                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")"><a class="page-link" asp-route-page="@Model.TotalPages" asp-route-category="@Model.Category">»</a></li>
+                    </ul>
+                </nav>
+            </div>
 
-                                    <p class="text-muted description-text" id="desc-@product.ProductID">@product.Description</p>
-                                    @if (product.Description?.Length > 120)
-                                    {
-                                        <span class="show-more" onclick="toggleDesc('@product.ProductID')">Xem thêm</span>
-                                    }
-
-                                    <div class="d-flex gap-2 mt-3">
-                                        <a class="btn btn-sm btn-outline-primary" asp-action="Detail" asp-controller="Product" asp-route-id="@product.ProductID">
-                                            <i class="bi bi-card-heading"></i> Detail
-                                        </a>
-                                        <a class="btn btn-sm btn-outline-warning" asp-action="Edit" asp-controller="Product" asp-route-id="@product.ProductID">
-                                            <i class="bi bi-pencil-square"></i> Edit
-                                        </a>
-                                        <button class="btn btn-sm btn-outline-danger delete-button" data-id="@product.ProductID">
-                                            <i class="bi bi-trash"></i> Delete
-                                        </button>
+            <div class="row mt-2">
+                @foreach (var product in Model.Products)
+                {
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card shadow-sm h-100 card-hover">
+                            <div class="card-body">
+                                <div class="d-flex gap-3 align-items-start">
+                                    <img src="@product.Image" class="product-image" />
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-1">@product.Name</h5>
+                                        <div class="small text-muted mb-2">@product.Category • Qty: @product.Quantity • $@product.Price</div>
+                                        <p class="text-muted description-text" id="desc-@product.ProductID">@product.Description</p>
+                                        @if (product.Description?.Length > 120)
+                                        {
+                                            <span class="show-more" onclick="toggleDesc('@product.ProductID')">Show more</span>
+                                        }
+                                        <div class="d-flex gap-2 mt-3">
+                                            <a class="btn btn-sm btn-outline-primary" asp-action="Detail" asp-controller="Product" asp-route-id="@product.ProductID"><i class="bi bi-card-heading"></i> Detail</a>
+                                            <a class="btn btn-sm btn-outline-warning" asp-action="Edit" asp-controller="Product" asp-route-id="@product.ProductID"><i class="bi bi-pencil-square"></i> Edit</a>
+                                            <button class="btn btn-sm btn-outline-danger delete-button" data-id="@product.ProductID"><i class="bi bi-trash"></i> Delete</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
-
-        <!-- Pagination -->
-        <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap">
-            <span class="text-muted">Showing @resultStart - @resultEnd of @Model.TotalProducts</span>
-            <nav>
-                <ul class="pagination mb-0">
-                    <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                        <a class="page-link" asp-route-page="1" asp-route-category="@Model.Category">«</a>
-                    </li>
-                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
-                        <a class="page-link" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">‹</a>
-                    </li>
-
-                    @{
-                        var start = Math.Max(1, Model.Page - 1);
-                        var end = Math.Min(Model.TotalPages, Model.Page + 1);
-                        for (int i = start; i <= end; i++)
-                        {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link" asp-route-page="@i" asp-route-category="@Model.Category">@i</a>
-                            </li>
-                        }
-                    }
-
-                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
-                        <a class="page-link" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">›</a>
-                    </li>
-                    <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-                        <a class="page-link" asp-route-page="@Model.TotalPages" asp-route-category="@Model.Category">»</a>
-                    </li>
-                </ul>
-            </nav>
+                }
+            </div>
         </div>
     </div>
 </section>

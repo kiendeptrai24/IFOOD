@@ -2,20 +2,31 @@
 @using iFood.Data.Enum
 @model IndexCartViewModel
 
-<section class="bg-light d-flex justify-content-center align-items-center min-vh-100 pt-3">
-    <div class="card w-75 shadow-lg">
-        <div class="card-header bg-dark text-white text-center position-relative">
-            <i class="bi bi-cart3 fs-3"></i>
-            <span class="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger">@Model.CartCount</span>
+<style>
+    .cart-hero { background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); }
+    .item-card:hover { background-color: #f8f9fa; }
+    .summary-sticky { position: sticky; bottom: 0; }
+</style>
+<section class="bg-light d-flex justify-content-center align-items-start min-vh-100 pt-3">
+    <div class="w-75">
+        <div class="cart-hero text-white p-3 rounded-3 shadow-sm mb-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-cart3 fs-3"></i>
+                <div>
+                    <h4 class="mb-0">Your Cart</h4>
+                    <small class="opacity-75">Items selected will be included at checkout</small>
+                </div>
+            </div>
+            <span class="badge rounded-pill bg-dark">@Model.CartCount</span>
         </div>
-        <div class="card-body">
-            <h2 class="text-center mb-4">Shopping Bag</h2>
-            <div class="list-group">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="list-group">
 
                 @foreach (var item in Model.CartItems)
                 {
                     <div class="row position-relative">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="list-group-item d-flex justify-content-between align-items-center item-card">
                             
                             <input type="checkbox" class="position-absolute top-0 end-0 m-2 form-check-input item-checkbox"
                              checked onchange="calculateTotal()"
@@ -23,29 +34,29 @@
 
                             <div class="col-lg-6 col-md-8 d-flex align-items-center">
                                 <a type="button" class="delete-button" data-id="@item.Id">
-                                    <button class="btn btn-light me-2"><i class="bi bi-x"></i></button>
+                                    <button class="btn btn-outline-danger me-2" title="Remove"><i class="bi bi-x-lg"></i></button>
                                 </a>
-                                <button class="btn btn-light me-2"><i class="bi bi-heart"></i></button>
-                                <img src="@item.product.Image" alt="Product Image" class="img-thumbnail" width="70">
+                                <button class="btn btn-outline-secondary me-2" title="Save for later"><i class="bi bi-heart"></i></button>
+                                <img src="@item.product.Image" alt="Product Image" class="img-thumbnail" width="70" height="70" style="object-fit:cover;">
                                 <div class="ms-3">
                                     <p class="mb-0 fw-semibold">@item.product.Name</p>
-                                    <small class="text-muted">Category: @item.product.Category</small>
-                                    <small class="text-muted">Price of one: @item.Price$</small>
+                                    <small class="text-muted d-block">Category: @item.product.Category</small>
+                                    <small class="text-muted d-block">Price: $@item.Price</small>
                                 </div>
                             </div>
 
                             <div class="col">
                                 <div class="row">
                                     <div class="col-6 d-flex align-items-center justify-content-center">
-                                        <button class="btn btn-light"><i class="bi bi-plus"></i></button>
+                                        <button class="btn btn-outline-secondary"><i class="bi bi-dash"></i></button>
                                         <span class="mx-2">@item.Quantity</span>
-                                        <button class="btn btn-light"><i class="bi bi-dash"></i></button>
+                                        <button class="btn btn-outline-secondary"><i class="bi bi-plus"></i></button>
                                     </div>
                                     <div class="col">
-                                        <p class="fw-semibold mb-0 col">Price: @item.Price$</p>
+                                        <p class="fw-semibold mb-0 col">Price: $@item.Price</p>
                                     </div>
                                     <div class="col">
-                                        <p class="fw-semibold mb-0 col">Total: @item.Total$</p>
+                                        <p class="fw-semibold mb-0 col">Total: $@item.Total</p>
                                     </div>
                                 </div>
                             </div>
@@ -53,14 +64,18 @@
                     </div>
                 }
 
+                </div>
             </div>
-        </div>
-        <div class="card-footer bg-danger text-white text-end">
-            <p class="fw-semibold mb-0" onclick="">Total: <span id="totalPrice">@Model.TotalPrice</span></p>
-        </div>
-        <div class="card-footer d-flex justify-content-between">
-            <a class="btn btn-dark" type="button" asp-controller="Cart" asp-action="DeleteAll" >Delete all</a>
-            <button onclick="submitCheckedItems()" class="btn btn-primary text-center">Checkout</button>
+            <div class="card-footer bg-white summary-sticky d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <p class="fw-semibold mb-0">Total: <span id="totalPrice">@Model.TotalPrice</span></p>
+                    <small class="text-muted">USD</small>
+                </div>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-outline-danger" type="button" asp-controller="Cart" asp-action="DeleteAll">Delete all</a>
+                    <button onclick="submitCheckedItems()" class="btn btn-primary">Checkout</button>
+                </div>
+            </div>
         </div>
     </div>
 </section>

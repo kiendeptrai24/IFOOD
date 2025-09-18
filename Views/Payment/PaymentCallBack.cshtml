@@ -1,10 +1,36 @@
 ﻿@using iFood.Models.Momo;
-
 @model MomoExecuteResponseModel
 
-<h1>Name of Product: @Model.FullName</h1>
-<p> Price: @Model.Amount</p>
-<p> Id of Product: @Model.OrderId</p>
-<p> Information: @Model.OrderInfo</p>
-
-
+<section class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Payment Result</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Customer</span>
+                        <strong>@Model.FullName</strong>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Order ID</span>
+                        <strong>@Model.OrderId</strong>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Amount</span>
+                        <strong>$@Model.Amount</strong>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Information</span>
+                        <strong>@Model.OrderInfo</strong>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-end gap-2">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Home</a>
+                    <a asp-controller="Order" asp-action="Index" class="btn btn-primary">View Orders</a>
+                </div>
+            </div>
+        </div>
+    </div>
+ </section>

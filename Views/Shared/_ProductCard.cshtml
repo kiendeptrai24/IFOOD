@@ -1,0 +1,64 @@
+@using iFood.Data.Enum
+@model iFood.Models.Product
+<div class="card m-2 col-12 col-md-4 col-lg-3 mt-2" style="width: 18rem;">
+    <div class="card-body">
+        @if(Model.Status == null || Model.Status == ProductStatus.Unknown)
+        {
+            <span class="badge badge-pill badge-light text-purple-800 bg-purple-200 mb-2"></span>
+        }
+        else
+        {
+            <span class="badge badge-pill text-white mb-2"
+                  style="background-color:
+                    @(Model.Status switch
+                    {
+                        ProductStatus.Bestseller => "green",
+                        ProductStatus.NewArrival => "blue",
+                        ProductStatus.Featured => "purple",
+                        ProductStatus.OutOfStock => "gray",
+                        ProductStatus.Discounted => "red",
+                        ProductStatus.LimitedEdition => "gold",
+                        ProductStatus.ComingSoon => "orange",
+                        _ => "brown"
+                    });">
+                @Model.Status
+            </span>
+        }
+        <div>
+            <a class="fixed-card" type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@Model.ProductID">
+                @if(Model.Image != null)
+                {
+                    <img class="card-img-top card-img-top mb-4 fixed-card-img" src="@Model.Image" alt="@Model.Name">
+                }
+                else
+                {
+                    <img class="card-img-top card-img-top mb-4 fixed-card-img" src="/img/rungroopclub.png" alt="@Model.Name">
+                }
+            </a>
+        </div>
+        <h5 class="card-title">@Model.Name</h5>
+        <p class="card-text text-muted">Shipped in 3-4 days</p>
+        <p class="card-text text-muted">Quantity: @Model.Quantity</p>
+        <p class="card-text fw-bold">$@Model.Price</p>
+        <div class="d-flex">
+            @if(Model.Quantity <= 0)
+            {
+                <p>Sold out</p>
+            }
+            else if(Model.Status == ProductStatus.ComingSoon)
+            {
+                <p>Comming soon</p>
+            }
+            else
+            {
+                <a type="button" asp-controller="Cart" asp-action="Create" asp-route-id="@Model.ProductID" class="flex-fill me-2">
+                    <span class="btn btn-outline-primary w-100"><i class="bi bi-bag-plus"></i> Add to Cart</span>
+                </a>
+                <button class="btn btn-primary flex-fill" onclick="BuyItems(this)" data-id="@Model.ProductID">
+                    <i class="bi bi-piggy-bank"></i> Buy
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
