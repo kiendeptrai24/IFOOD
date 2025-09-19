@@ -16,13 +16,14 @@
     {
         return status switch
         {
+
             iFood.Data.Enum.Status.PendingConfirmation => "status-pending", 
             iFood.Data.Enum.Status.Shipping => "status-shipping", 
             iFood.Data.Enum.Status.Delivered => "status-delivered", 
             iFood.Data.Enum.Status.Completed => "status-completed", 
             iFood.Data.Enum.Status.Canceled => "status-canceled", 
             iFood.Data.Enum.Status.ReturnedOrRefunded => "status-returned", 
-            _ => "status-default" 
+            _ => "status-default"
         };
     }
 
@@ -30,12 +31,12 @@
     {
         return status switch
         {
-            iFood.Data.Enum.Status.PendingConfirmation => "bi-clock", 
+            iFood.Data.Enum.Status.PendingConfirmation => "bi-clock-history", 
             iFood.Data.Enum.Status.Shipping => "bi-truck", 
-            iFood.Data.Enum.Status.Delivered => "bi-check-circle", 
-            iFood.Data.Enum.Status.Completed => "bi-check-all", 
-            iFood.Data.Enum.Status.Canceled => "bi-x-circle", 
-            iFood.Data.Enum.Status.ReturnedOrRefunded => "bi-arrow-repeat", 
+            iFood.Data.Enum.Status.Delivered => "bi-check-circle-fill", 
+            iFood.Data.Enum.Status.Completed => "bi-patch-check-fill", 
+            iFood.Data.Enum.Status.Canceled => "bi-x-circle-fill", 
+            iFood.Data.Enum.Status.ReturnedOrRefunded => "bi-arrow-counterclockwise", 
             _ => "bi-question-circle" 
         };
     }
@@ -44,6 +45,7 @@
 <style>
     :root {
         --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
         --success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
         --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
@@ -351,11 +353,12 @@
     .btn-detail {
         background: var(--success-gradient);
         box-shadow: 0 4px 15px rgba(86, 171, 47, 0.3);
+
     }
 
     .btn-update {
         background: var(--warning-gradient);
-        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+        color: white;
     }
 
     .btn-status {
@@ -369,7 +372,6 @@
         text-decoration: none;
         color: white;
     }
-
     /* Pagination */
     .pagination-container {
         background: rgba(255,255,255,0.95);
@@ -659,6 +661,12 @@
 
     // Show status selection modal
     function showStatusSelection(orderId) {
+        const inputOptions = {};
+        Object.keys(statusConfig).forEach(key => {
+            const config = statusConfig[key];
+            inputOptions[key] = `${config.icon} ${config.label}`;
+        });
+
         Swal.fire({
             title: `Update Order Status #${orderId}`,
             input: "select",
@@ -681,11 +689,10 @@
             buttonsStyling: false
         }).then((result) => {
             if (result.isConfirmed && result.value) {
-                sendData(orderId, result.value);
+                updateOrderStatus(orderId, result.value);
             }
         });
     }
-
     // Send update request to API
     function sendData(orderId, status) {
         Swal.fire({
