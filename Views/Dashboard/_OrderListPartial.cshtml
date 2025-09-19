@@ -9,21 +9,20 @@
 
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-
-
 }
+
 @functions {
     public string GetStatusColor(iFood.Data.Enum.Status status)
     {
         return status switch
         {
-            iFood.Data.Enum.Status.PendingConfirmation => "orange", 
-            iFood.Data.Enum.Status.Shipping => "blue", 
-            iFood.Data.Enum.Status.Delivered => "green", 
-            iFood.Data.Enum.Status.Completed => "purple", 
-            iFood.Data.Enum.Status.Canceled => "red", 
-            iFood.Data.Enum.Status.ReturnedOrRefunded => "gray", 
-            _ => "lightgray" 
+            iFood.Data.Enum.Status.PendingConfirmation => "status-pending", 
+            iFood.Data.Enum.Status.Shipping => "status-shipping", 
+            iFood.Data.Enum.Status.Delivered => "status-delivered", 
+            iFood.Data.Enum.Status.Completed => "status-completed", 
+            iFood.Data.Enum.Status.Canceled => "status-canceled", 
+            iFood.Data.Enum.Status.ReturnedOrRefunded => "status-returned", 
+            _ => "status-default" 
         };
     }
 
@@ -41,135 +40,614 @@
         };
     }
 }
-  
-
 
 <style>
-    .status-badge { border-radius: 20px; padding: .25rem .6rem; color: #fff; font-size: .85rem; }
-    .status-pending { background: orange; }
-    .status-shipping { background: #0d6efd; }
-    .status-delivered { background: #198754; }
-    .status-completed { background: #6f42c1; }
-    .status-canceled { background: #dc3545; }
-    .status-returned { background: #6c757d; }
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --shadow-soft: 0 10px 30px rgba(0,0,0,0.1);
+        --shadow-hover: 0 15px 40px rgba(0,0,0,0.2);
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        min-height: 100vh;
+    }
+
+    /* Header Styles */
+    .dashboard-header {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .dashboard-title {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+        font-size: 2.5rem;
+        margin: 0;
+    }
+
+    /* Search Container */
+    .search-container {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .search-form {
+        max-width: 500px;
+        position: relative;
+    }
+
+    .search-input {
+        border: none;
+        border-radius: 50px;
+        padding: 1rem 3.5rem 1rem 1.5rem;
+        font-size: 1rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        background: #fff;
+        width: 100%;
+    }
+
+    .search-input:focus {
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        transform: translateY(-2px);
+        outline: none;
+    }
+
+    .search-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Order Cards Grid */
+    .orders-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .order-card {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(20px);
+        border: none;
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: var(--shadow-soft);
+        transition: all 0.4s ease;
+        position: relative;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .order-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .order-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+    }
+
+    .order-header {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        position: relative;
+    }
+
+    .order-code {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2d3436;
+        margin: 0;
+    }
+
+    .transaction-id {
+        color: #636e72;
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        color: white;
+    }
+
+    .status-pending { background: linear-gradient(135deg, #ff9a56 0%, #ffd39a 100%); }
+    .status-shipping { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .status-delivered { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    .status-completed { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .status-canceled { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .status-returned { background: linear-gradient(135deg, #a8a8a8 0%, #d3d3d3 100%); }
+    .status-default { background: linear-gradient(135deg, #ddd 0%, #eee 100%); color: #666; }
+
+    .order-body {
+        padding: 1.5rem;
+    }
+
+    .order-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: #636e72;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: #2d3436;
+    }
+
+    /* Product List */
+    .products-section h6 {
+        color: #2d3436;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .product-list {
+        background: rgba(248, 249, 250, 0.8);
+        border-radius: 15px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .product-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+    .product-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .product-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #2d3436;
+        margin-bottom: 0.25rem;
+    }
+
+    .product-quantity {
+        font-size: 0.85rem;
+        color: #636e72;
+    }
+
+    .product-price {
+        font-weight: 700;
+        color: #00b894;
+        font-size: 1rem;
+    }
+
+    .total-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: linear-gradient(135deg, rgba(0, 184, 148, 0.1) 0%, rgba(0, 184, 148, 0.05) 100%);
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+    }
+
+    .total-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2d3436;
+    }
+
+    .total-amount {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #00b894;
+    }
+
+    /* Action Buttons */
+    .order-actions {
+        display: flex;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: rgba(248, 249, 250, 0.5);
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: white;
+    }
+
+    .btn-detail {
+        background: var(--success-gradient);
+        box-shadow: 0 4px 15px rgba(86, 171, 47, 0.3);
+    }
+
+    .btn-update {
+        background: var(--warning-gradient);
+        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+    }
+
+    .btn-status {
+        background: var(--info-gradient);
+        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    }
+
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        text-decoration: none;
+        color: white;
+    }
+
+    /* Pagination */
+    .pagination-container {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .pagination {
+        margin: 0;
+        justify-content: center;
+    }
+
+    .page-link {
+        border: none;
+        border-radius: 12px;
+        margin: 0 0.25rem;
+        padding: 0.75rem 1rem;
+        color: #667eea;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: transparent;
+        text-decoration: none;
+    }
+
+    .page-link:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        text-decoration: none;
+    }
+
+    .page-item.active .page-link {
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .page-item.disabled .page-link {
+        color: #adb5bd;
+        background: transparent;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .orders-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .order-info {
+            grid-template-columns: 1fr;
+        }
+        
+        .dashboard-title {
+            font-size: 2rem;
+        }
+        
+        .status-badge {
+            position: static;
+            margin-top: 1rem;
+            align-self: flex-start;
+        }
+        
+        .order-actions {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+    }
+
+    /* Animations */
+    .order-card {
+        animation: fadeInUp 0.6s ease forwards;
+        
+    }
+
+    .order-card:nth-child(even) {
+        animation-delay: 0.2s;
+    }
+
+    .order-card:nth-child(odd) {
+        animation-delay: 0.1s;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .product-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .product-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .product-list::-webkit-scrollbar-thumb {
+        background: var(--primary-gradient);
+        border-radius: 10px;
+    }
 </style>
-<div class="bg-white p-4 rounded-bottom shadow-sm">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <form method="get" class="form-inline my-2 my-lg-0 d-flex">
-            <input class="form-control me-2" type="search" placeholder="Search" name="searchTerm">
-            <button class="btn btn-outline-secondary" type="submit">
-                <i class="bi bi-search"></i>
-            </button>
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="dashboard-title">
+                    <i class="bi bi-box-seam me-3"></i>Order Management
+                </h1>
+                <p class="text-muted">Manage and track all your orders efficiently</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary">
+                    <i class="bi bi-download me-2"></i>Export
+                </button>
+                <button class="btn btn-primary" style="background: var(--primary-gradient); border: none;">
+                    <i class="bi bi-plus-lg me-2"></i>New Order
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Container -->
+    <div class="search-container">
+        <form method="get" class="search-form">
+            <div class="position-relative">
+                <input class="search-input" type="search" placeholder="Search orders by code, user, or product..." name="searchTerm" value="@ViewData["SearchTerm"]">
+                <button class="search-btn" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
         </form>
     </div>
-    <!-- Phân trang -->
-    <nav>
-        <ul class="pagination justify-content-center">
-            <!-- Trang đầu (<<) -->
-            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                <a class="page-link" asp-action="OrderIndex" asp-route-page="1" asp-route-category="@Model.Category">&laquo;&laquo;</a>
-            </li>
 
-            <!-- Trang gần hiện tại -->
-            @for (int i = Math.Max(1, Model.Page - 1); i <= Math.Min(Model.TotalPages, Model.Page + 1); i++)
-            {
-                <li class="page-item @(i == Model.Page ? "active" : "")">
-                    <a class="page-link" asp-action="OrderIndex" asp-route-page="@i" asp-route-category="@Model.Category">@i</a>
+    <!-- Top Pagination -->
+    <div class="pagination-container mb-4">
+        <nav>
+            <ul class="pagination">
+                <!-- First Page -->
+                <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="OrderIndex" asp-route-page="1" asp-route-category="@Model.Category">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
                 </li>
-            }
 
-            <!-- Trang cuối (>>) -->
-            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-                <a class="page-link" asp-action="OrderIndex" asp-route-page="@Model.TotalPages" asp-route-category="@Model.Category">&raquo;&raquo;</a>
-            </li>
-        </ul>
-    </nav>
-<div class="row row-cols-1 row-cols-md-2 g-4">
-    @foreach (var order in Model.Orders)
-    {
-        <div class="col">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-0">Order Code: @order.Ordercode</h5>
-                        <small>Transaction ID: @order.TransactionId</small>
-                    </div>
-                    <span class="status-badge @(order.status == iFood.Data.Enum.Status.PendingConfirmation ? "status-pending" :
-                                                order.status == iFood.Data.Enum.Status.Shipping ? "status-shipping" :
-                                                order.status == iFood.Data.Enum.Status.Delivered ? "status-delivered" :
-                                                order.status == iFood.Data.Enum.Status.Completed ? "status-completed" :
-                                                order.status == iFood.Data.Enum.Status.Canceled ? "status-canceled" :
-                                                "status-returned")">
-                        <i class="bi @(GetStatusIcon(order.status))"></i> @order.status
+                <!-- Page Range -->
+                @for (int i = Math.Max(1, Model.Page - 1); i <= Math.Min(Model.TotalPages, Model.Page + 1); i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link" asp-action="OrderIndex" asp-route-page="@i" asp-route-category="@Model.Category">@i</a>
+                    </li>
+                }
+
+                <!-- Last Page -->
+                <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="OrderIndex" asp-route-page="@Model.TotalPages" asp-route-category="@Model.Category">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Orders Grid -->
+    <div class="orders-grid" id="order-container">
+        @foreach (var order in Model.Orders)
+        {
+
+            <div class="order-card">
+                <div class="order-header">
+                    <h5 class="order-code">Order #@order.Ordercode</h5>
+                    <p class="transaction-id">Transaction ID: @order.TransactionId</p>
+                    <span class="status-badge @GetStatusColor(order.status)">
+                        <i class="bi @GetStatusIcon(order.status)"></i>
+                        @order.status
                     </span>
                 </div>
+                
+                <div class="order-body">
+                    <div class="order-info">
+                        <div class="info-item">
+                            <span class="info-label">Customer</span>
+                            <span class="info-value">@order.AppUserId</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Order Date</span>
+                            <span class="info-value">@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Payment</span>
+                            <span class="info-value">@order.PaymentMethod</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Items</span>
+                            <span class="info-value">@order.OrderDetails.Count() Products</span>
+                        </div>
+                    </div>
 
-                <div class="card-body">
-                    <p class="mb-1"><strong>User:</strong> @order.AppUserId</p>
-                    <p><strong>Order Date:</strong> @order.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
-                    <p><strong>Payment Method:</strong> @order.PaymentMethod</p>
-                    <hr />
-                    <h6>Products:</h6>
-                    <ul class="list-group mb-3">
-                        @foreach (var product in order.OrderDetails)
-                        {
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <div class="ms-2 me-auto">
-                                    <div class="fw-bold">@product.Product.Name</div>
-                                    Quantity: @product.Quantity
+                    <div class="products-section">
+                        <h6><i class="bi bi-basket3"></i>Products</h6>
+                        <div class="product-list">
+                            @foreach (OrderDetail product in order.OrderDetails)
+                            {
+                                <div class="product-item">
+                                    <div>
+                                        <div class="product-name">@product.Product.Name</div>
+                                        <div class="product-quantity">Quantity: @product.Quantity</div>
+                                    </div>
+                                    <div class="product-price">$@((product.Quantity * (product.Product?.Price ?? 0)).ToString("0.00"))</div>
                                 </div>
-                                <span>$@((product.Quantity * (product.Product?.Price ?? 0)).ToString("0.00"))</span>
-                            </li>
-                        }
-                    </ul>
+                            }
+                        </div>
+                    </div>
 
-                    <div class="d-flex justify-content-between">
-                        <span><strong>Total:</strong></span>
-                        <span class="fw-bold text-success">$@order.TotalPrice</span>
+                    <div class="total-section">
+                        <span class="total-label">Total Amount:</span>
+                        <span class="total-amount">$@order.TotalPrice</span>
                     </div>
                 </div>
-
-                <div class="card-footer d-flex justify-content-between">
-                    <a asp-controller="Order" asp-action="OrderDetail" asp-route-id="@order.Id" class="btn btn-success btn-sm">
-                        <i class="bi bi-card-heading"></i> Detail
+                
+                <div class="order-actions">
+                    <a asp-controller="Order" asp-action="OrderDetail" asp-route-id="@order.Id" class="action-btn btn-detail">
+                        <i class="bi bi-eye"></i> Detail
                     </a>
-                    <a asp-controller="Order" asp-action="UpdateStateForOrder" asp-route-id="@order.Id" class="btn btn-warning btn-sm">
-                        <i class="bi bi-arrow-right-square-fill"></i> Update
+                    <a asp-controller="Order" asp-action="UpdateStateForOrder" asp-route-id="@order.Id" class="action-btn btn-update">
+                        <i class="bi bi-arrow-right-square"></i> Update
                     </a>
-                    <button class="btn btn-secondary btn-sm" onclick="showStatusSelection(@order.Id)">
-                        Change Status
+                    <button class="action-btn btn-status" onclick="showStatusSelection(@order.Id)">
+                        <i class="bi bi-gear"></i> Status
                     </button>
                 </div>
             </div>
-        </div>
-    }
+        }
+    </div>
+
+    <!-- Bottom Pagination -->
+    <div class="pagination-container">
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                    <a class="page-link pagination-link" href="#" onclick="loadOrders(1)">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                </li>
+
+                @for (int i = Math.Max(1, Model.Page - 1); i <= Math.Min(Model.TotalPages, Model.Page + 1); i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link pagination-link" href="#" onclick="loadOrders(@i)">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link pagination-link" href="#" onclick="loadOrders(@Model.TotalPages)">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
 
-<!-- Phân trang AJAX -->
-<nav class="mt-4">
-    <ul class="pagination justify-content-center">
-        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-            <a class="page-link" href="#" onclick="loadOrders(1)">&laquo;&laquo;</a>
-        </li>
-
-        @for (int i = Math.Max(1, Model.Page - 1); i <= Math.Min(Model.TotalPages, Model.Page + 1); i++)
-        {
-            <li class="page-item @(i == Model.Page ? "active" : "")">
-                <a class="page-link" href="#" onclick="loadOrders(@i)">@i</a>
-            </li>
-        }
-
-        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" href="#" onclick="loadOrders(@Model.TotalPages)">&raquo;&raquo;</a>
-        </li>
-    </ul>
-</nav>
-
-
-
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Mapping trạng thái từ chữ sang số
+    // Status mapping
     const statusMapping = {
         "PendingConfirmation": 0,
         "Shipping": 1,
@@ -179,21 +657,28 @@
         "ReturnedOrRefunded": 5,
     };
 
-    // Mở popup chọn trạng thái mới
+    // Show status selection modal
     function showStatusSelection(orderId) {
         Swal.fire({
-            title: `Chọn trạng thái mới cho Order #${orderId}`,
+            title: `Update Order Status #${orderId}`,
             input: "select",
             inputOptions: {
-                "PendingConfirmation": "PendingConfirmation",
-                "Shipping": "Shipping",
-                "Delivered": "Delivered",
-                "Completed": "Completed",
-                "Canceled": "Canceled",
-                "ReturnedOrRefunded": "ReturnedOrRefunded"
+                "PendingConfirmation": "🕐 Pending Confirmation",
+                "Shipping": "🚚 Shipping",
+                "Delivered": "✅ Delivered",
+                "Completed": "🎉 Completed",
+                "Canceled": "❌ Canceled",
+                "ReturnedOrRefunded": "🔄 Returned/Refunded"
             },
-            inputPlaceholder: "Chọn trạng thái",
-            showCancelButton: true
+            inputPlaceholder: "Select new status",
+            showCancelButton: true,
+            confirmButtonText: 'Update Status',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-outline-secondary'
+            },
+            buttonsStyling: false
         }).then((result) => {
             if (result.isConfirmed && result.value) {
                 sendData(orderId, result.value);
@@ -201,35 +686,70 @@
         });
     }
 
-    // Gửi yêu cầu cập nhật trạng thái đến API
+    // Send update request to API
     function sendData(orderId, status) {
+        Swal.fire({
+            title: 'Updating...',
+            html: 'Please wait while we update the order status.',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            }
+        });
+
         fetch('/Dashboard/UpdateOrderStatus', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: orderId, status: statusMapping[status] }) // Chuyển trạng thái sang số
+            body: JSON.stringify({ id: orderId, status: statusMapping[status] })
         })
         .then(response => response.json())
         .then(data => {
-            Swal.fire("Thành công", `Cập nhật: ${data.message}`, "success")
-            .then(() => {
-                location.reload(); // Tải lại trang sau khi người dùng nhấn "OK"
+            Swal.fire({
+                title: "Success!",
+                text: `Order updated: ${data.message}`,
+                icon: "success"
+            }).then(() => {
+                location.reload();
             });
         })
-        .catch(error => Swal.fire("Lỗi", "Không thể cập nhật!", "error"));
+        .catch(error => {
+            Swal.fire("Error", "Unable to update order status!", "error");
+        });
     }
-</script>
-<script>
-    $(document).on("click", ".pagination-link", function (e) {
-        e.preventDefault();
-        const url = $(this).attr("href");
 
+    // AJAX Pagination
+    function loadOrders(page) {
+        const currentUrl = new URL(window.location);
+        currentUrl.searchParams.set('page', page);
+        
         $.ajax({
-            url: url,
+            url: currentUrl.toString(),
             type: 'GET',
             success: function (data) {
                 $('#order-container').html($(data).find('#order-container').html());
+                // Update pagination
+                $('.pagination-container').html($(data).find('.pagination-container').html());
+                // Update URL without reload
+                window.history.pushState({}, '', currentUrl.toString());
+            },
+            error: function() {
+                Swal.fire("Error", "Unable to load orders!", "error");
             }
         });
+    }
+
+    // Enhanced pagination click handler
+    $(document).on("click", ".pagination-link", function (e) {
+        e.preventDefault();
+        const page = $(this).text() || $(this).data('page');
+        if (page && !$(this).parent().hasClass('disabled')) {
+            loadOrders(page);
+        }
+    });
+
+    // Add smooth scroll to top after page load
+    $(document).ready(function() {
+        $('html, body').animate({ scrollTop: 0 }, 'slow');
     });
 </script>
-

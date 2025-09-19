@@ -2,50 +2,618 @@
 @model IndexProductViewModel
 
 <style>
-    .tbl-rounded { overflow: hidden; border-radius: .5rem; }
-    .tbl-head { background: #f8f9fa; }
-    .img-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
-    .actions .btn { padding: .25rem .5rem; }
-</style>
-<table class="table table-bordered tbl-rounded">
-    <thead class="tbl-head">
-        <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total</th>
-            <th>Release</th>
-            <th class="text-end">Actions</th>
-        </tr>
-    </thead>
-    @foreach(var product in Model.Products)
-    {
-        <tbody>
-            <tr>
-                <td class="d-flex align-items-center gap-2">
-                    <img src="@(product.Image ?? "https://placehold.co/50x50")" class="img-thumb" alt="@product.Name">
-                    <span class="fw-semibold">@product.Name</span>
-                </td>
-                <td class="text-muted" style="max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@product.Description</td>
-                <td>@product.Category</td>
-                <td>@product.Quantity</td>
-                <td>$@product.Price</td>
-                <td>$@product.Total</td>
-                <td>@product.DateSell.ToString("yyyy/MM/dd")</td>
-                <td class="text-end actions">
-                    <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID" class="btn btn-outline-success btn-sm" title="Detail">
-                        <i class="bi bi-card-heading"></i>
-                    </a>
-                    <a asp-controller="Product" asp-action="Edit" asp-route-id="@product.ProductID" class="btn btn-outline-warning btn-sm" title="Edit">
-                        <i class="bi bi-pencil-square"></i>
-                    </a>
-                    <a class="btn btn-outline-danger btn-sm delete-button" data-id="@product.ProductID" title="Delete">
-                        <i class="bi bi-trash"></i>
-                    </a>
-                </td>
-            </tr>
-        </tbody>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --shadow-soft: 0 10px 30px rgba(0,0,0,0.1);
+        --shadow-hover: 0 15px 40px rgba(0,0,0,0.15);
     }
-</table>
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        min-height: 100vh;
+    }
+
+    /* Table Container */
+    .table-container {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(255,255,255,0.3);
+        margin: 2rem 0;
+    }
+
+    .table-header {
+        background: var(--primary-gradient);
+        padding: 2rem;
+        color: white;
+        margin: 0;
+    }
+
+    .table-title {
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .table-subtitle {
+        opacity: 0.9;
+        font-size: 1rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0;
+    }
+
+    /* Table Styles */
+    .modern-table {
+        margin: 0;
+        border: none;
+        background: transparent;
+    }
+
+    .modern-table thead th {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        padding: 1.25rem 1.5rem;
+        font-weight: 700;
+        color: #495057;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .modern-table thead th:first-child {
+        border-radius: 0;
+    }
+
+    .modern-table thead th:last-child {
+        border-radius: 0;
+    }
+
+    .modern-table tbody {
+        background: transparent;
+    }
+
+    .modern-table tbody tr {
+        border: none;
+        transition: all 0.3s ease;
+        background: rgba(255,255,255,0.8);
+    }
+
+    .modern-table tbody tr:hover {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .modern-table tbody tr + tr {
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .modern-table td {
+        border: none;
+        padding: 1.5rem;
+        vertical-align: middle;
+        background: transparent;
+    }
+
+    /* Product Image and Name */
+    .product-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 200px;
+    }
+
+    .img-thumb {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 15px;
+        border: 3px solid #fff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .img-thumb:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .product-name {
+        font-weight: 700;
+        color: #2d3436;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    /* Description */
+    .product-description {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #636e72;
+        font-size: 0.9rem;
+        position: relative;
+        cursor: help;
+    }
+
+    .product-description:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        background: #2d3436;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        white-space: normal;
+        max-width: 250px;
+        z-index: 1000;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Category Badge */
+    .category-badge {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Quantity Badge */
+    .quantity-badge {
+        background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+        color: white;
+        padding: 0.5rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        display: inline-block;
+        min-width: 50px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+    }
+
+    /* Price Styling */
+    .price-text {
+        font-weight: 800;
+        color: #e17055;
+        font-size: 1.1rem;
+    }
+
+    .total-text {
+        font-weight: 800;
+        color: #00b894;
+        font-size: 1.2rem;
+    }
+
+    /* Date Styling */
+    .date-text {
+        color: #636e72;
+        font-size: 0.9rem;
+        font-weight: 500;
+        font-family: 'Courier New', monospace;
+    }
+
+    /* Action Buttons */
+    .actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        align-items: center;
+        min-width: 130px;
+    }
+
+    .btn-action {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-action::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        transition: all 0.3s ease;
+        transform: translate(-50%, -50%);
+    }
+
+    .btn-action:hover::before {
+        width: 100%;
+        height: 100%;
+    }
+
+    .btn-detail {
+        background: var(--success-gradient);
+        color: white;
+        box-shadow: 0 4px 10px rgba(86, 171, 47, 0.3);
+    }
+
+    .btn-edit {
+        background: var(--warning-gradient);
+        color: white;
+        box-shadow: 0 4px 10px rgba(240, 147, 251, 0.3);
+    }
+
+    .btn-delete {
+        background: var(--danger-gradient);
+        color: white;
+        box-shadow: 0 4px 10px rgba(250, 112, 154, 0.3);
+    }
+
+    .btn-action:hover {
+        transform: translateY(-3px) scale(1.05);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-detail:hover { 
+        box-shadow: 0 8px 20px rgba(86, 171, 47, 0.4); 
+    }
+    .btn-edit:hover { 
+        box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4); 
+    }
+    .btn-delete:hover { 
+        box-shadow: 0 8px 20px rgba(250, 112, 154, 0.4); 
+    }
+
+    /* Tooltip */
+    .btn-action[title] {
+        position: relative;
+    }
+
+    .btn-action[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: 120%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #2d3436;
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        z-index: 1000;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 1200px) {
+        .table-responsive {
+            border-radius: 0 0 25px 25px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .table-title {
+            font-size: 1.5rem;
+        }
+        
+        .modern-table thead th,
+        .modern-table td {
+            padding: 1rem;
+        }
+        
+        .product-info {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .img-thumb {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .product-description {
+            max-width: 200px;
+        }
+        
+        .actions {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .btn-action {
+            width: 35px;
+            height: 35px;
+        }
+    }
+
+    /* Loading Animation */
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modern-table tbody tr {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .modern-table tbody tr:nth-child(even) {
+        animation-delay: 0.1s;
+    }
+
+    .modern-table tbody tr:nth-child(odd) {
+        animation-delay: 0.05s;
+    }
+
+    /* Custom Scrollbar */
+    .table-responsive::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: rgba(248, 249, 250, 0.8);
+        border-radius: 10px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--primary-gradient);
+        border-radius: 10px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #636e72;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        opacity: 0.8;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="table-container">
+        <!-- Header -->
+        <div class="table-header">
+            <h1 class="table-title">
+                <i class="bi bi-box-seam"></i>
+                Product Inventory
+            </h1>
+            <p class="table-subtitle">Manage your product catalog with ease</p>
+        </div>
+
+        <!-- Table Content -->
+        @if (Model.Products != null && Model.Products.Any())
+        {
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th><i class="bi bi-box me-2"></i>Product</th>
+                            <th><i class="bi bi-file-text me-2"></i>Description</th>
+                            <th><i class="bi bi-tags me-2"></i>Category</th>
+                            <th><i class="bi bi-stack me-2"></i>Quantity</th>
+                            <th><i class="bi bi-currency-dollar me-2"></i>Price</th>
+                            <th><i class="bi bi-calculator me-2"></i>Total</th>
+                            <th><i class="bi bi-calendar me-2"></i>Release</th>
+                            <th class="text-end"><i class="bi bi-gear me-2"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var product in Model.Products)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="product-info">
+                                        <img src="@(product.Image ?? "https://placehold.co/60x60/667eea/white?text=IMG")" 
+                                             class="img-thumb" 
+                                             alt="@product.Name"
+                                             onerror="this.src='https://placehold.co/60x60/667eea/white?text=IMG'">
+                                        <span class="product-name">@product.Name</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="product-description" title="@product.Description">
+                                        @product.Description
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="category-badge">@product.Category</span>
+                                </td>
+                                <td>
+                                    <span class="quantity-badge">@product.Quantity</span>
+                                </td>
+                                <td>
+                                    <span class="price-text">$@product.Price.ToString("0.00")</span>
+                                </td>
+                                <td>
+                                    <span class="total-text">$@product.Total.ToString("0.00")</span>
+                                </td>
+                                <td>
+                                    <span class="date-text">@product.DateSell.ToString("yyyy/MM/dd")</span>
+                                </td>
+                                <td>
+                                    <div class="actions">
+                                        <a asp-controller="Product" 
+                                           asp-action="Detail" 
+                                           asp-route-id="@product.ProductID" 
+                                           class="btn-action btn-detail" 
+                                           title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-controller="Product" 
+                                           asp-action="Edit" 
+                                           asp-route-id="@product.ProductID" 
+                                           class="btn-action btn-edit" 
+                                           title="Edit Product">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="#" 
+                                           class="btn-action btn-delete delete-button" 
+                                           data-id="@product.ProductID" 
+                                           title="Delete Product">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <h3>No Products Found</h3>
+                <p>Start adding products to your inventory to see them here.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Enhanced Delete Confirmation Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delete button functionality
+        document.querySelectorAll('.delete-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const productId = this.getAttribute('data-id');
+                const productRow = this.closest('tr');
+                const productName = productRow.querySelector('.product-name').textContent;
+                
+                // Enhanced confirmation dialog
+                if (confirm(`Are you sure you want to delete "${productName}"?\n\nThis action cannot be undone.`)) {
+                    // Add loading state
+                    this.innerHTML = '<i class="bi bi-spinner-border spinner-border-sm"></i>';
+                    this.style.pointerEvents = 'none';
+                    
+                    // Simulate delete request (replace with your actual delete logic)
+                    setTimeout(() => {
+                        // Add fade out animation
+                        productRow.style.transition = 'all 0.3s ease';
+                        productRow.style.opacity = '0';
+                        productRow.style.transform = 'translateX(-100px)';
+                        
+                        setTimeout(() => {
+                            productRow.remove();
+                            
+                            // Check if table is empty
+                            const remainingRows = document.querySelectorAll('.modern-table tbody tr');
+                            if (remainingRows.length === 0) {
+                                const tableContainer = document.querySelector('.table-responsive');
+                                tableContainer.innerHTML = `
+                                    <div class="empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        <h3>No Products Found</h3>
+                                        <p>All products have been removed from inventory.</p>
+                                    </div>
+                                `;
+                            }
+                        }, 300);
+                    }, 1000);
+                    
+                    // In real implementation, make AJAX call to delete endpoint:
+                    /*
+                    fetch(`/Product/Delete/${productId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Remove row with animation
+                            productRow.style.transition = 'all 0.3s ease';
+                            productRow.style.opacity = '0';
+                            setTimeout(() => productRow.remove(), 300);
+                        } else {
+                            alert('Failed to delete product. Please try again.');
+                            this.innerHTML = '<i class="bi bi-trash"></i>';
+                            this.style.pointerEvents = 'auto';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                        this.innerHTML = '<i class="bi bi-trash"></i>';
+                        this.style.pointerEvents = 'auto';
+                    });
+                    */
+                }
+            });
+        });
+
+        // Enhanced row hover effects
+        document.querySelectorAll('.modern-table tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            row.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Image error handling
+        document.querySelectorAll('.img-thumb').forEach(img => {
+            img.addEventListener('error', function() {
+                this.src = 'https://placehold.co/60x60/667eea/white?text=IMG';
+            });
+        });
+    });
+</script>

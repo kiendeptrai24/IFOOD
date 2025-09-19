@@ -298,6 +298,7 @@
 
     .product-card {
         background: white;
+        width: 100%;  
         border-radius: 20px;
         overflow: hidden;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -692,7 +693,7 @@
 
             <!-- Product Grid -->
             <div class="row">
-                @foreach (var product in Model.Products)
+                @foreach (Product product in Model.Products)
                 {
                     <div class="col-lg-4 col-md-6 mb-4">
                         <div class="product-card">

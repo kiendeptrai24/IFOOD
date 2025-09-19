@@ -14,18 +14,373 @@
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
+
 <style>
-    .product-image {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 50%;
-        border: 2px solid #dee2e6;
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --shadow-soft: 0 10px 30px rgba(0,0,0,0.1);
+        --shadow-hover: 0 15px 40px rgba(0,0,0,0.15);
+        --glass-bg: rgba(255,255,255,0.95);
+        --glass-border: rgba(255,255,255,0.3);
     }
 
-    .card-title {
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        min-height: 100vh;
+    }
+
+    /* Dashboard Hero Section */
+    .dash-hero {
+        background: var(--primary-gradient);
+        backdrop-filter: blur(20px);
+        border-radius: 25px !important;
+        padding: 2.5rem !important;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(255,255,255,0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dash-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        z-index: 0;
+    }
+
+    .dash-hero > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .dash-hero h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .dash-hero p {
         font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .btn-hero {
+        background: rgba(255,255,255,0.2);
+        border: 2px solid rgba(255,255,255,0.3);
+        color: white !important;
         font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-hero:hover {
+        background: rgba(255,255,255,0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        color: white !important;
+    }
+
+    /* Control Panel */
+    .control-panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid var(--glass-border);
+    }
+
+    /* Search Section */
+    .search-container {
+        position: relative;
+        max-width: 400px;
+    }
+
+    .search-input {
+        border: none;
+        border-radius: 50px;
+        padding: 1rem 3.5rem 1rem 1.5rem;
+        font-size: 1rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        background: #fff;
+        width: 100%;
+    }
+
+    .search-input:focus {
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        transform: translateY(-2px);
+        outline: none;
+    }
+
+    .search-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Category Filter Buttons */
+    .category-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .filter-btn {
+        background: transparent;
+        border: 2px solid #e9ecef;
+        color: #6c757d;
+        border-radius: 25px;
+        padding: 0.5rem 1.2rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .filter-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        transition: all 0.3s ease;
+        z-index: -1;
+    }
+
+    .filter-btn:hover::before,
+    .filter-btn.active::before {
+        left: 0;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+        color: white;
+        border-color: transparent;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Stats Section */
+    .stats-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid rgba(0,0,0,0.05);
+    }
+
+    .stats-info {
+        color: #6c757d;
+        font-weight: 500;
+        font-size: 1rem;
+    }
+
+    /* Pagination */
+    .pagination-modern {
+        margin: 0;
+        gap: 0.5rem;
+    }
+
+    .pagination-modern .page-link {
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        color: #667eea;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: transparent;
+        text-decoration: none;
+        margin: 0;
+    }
+
+    .pagination-modern .page-link:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        text-decoration: none;
+    }
+
+    .pagination-modern .page-item.active .page-link {
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .pagination-modern .page-item.disabled .page-link {
+        color: #adb5bd;
+        background: transparent;
+    }
+
+    /* Product Cards */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .product-card {
+        width: 100%; /* Đảm bảo chiếm toàn bộ chiều ngang của cột */
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: none;
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: var(--shadow-soft);
+        transition: all 0.4s ease;
+        border: 1px solid var(--glass-border);
+        position: relative;
+        height: fit-content;
+    }
+
+    .product-card::before {
+        content: '';
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+    }
+
+    .product-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .product-card-body {
+        padding: 2rem;
+    }
+
+    .product-header {
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 20px;
+        border: 4px solid #fff;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .product-image:hover {
+        transform: scale(1.1);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    }
+
+    .product-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .product-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+
+    .product-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #636e72;
+    }
+
+    .meta-badge {
+        background: var(--info-gradient);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .price-badge {
+        background: var(--success-gradient);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-left: auto;
+    }
+
+    .quantity-badge {
+        background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    /* Description */
+    .product-description {
+        color: #636e72;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
     }
 
     .description-text {
@@ -37,135 +392,474 @@
     }
 
     .show-more {
-        color: #007bff;
+        color: #667eea;
         cursor: pointer;
+        font-weight: 600;
         font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .show-more:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
+    /* Action Buttons */
+    .product-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid rgba(0,0,0,0.05);
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: white;
+        font-size: 0.9rem;
+    }
+
+    .btn-detail {
+        background: var(--info-gradient);
+        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    }
+
+    .btn-edit {
+        background: var(--warning-gradient);
+        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+    }
+
+    .btn-delete {
+        background: var(--danger-gradient);
+        box-shadow: 0 4px 15px rgba(250, 112, 154, 0.3);
+    }
+
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        text-decoration: none;
+        color: white;
+    }
+
+    .btn-detail:hover { box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4); }
+    .btn-edit:hover { box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4); }
+    .btn-delete:hover { box-shadow: 0 8px 25px rgba(250, 112, 154, 0.4); }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #636e72;
+        grid-column: 1 / -1;
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.3;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        opacity: 0.8;
+        font-size: 1.1rem;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .dash-hero {
+            padding: 1.5rem !important;
+        }
+        
+        .dash-hero h2 {
+            font-size: 1.8rem;
+        }
+        
+        .control-panel {
+            padding: 1.5rem;
+        }
+        
+        .search-container {
+            max-width: none;
+            width: 100%;
+        }
+        
+        .category-filters {
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .stats-row {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .products-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .product-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .product-actions {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .product-meta {
+            justify-content: center;
+        }
+    }
+
+    /* Loading Animation */
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .product-card {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .product-card:nth-child(odd) {
+        animation-delay: 0.1s;
+    }
+
+    .product-card:nth-child(even) {
+        animation-delay: 0.2s;
     }
 </style>
 
-<style>
-    .dash-hero { background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); }
-    .dash-stat { border-left: 4px solid rgba(0,0,0,.1); }
-    .product-image { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #f1f1f1; }
-    .description-text { overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-    .show-more { color: #7b4397; cursor: pointer; font-size: .9rem; }
-    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important; }
-</style>
 <section>
-    <div class="container mt-4">
-        <div class="dash-hero text-white p-4 rounded-3 shadow-sm">
+    <div class="container-fluid py-4" style="max-width: 1400px;">
+        <!-- Dashboard Hero -->
+        <div class="dash-hero">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
-                    <h2 class="mb-1">Admin Dashboard</h2>
-                    <p class="mb-0 opacity-75">Manage products, categories and inventory</p>
+                    <h2 class="mb-1">
+                        <i class="bi bi-speedometer2 me-3"></i>Admin Dashboard
+                    </h2>
+                    <p class="mb-0">Manage products, categories and inventory with ease</p>
                 </div>
-                <div class="d-flex gap-2">
-                    <a class="btn btn-light" asp-controller="Product" asp-action="Create"><i class="bi bi-plus-circle"></i> New Product</a>
+                <div class="d-flex gap-3">
+                    <a class="btn btn-hero" asp-controller="Product" asp-action="Create">
+                        <i class="bi bi-plus-circle me-2"></i>New Product
+                    </a>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-bottom shadow-sm p-3 mt-3">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <form method="get" class="d-flex" style="max-width: 320px;">
-                    <input class="form-control me-2" type="search" name="searchTerm" placeholder="Search products..." value="@ViewBag.SearchTerm">
-                    <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <!-- Search and Filters Row -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <!-- Search Section -->
+                <form method="get" class="search-container">
+                    <input class="search-input" 
+                           type="search" 
+                           name="searchTerm" 
+                           placeholder="Search products by name, category, or description..." 
+                           value="@ViewBag.SearchTerm">
+                    <button class="search-btn" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
                 </form>
-                <div class="text-nowrap">
-                    <a class="btn btn-outline-secondary btn-sm me-1" asp-action="Index" asp-route-page="1" asp-route-category="-1">All</a>
+
+                <!-- Category Filters -->
+                <div class="category-filters">
+                    <span class="text-muted fw-semibold me-2">Filters:</span>
+                    <a class="filter-btn @(Model.Category == -1 ? "active" : "")" 
+                       asp-action="Index" 
+                       asp-route-page="1" 
+                       asp-route-category="-1">
+                        <i class="bi bi-grid me-1"></i>All
+                    </a>
                     @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
                     {
-                        <a class="btn btn-outline-secondary btn-sm me-1 mb-1" asp-action="Index" asp-route-page="1" asp-route-category="@category.Value">@category.Text</a>
+                        <a class="filter-btn @(Model.Category.ToString() == category.Value ? "active" : "")" 
+                           asp-action="Index" 
+                           asp-route-page="1" 
+                           asp-route-category="@category.Value">
+                            @category.Text
+                        </a>
                     }
                 </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
-                <span class="text-muted">Showing @resultStart - @resultEnd of @Model.TotalProducts</span>
+            <!-- Stats and Pagination Row -->
+            <div class="stats-row">
+                <div class="stats-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Showing <strong>@resultStart - @resultEnd</strong> of <strong>@Model.TotalProducts</strong> products
+                </div>
+                
                 <nav>
-                    <ul class="pagination mb-0">
-                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")"><a class="page-link" asp-route-page="1" asp-route-category="@Model.Category">«</a></li>
-                        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")"><a class="page-link" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">‹</a></li>
+                    <ul class="pagination pagination-modern">
+                        <!-- First Page -->
+                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-route-page="1" asp-route-category="@Model.Category">
+                                <i class="bi bi-chevron-double-left"></i>
+                            </a>
+                        </li>
+                        <!-- Previous -->
+                        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                            <a class="page-link" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        
                         @{
                             var _start = Math.Max(1, Model.Page - 1);
                             var _end = Math.Min(Model.TotalPages, Model.Page + 1);
                             for (int i = _start; i <= _end; i++)
                             {
-                                <li class="page-item @(i == Model.Page ? "active" : "")"><a class="page-link" asp-route-page="@i" asp-route-category="@Model.Category">@i</a></li>
+                                <li class="page-item @(i == Model.Page ? "active" : "")">
+                                    <a class="page-link" asp-route-page="@i" asp-route-category="@Model.Category">@i</a>
+                                </li>
                             }
                         }
-                        <li class="page-item @(Model.HasNextPage ? "" : "disabled")"><a class="page-link" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">›</a></li>
-                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")"><a class="page-link" asp-route-page="@Model.TotalPages" asp-route-category="@Model.Category">»</a></li>
+                        
+                        <!-- Next -->
+                        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                            <a class="page-link" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                        <!-- Last Page -->
+                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-route-page="@Model.TotalPages" asp-route-category="@Model.Category">
+                                <i class="bi bi-chevron-double-right"></i>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>
+        </div>
 
-            <div class="row mt-2">
+        <!-- Products Grid -->
+        @if (Model.Products != null && Model.Products.Any())
+        {
+            <div class="row" id="products-container">
                 @foreach (var product in Model.Products)
                 {
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card shadow-sm h-100 card-hover">
-                            <div class="card-body">
-                                <div class="d-flex gap-3 align-items-start">
-                                    <img src="@product.Image" class="product-image" />
-                                    <div class="flex-grow-1">
-                                        <h5 class="card-title mb-1">@product.Name</h5>
-                                        <div class="small text-muted mb-2">@product.Category • Qty: @product.Quantity • $@product.Price</div>
-                                        <p class="text-muted description-text" id="desc-@product.ProductID">@product.Description</p>
-                                        @if (product.Description?.Length > 120)
-                                        {
-                                            <span class="show-more" onclick="toggleDesc('@product.ProductID')">Show more</span>
-                                        }
-                                        <div class="d-flex gap-2 mt-3">
-                                            <a class="btn btn-sm btn-outline-primary" asp-action="Detail" asp-controller="Product" asp-route-id="@product.ProductID"><i class="bi bi-card-heading"></i> Detail</a>
-                                            <a class="btn btn-sm btn-outline-warning" asp-action="Edit" asp-controller="Product" asp-route-id="@product.ProductID"><i class="bi bi-pencil-square"></i> Edit</a>
-                                            <button class="btn btn-sm btn-outline-danger delete-button" data-id="@product.ProductID"><i class="bi bi-trash"></i> Delete</button>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="product-card">
+                            <div class="product-card-body">
+                                <!-- Product Header -->
+                                <div class="product-header d-flex align-items-center">
+                                    <img src="@(product.Image ?? "https://placehold.co/80x80/667eea/white?text=IMG")" 
+                                        class="product-image me-3" 
+                                        alt="@product.Name"
+                                        onerror="this.src='https://placehold.co/80x80/667eea/white?text=IMG'">
+                                    
+                                    <div class="product-info">
+                                        <h5 class="product-title">@product.Name</h5>
+                                        <div class="product-meta d-flex flex-wrap align-items-center gap-2 mt-1">
+                                            <span class="meta-badge">@product.Category</span>
+                                            <div class="meta-item d-flex align-items-center">
+                                                <i class="bi bi-stack me-1"></i>
+                                                <span class="quantity-badge">Qty: @product.Quantity</span>
+                                            </div>
+                                            <div class="price-badge d-flex align-items-center">
+                                                <i class="bi bi-currency-dollar me-1"></i>
+                                                @product.Price.ToString("0.00")
+                                            </div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <!-- Product Description -->
+                                <div class="product-description mt-2">
+                                    <p class="description-text" id="desc-@product.ProductID">@product.Description</p>
+                                    @if (product.Description?.Length > 120)
+                                    {
+                                        <span class="show-more text-primary" style="cursor:pointer;" onclick="toggleDesc('@product.ProductID')">
+                                            <i class="bi bi-chevron-down me-1"></i>Show more
+                                        </span>
+                                    }
+                                </div>
+
+                                <!-- Product Actions -->
+                                <div class="product-actions d-flex gap-2 mt-3">
+                                    <a class="action-btn btn-detail btn btn-success flex-fill" 
+                                    asp-action="Detail" 
+                                    asp-controller="Product" 
+                                    asp-route-id="@product.ProductID">
+                                        <i class="bi bi-eye me-1"></i>Detail
+                                    </a>
+                                    <a class="action-btn btn-edit btn btn-warning flex-fill" 
+                                    asp-action="Edit" 
+                                    asp-controller="Product" 
+                                    asp-route-id="@product.ProductID">
+                                        <i class="bi bi-pencil me-1"></i>Edit
+                                    </a>
+                                    <button class="action-btn btn-delete btn btn-danger flex-fill delete-button" 
+                                            data-id="@product.ProductID"
+                                            data-name="@product.Name">
+                                        <i class="bi bi-trash me-1"></i>Delete
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 }
             </div>
-        </div>
+
+        }
+        else
+        {
+            <div class="products-grid">
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h3>No Products Found</h3>
+                    <p>Start adding products to your inventory or adjust your search criteria.</p>
+                </div>
+            </div>
+        }
     </div>
 </section>
-<!-- Toggle Description -->
+
+<!-- Enhanced Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    // Toggle Description Function
     function toggleDesc(id) {
         const desc = document.getElementById("desc-" + id);
+        const toggleBtn = event.target;
+        
         if (desc.classList.contains("description-text")) {
             desc.classList.remove("description-text");
-            event.target.innerText = "Show less";
+            toggleBtn.innerHTML = '<i class="bi bi-chevron-up me-1"></i>Show less';
         } else {
             desc.classList.add("description-text");
-            event.target.innerText = "Show more";
+            toggleBtn.innerHTML = '<i class="bi bi-chevron-down me-1"></i>Show more';
         }
     }
-</script>
 
-<!-- SweetAlert Delete -->
-<script>
+    // Enhanced Delete Functionality
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".delete-button").forEach(button => {
             button.addEventListener("click", function (event) {
                 event.preventDefault();
-                let itemId = this.getAttribute("data-id");
+                
+                const itemId = this.getAttribute("data-id");
+                const itemName = this.getAttribute("data-name");
+                const productCard = this.closest('.product-card');
 
                 Swal.fire({
-                    title: "Are you sure you want to delete?",
-                    text: "This action cannot be undone!",
+                    title: `Delete "${itemName}"?`,
+                    text: "This action cannot be undone! The product will be permanently removed from your inventory.",
                     icon: "warning",
                     showCancelButton: true,
-                    confirmButtonText: "Confirm",
-                    cancelButtonText: "Cancel"
+                    confirmButtonColor: "#fa709a",
+                    cancelButtonColor: "#6c757d",
+                    confirmButtonText: '<i class="bi bi-trash me-2"></i>Yes, Delete',
+                    cancelButtonText: '<i class="bi bi-x-circle me-2"></i>Cancel',
+                    customClass: {
+                        popup: 'animate__animated animate__fadeInDown',
+                        confirmButton: 'fw-bold',
+                        cancelButton: 'fw-bold'
+                    },
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return new Promise((resolve) => {
+                            setTimeout(resolve, 1500); // Simulate API call delay
+                        });
+                    }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = `/Product/DeleteAdmin/${itemId}`;
+                        // Add fade out animation
+                        productCard.style.transition = 'all 0.5s ease';
+                        productCard.style.opacity = '0';
+                        productCard.style.transform = 'translateY(-20px) scale(0.9)';
+                        
+                        setTimeout(() => {
+                            // Redirect to delete endpoint
+                            window.location.href = `/Product/DeleteAdmin/${itemId}`;
+                        }, 500);
+                        
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: `"${itemName}" has been deleted successfully.`,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false,
+                            customClass: {
+                                popup: 'animate__animated animate__fadeInUp'
+                            }
+                        });
                     }
                 });
             });
+        });
+
+        // Enhanced hover effects
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Image error handling
+        document.querySelectorAll('.product-image').forEach(img => {
+            img.addEventListener('error', function() {
+                this.src = 'https://placehold.co/80x80/667eea/white?text=IMG';
+            });
+        });
+
+        // Smooth scroll to top when pagination changes
+        if (window.location.hash === '#top') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+
+    // Add loading state to pagination links
+    document.querySelectorAll('.pagination .page-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (!this.closest('.page-item').classList.contains('disabled')) {
+                this.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
+            }
+        });
+    });
+
+    // Add loading state to filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div>Loading...';
         });
     });
 </script>
