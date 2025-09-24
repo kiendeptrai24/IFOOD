@@ -1,0 +1,279 @@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<AppUser> UserManager
+@{
+    var appUser = User.Identity.IsAuthenticated ? await UserManager.GetUserAsync(User) : null;
+    var userAvatarUrl = appUser?.ProfileImageUrl ?? "https://placehold.co/36x36/2196F3/white?text=U";
+    var botAvatarUrl = Url.Content("~/Chatbot.jpg");
+}
+<link rel="stylesheet" href="~/css/chatbot.css" asp-append-version="true" />
+<!-- Chatbox HTML -->
+<div id="chatbox-button" onclick="toggleChatbox()">
+    <i class="fas fa-comments"></i>
+    <span class="chat-text">Chat với chúng tôi</span>
+    <div class="pulse-ring"></div>
+</div>
+
+<div id="chatbox-container" aria-hidden="true">
+    <!-- Header -->
+    <div id="chatbox-header">
+        <div class="header-content">
+            <div class="bot-info">
+                <img src="@botAvatarUrl" class="bot-avatar" alt="Bot">
+                <div class="bot-details">
+                    <h4>AI Assistant</h4>
+                    <span class="status">
+                        <div class="status-dot"></div>
+                        Đang online
+                    </span>
+                </div>
+            </div>
+            <button id="close-chat" onclick="toggleChatbox()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Chat Content -->
+    <div id="chatbox-content">
+        <div id="chatlog">
+            <!-- Welcome Message -->
+            <div class="message-container bot welcome-message">
+                <img src="@botAvatarUrl" class="message-avatar" alt="Bot">
+                <div class="message-wrapper">
+                    <div class="message-content">
+                        <p>Xin chào! 👋 Tôi là AI Assistant. Tôi có thể giúp bạn:</p>
+                        <ul>
+                            <li>Tìm kiếm sản phẩm</li>
+                            <li>Tư vấn mua sắm</li>
+                            <li>Hỗ trợ kỹ thuật</li>
+                            <li>Trả lời câu hỏi</li>
+                        </ul>
+                        <p>Bạn cần hỗ trợ gì hôm nay? 😊</p>
+                    </div>
+                    <span class="message-time">Vừa xong</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" style="display: none;">
+            <div class="message-container bot">
+                <img src="@botAvatarUrl" class="message-avatar" alt="Bot">
+                <div class="message-wrapper">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div id="quick-actions">
+        <button class="quick-btn" onclick="sendQuickMessage('Tôi cần hỗ trợ')">
+            <i class="fas fa-question-circle"></i>
+            Hỗ trợ
+        </button>
+        <button class="quick-btn" onclick="sendQuickMessage('Tìm sản phẩm')">
+            <i class="fas fa-search"></i>
+            Tìm kiếm
+        </button>
+        <button class="quick-btn" onclick="sendQuickMessage('Giá cả như thế nào?')">
+            <i class="fas fa-tags"></i>
+            Giá cả
+        </button>
+    </div>
+
+    <!-- Input Area -->
+    <div id="chatbox-input">
+        <div class="input-wrapper">
+            <button id="attach-btn" type="button">
+                <i class="fas fa-paperclip"></i>
+            </button>
+            <input type="text" id="userInput" placeholder="Nhập tin nhắn của bạn..." autocomplete="off" />
+            <button id="emoji-btn" type="button">
+                <i class="fas fa-smile"></i>
+            </button>
+            <button id="sendButton" type="button">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden anti-forgery token (needed for AJAX POST) -->
+<form id="__antiForgeryForm" style="display:none">
+    @Html.AntiForgeryToken()
+</form>
+
+<!-- Font Awesome Icons -->
+
+
+
+<script>
+(function waitForjQuery(initFn, maxTries = 100) {
+    var tries = 0;
+    function ready() {
+        if (window.jQuery) return initFn(window.jQuery);
+        tries++;
+        if (tries > maxTries) {
+            console.error("chatbot: jQuery not found after waiting.");
+            return;
+        }
+        setTimeout(ready, 50);
+    }
+    ready();
+})(function($) {
+    // Variables from server
+    var userAvatarUrl = '@userAvatarUrl';
+    var botAvatarUrl = '@botAvatarUrl';
+    var postUrl = '@Url.Action("GetResponse","ChatBot")';
+
+    // Helper functions
+    function getAntiForgeryToken() {
+        return $('#__antiForgeryForm input[name="__RequestVerificationToken"]').val();
+    }
+
+    function getCurrentTime() {
+        return new Date().toLocaleTimeString('vi-VN', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    }
+
+    function showTyping() {
+        $('#typing-indicator').show();
+        $('#chatbox-content').scrollTop($('#chatbox-content')[0].scrollHeight);
+    }
+
+    function hideTyping() {
+        $('#typing-indicator').hide();
+    }
+
+    function appendMessage(text, isBot) {
+        hideTyping();
+        var cls = isBot ? 'bot' : 'user';
+        var avatar = isBot ? botAvatarUrl : userAvatarUrl;
+        var time = getCurrentTime();
+        
+        var html = '<div class="message-container ' + cls + '">' +
+                        (isBot ? ('<img src="' + avatar + '" class="message-avatar" alt="Bot" />') : '') +
+                        '<div class="message-wrapper">' +
+                            '<div class="message-content">' + $('<div>').text(text).html() + '</div>' +
+                            '<span class="message-time">' + time + '</span>' +
+                        '</div>' +
+                        (!isBot ? ('<img src="' + avatar + '" class="message-avatar" alt="User" />') : '') +
+                    '</div>';
+        
+        $('#chatlog').append(html);
+        $('#chatbox-content').scrollTop($('#chatbox-content')[0].scrollHeight);
+    }
+
+    function displayProducts(products) {
+        if (!products || !products.length) {
+            appendMessage("Không có sản phẩm phù hợp.", true);
+            return;
+        }
+        
+        var container = $('<div class="product-list"></div>');
+        products.forEach(function(p) {
+            var card = $('<div class="product-card"></div>');
+            card.append('<img class="product-chatbot-image" src="'+(p.img||'https://placehold.co/200x120')+'" alt="Product" />');
+            card.append('<div style="font-weight:600;font-size:14px;margin-bottom:8px;">'+(p.name||'Product')+'</div>');
+            card.append('<div style="font-size:13px;color:#666;margin-bottom:12px;">'+(p.price||'')+'</div>');
+            card.append('<a class="btn" href="'+ (window.location.origin + '/Product/Detail/' + (p.id||'')) +'">Xem chi tiết</a>');
+            container.append(card);
+        });
+        
+        $('#chatlog').append(container);
+        $('#chatbox-content').scrollTop($('#chatbox-content')[0].scrollHeight);
+    }
+
+    function sendMessage() {
+        var msg = $('#userInput').val().trim();
+        if (!msg) return;
+        
+        appendMessage(msg, false);
+        $('#userInput').val('');
+        $('#sendButton').prop('disabled', true);
+        
+        showTyping();
+
+        $.ajax({
+            url: postUrl,
+            type: 'POST',
+            data: {
+                message: msg,
+                __RequestVerificationToken: getAntiForgeryToken()
+            },
+            headers: {
+                'RequestVerificationToken': getAntiForgeryToken()
+            },
+            success: function(data) {
+                hideTyping();
+                if (!data) {
+                    appendMessage('Không có phản hồi từ server.', true);
+                } else {
+                    appendMessage(data.response || '...', true);
+                    if (data.products && data.products.length) {
+                        displayProducts(data.products);
+                    }
+                }
+            },
+            error: function(xhr) {
+                hideTyping();
+                var err = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : xhr.statusText || 'Lỗi';
+                appendMessage('⚠️ Lỗi: ' + err, true);
+                console.error('Chatbot AJAX error', xhr);
+            },
+            complete: function() {
+                $('#sendButton').prop('disabled', false);
+            }
+        });
+    }
+
+    function sendQuickMessage(message) {
+        $('#userInput').val(message);
+        sendMessage();
+    }
+
+    // Make sendQuickMessage available globally
+    window.sendQuickMessage = sendQuickMessage;
+
+    // Toggle chatbox
+    window.toggleChatbox = function() {
+        $('#chatbox-container').fadeToggle(300, function() {
+            if ($(this).is(':visible')) {
+                $('#userInput').focus();
+            }
+        });
+    };
+
+    // Event listeners
+    $('#sendButton').on('click', sendMessage);
+    $('#userInput').on('keypress', function(e) { 
+        if (e.which === 13) sendMessage(); 
+    });
+
+    // Input visual feedback
+    $('#userInput').on('input', function(e) {
+        var $sendBtn = $('#sendButton');
+        if ($(this).val().trim()) {
+            $sendBtn.css('opacity', '1');
+        } else {
+            $sendBtn.css('opacity', '0.6');
+        }
+    });
+
+    // Optional: load chat history if you have an endpoint
+    if (typeof loadChatHistory === 'function') {
+        loadChatHistory();
+    }
+
+    // Initialize
+    $('#sendButton').css('opacity', '0.6');
+
+}, 100);
+</script>

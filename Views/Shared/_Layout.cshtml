@@ -2,666 +2,105 @@
 @inject UserManager<AppUser> UserManager
 @{
     var appUser = User.Identity.IsAuthenticated ? await UserManager.GetUserAsync(User) : null;
-    var avatarUrl = appUser?.ProfileImageUrl ?? "https://placehold.co/30x30"; // Avatar mặc định nếu không có ảnh
-    @* var avatarUrl = Url.Content("~/uploads/avatars/" + avatarFileName); *@
-    var botAvatarUrl = Url.Content("~/Chatbot.jpg"); // Ảnh bot cố định
+    var avatarUrl = appUser?.ProfileImageUrl ?? "https://placehold.co/30x30";
+    var botAvatarUrl = Url.Content("~/Chatbot.jpg");
 }
-<!DOCTYPE html>
 <html lang="en">
 <head>
-
-    @* test *@
-
-
-
-
-
+    <title>iFood</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>iFood</title>
-    <script type="importmap"></script>
     <link rel="icon" type="image/x-icon" href="@Url.Content("~/cutlery.png")" />
-
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link href="~/css/styles.css" rel="stylesheet" asp-append-version="true" />
-
-
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-  
     <link href="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.css" rel="stylesheet" />
-
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.2/sweetalert2.min.css">
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/scripts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js"></script>
+    <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.2/sweetalert2.all.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-
-<Style>
-    .btntest {
-        padding: .55rem 1.5rem .45rem;
-
-        .nav-links {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: none; /* Mặc định ẩn */
-        position: absolute;
-        top: 50px;
-        right: 0;
-        background: white;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border-radius: 5px;
-    }
-
-    .nav-links li {
-        padding: 10px;
-    }
-
-    .nav-links a {
-        text-decoration: none;
-        color: black;
-        display: block;
-    }
-
-    .menu-toggle {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 24px;
-    }
-/* Đảm bảo ảnh đại diện hiển thị đúng */
-.avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    cursor: pointer;
-    object-fit: cover;
-    border: 2px solid #ddd;
-}
-
-
-/* Định vị dropdown từ phải qua trái */
-.dropdown-menu {
-    position: absolute !important;
-    top: 100% !important; /* Ngay dưới avatar */
-    right: 0 !important; /* Căn lề phải */
-    transform: translateX(0); /* Không bị lệch */
-    min-width: 180px;
-    z-index: 1050;
-}
-
-/* Căn chỉnh text từ phải qua trái */
-.dropdown-item {
-    text-align: right !important; /* Chữ căn phải */ /* Để chữ không sát mép */
-}
-
-/* Căn biểu tượng bên phải chữ */
-.dropdown-item i {
-    margin-left: 10px;
-    margin-right: 0;
-}
-
-
-    .searchbar{
-    margin-bottom: auto;
-    margin-top: auto;
-    height: 60px;
-    background-color: #353b48;
-    border-radius: 30px;
-    padding: 10px;
-    }
-
-    .search_input{
-    color: white;
-    border: 0;
-    outline: 0;
-    background: none;
-    width: 0;
-    caret-color:transparent;
-    line-height: 40px;
-    transition: width 0.4s linear;
-    }
-
-    .searchbar:hover > .search_input{
-    padding: 0 10px;
-    width: 450px;
-    caret-color:red;
-    transition: width 0.4s linear;
-    }
-
-    .searchbar:hover > .search_icon{
-    background: white;
-    color: #e74c3c;
-    }
-
-    .search_icon{
-    height: 40px;
-    width: 40px;
-    float: right;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    color:white;
-    text-decoration:none;
-    }
-
-
-}
-</Style>
-<Style>
-    /*avatar */
-    .avatar {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%; /* Làm tròn avatar */
-    object-fit: cover; /* Giữ tỷ lệ hình ảnh */
-    border: 2px solid white; /* Viền trắng */
-    transition: transform 0.3s ease-in-out;
-}
-
-.avatar:hover {
-    transform: scale(1.1); /* Phóng to nhẹ khi hover */
-}
-
-.avatar-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.avatar-dropdown {
-    background: #fff; /* Màu nền dropdown */
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-</Style>
-
- <style>
-    /* Chatbox Styles */
-    
-    #chatbox-button {
-        position: fixed;
-        bottom: 25px;
-        right: 25px;
-        background: linear-gradient(135deg, #00c853, #4caf50);
-        color: white;
-        padding: 12px 20px;
-        border-radius: 50px;
-        cursor: pointer;
-        z-index: 1001;
-        transition: all 0.3s ease;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 6px 15px rgb(244, 98, 58,0.3);
-    }
-    #chatbox-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgb(244, 98, 58,0.3);
-        background: linear-gradient(135deg,rgb(244, 98, 58,1),rgb(230, 112, 22));
-    }
-
-    #chatbox-container {
-        position: fixed;
-        bottom: 90px;
-        right: 25px;
-        width: 380px;
-        height: 480px;
-        background: #f0f2f5;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        display: none;
-        z-index: 1000;
-        border-radius: 15px;
-        overflow: hidden;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    #chatbox-header {
-        background: linear-gradient(90deg, #00c853, #4caf50);
-        color: #fff;
-        padding: 15px;
-        text-align: center;
-        font-weight: 600;
-        cursor: pointer;
-        font-size: 16px;
-        letter-spacing: 0.5px;
-        position: relative;
-    }
-    #chatbox-header::after {
-        content: "▼";
-        position: absolute;
-        right: 15px;
-        font-size: 12px;
-        transition: transform 0.3s ease;
-    }
-    #chatbox-container[style*="display: none"] #chatbox-header::after {
-        transform: rotate(180deg);
-    }
-
-    #chatbox-content {
-        padding: 20px;
-        height: 360px;
-        overflow-y: auto;
-        background: #f0f2f5;
-        scrollbar-width: thin;
-        scrollbar-color: rgb(244, 98, 58,1) #f0f2f5;
-    }
-    #chatbox-content::-webkit-scrollbar {
-        width: 6px;
-    }
-    #chatbox-content::-webkit-scrollbar-thumb {
-        background: rgb(244, 98, 58,1);
-        border-radius: 10px;
-    }
-    #chatbox-content::-webkit-scrollbar-track {
-        background: #f0f2f5;
-    }
-
-    #chatbox-input {
-        display: flex;
-        padding: 10px 15px;
-        border-top: 1px solid #e0e4e8;
-        background: #fff;
-        gap: 10px;
-        align-items: center;
-    }
-
-    #chatbox-input input {
-        flex: 1;
-        padding: 10px 15px;
-        border: 1px solid #e0e4e8;
-        border-radius: 25px;
-        outline: none;
-        font-size: 14px;
-        transition: border-color 0.3s ease;
-    }
-    #chatbox-input input:focus {
-        border-color: rgb(244, 98, 58,1);
-        box-shadow: 0 0 5px rgba(0, 200, 83, 0.2);
-    }
-
-    #chatbox-input button#sendButton {
-        background:rgb(244, 98, 58,1);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        padding: 10px;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    #chatbox-input button#sendButton:hover {
-        background:rgb(244, 98, 58,1);
-    }
-
-    /* Chat messages */
-    #chatlog .message-container {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 15px;
-        gap: 10px;
-    }
-
-    #chatlog .message-container.user {
-        flex-direction: row-reverse;
-    }
-
-    #chatlog .avatar {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        background: #ddd;
-    }
-
-    #chatlog .message-content {
-        max-width: 70%;
-        position: relative;
-    }
-
-    #chatlog p {
-        margin: 0;
-        padding: 10px 15px;
-        border-radius: 15px;
-        font-size: 14px;
-        line-height: 1.4;
-        word-wrap: break-word;
-        position: relative;
-        animation: fadeIn 0.3s ease;
-    }
-
-    #chatlog p.user-message {
-        background: rgb(244, 98, 58,1);
-        color: white;
-        border-radius: 15px 15px 0 15px;
-    }
-
-    #chatlog p.bot-message {
-        background: #fff;
-        color: #333;
-        border: 1px solid #e0e4e8;
-        border-radius: 15px 15px 15px 0;
-    }
-
-    #chatlog .message-time {
-        font-size: 12px;
-        color: #888;
-        margin-top: 5px;
-        text-align: right;
-    }
-
-    #chatlog .message-container.bot .message-time {
-        text-align: left;
-    }
-
-    #chatlog .message-actions {
-        display: flex;
-        gap: 5px;
-        margin-top: 5px;
-        font-size: 12px;
-    }
-
-    #chatlog .message-actions span {
-        color: #888;
-        cursor: pointer;
-    }
-
-    #chatlog .message-actions span:hover {
-        color:rgb(244, 98, 58,1);
-    }
-
-    .product-card {
-      flex: 0 0 auto; /* Đảm bảo các card không bị co lại */
-    width: 250px; /* Độ rộng cố định */
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 10px;
-    background: white;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-
-/* Danh sách sản phẩm */
-.product-list {
-    display: flex;
-    overflow-x: auto; /* Cho phép cuộn ngang */
-    white-space: nowrap; /* Ngăn xuống hàng */
-    gap: 10px; /* Khoảng cách giữa các sản phẩm */
-    padding: 10px;
-    max-width: 100%; /* Không bị tràn */
-    scrollbar-width: thin; /* Thanh cuộn nhỏ */
-}
-
-/* Ẩn thanh cuộn trên Chrome */
-.product-list::-webkit-scrollbar {
-    height: 5px;
-}
-
-.product-list::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-}
-
-
-/* Thiết kế từng card sản phẩm */
-.product-card {
-    flex: 0 0 auto; /* Ngăn card bị co lại */
-    width: 200px; /* Độ rộng cố định */
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 10px;
-    background: white;
-    text-align: center;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Hình ảnh sản phẩm */
-.product-image {
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 10px;
-}
-
-/* Nút "Xem Chi Tiết" */
-.product-button {
-    display: inline-block;
-    background: #007bff;
-    color: white;
-    text-decoration: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    margin-top: 10px;
-    transition: background 0.3s;
-}
-
-.product-button:hover {
-    background: #0056b3;
-}
-
-/* Nếu chatbox chặn cuộn, thêm phần này */
-.chat-container {
-    overflow-x: auto !important;
-}
-
-.parent-container {
-    overflow-x: visible !important;
-}
-
-
-</style>
 <body id="page-top">
     <header>
-
-            @* <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
-                <div class="container px-4 px-lg-5">
-                    <a class="navbar-brand"asp-area="" asp-controller="Home" asp-action="Index">iFood</a>
-                    <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-                    <div class="collapse navbar-collapse" id="navbarResponsive">
-                        <ul class="navbar-nav ms-auto my-2 my-lg-0">
-                            <li class="nav-item"><a class="nav-link"asp-area="" asp-controller="Home" asp-action="Index">About</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="CLub" asp-action="Index">Services</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Race" asp-action="Index">Portfolio</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </nav> *@
-
-
-            <nav class="navbar navbar-expand-lg navbar-light  sticky-top py-3 bg-primary">
-                <div class="container px-4 px-lg-5">
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="font-weight: bold;"><i class="bi bi-egg-fried"></i>IFood</a>
-                    <form method="get" class="form-inline my-2 my-lg-0">
-                        <div style="position: relative; min-width: 200px; background-color: rgb(227, 229, 210); border: 25px;">
-                            <input class="form-control" type="search" placeholder="Search" aria-label="Search"
-                            name="searchTerm"
-                                style="padding-right: 35px;">
-                            <button type="submit"
-                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: none;">
-                                <i class="bi bi-search"></i>
-                            </button>
-                        </div>
-                    </form>
-                    
-                    <button class="navbar-toggler" id="menuToggle" type="button">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarResponsive">
-                        <ul class="navbar-nav ms-auto my-2 my-lg-0" style="color: rgb(0, 0, 0); font-weight: bold;">
-                            <li class="nav-item pt-1"><a class="nav-link" asp-controller="Product" asp-action="Index">Product</a></li>
-                            <li class="nav-item pt-1"><a class="nav-link" href="#services">Services</a></li>
-                            <li class="nav-item pt-1"><a class="nav-link" href="#contact">Contact</a></li>
-                            @if(User.Identity.IsAuthenticated)
+        <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3 bg-primary">
+            <div class="container px-4 px-lg-5">
+                <a class="navbar-brand fw-bold text-white" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-egg-fried"></i> IFood</a>
+                <form method="get" class="d-flex ms-3">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="searchTerm">
+                    <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
+                </form>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 fw-bold">
+                        <li class="nav-item"><a class="nav-link" asp-controller="Product" asp-action="Index">Product</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                        @if(User.Identity.IsAuthenticated)
+                        {
+                            if(User.IsInRole("user"))
                             {
-                                if(User.IsInRole("user"))
-                                {
-                                    <li class="nav-item">
-                                        <a class="nav-link" asp-area="" asp-controller="Cart" asp-action="Index">
-                                            <i class="bi bi-cart3 fs-5"></i> 
-                                        </a>
-                                    </li>
-                                }
-                                <li class="nav-item d-flex align-items-center">
-                                    
-                                    <div>
-                                        
-                                        @if (User.Identity.IsAuthenticated)
-                                        {
-                                            var appUsers = await UserManager.GetUserAsync(User);
-                                            var avatarUrls = appUsers?.ProfileImageUrl ?? "https://placehold.co/30x30";
-                                            
-                                            <a class="avatar" href="#" data-bs-toggle="dropdown" aria-expanded="false" id="avatarDropdown">
-                                                <img class="avatar" src="@avatarUrls" alt="User Avatar">
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                             <a class="avatar" href="#"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                                id="avatarDropdown">
-                                                <img class="avatar" src="https://placehold.co/30x30">
-                                            </a>
-                                        }
-
-
-                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="avatarDropdown">
-                                            <li>
-                                                <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">
-                                                    <i class="bi bi-person-bounding-box fs-5"></i>Profile</a>
-                                            </li>
-                                            @if(User.IsInRole("admin"))
-                                            {
-                                                <li>
-                                                    <a class="dropdown-item" asp-area="" asp-controller="Dashboard" asp-action="Index">
-                                                        <i class="bi bi-card-list fs-5"></i> Manager product
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" asp-area="" asp-controller="Dashboard" asp-action="OrderIndex">
-                                                        <i class="bi bi-card-list fs-5"></i> Manager Order
-                                                    </a>
-                                                </li>
-                                            }
-                                             <li>
-                                                <a class="dropdown-item" href="https://kienmiu.itch.io/randua-adventure">
-                                                    <i class="bi bi-controller"></i> Play game
-                                                </a>
-                                            </li>
-                                            <li>
-                                                @if(User.IsInRole("user"))
-                                                {
-                                                    <a class="dropdown-item" asp-area="" asp-controller="Cart" asp-action="Index">
-                                                        <i class="bi bi-cart3 fs-5"></i> Your cart
-                                                    </a>
-
-                                                }
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" asp-area="" asp-controller="Order" asp-action="Index">
-                                                    <i class="bi bi-clock-history fs-5"></i> Your History
-                                                </a>
-                                            </li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li>
-                                                <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
-                                                    <i class="bi bi-box-arrow-in-right fs-5"></i> SignOut
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="Cart" asp-action="Index">
+                                        <i class="bi bi-cart3 fs-5"></i>
+                                    </a>
                                 </li>
                             }
-                            else
-                            {
-                                <li class="nav-item pt-1"><a class="nav-link" asp-controller="Account" asp-action="Login">Login/Register</a> </li>
-
-                            }
-
-                        </ul>
-
-
-                    </div>
-                </div>
-            </nav>
-
-        <div>
-            <main role="main" class="pb-3">
-                @RenderBody()
-                
-                <div id="chatbox-button" onclick="toggleChatbox()">💬 Chat</div>
-                <div id="chatbox-container">
-                    <div id="chatbox-header" onclick="toggleChatbox()">Chatbot - Click to close</div>
-                    <div id="chatbox-content">
-                        <div id="chatlog"></div>
-                    </div>
-                    <div id="chatbox-input">
-                        <input type="text" id="userInput" class="form-control" placeholder="Enter your message..." />
-                        <button id="sendButton" class="btn btn-primary">Send</button>
-                    </div>
-                </div>
-            </main>
-            
-            @* <footer class="bg-dark text-white py-5">
-                <div class="container">
-                    <div class="text-center mb-4">
-                        <h2 class="section-heading text-uppercase">Contact Us</h2>
-                        <p class="text-muted">Feel free to reach out if you have any questions.</p>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <h4>Contact Information</h4>
-                            <p><i class="bi bi-geo-alt"></i> Address: 123 ABC Street, District X, Ho Chi Minh City</p>
-                            <p><i class="bi bi-telephone"></i> Phone: (0123) 456 789</p>
-                            <p><i class="bi bi-envelope"></i> Email: contact@example.com</p>
-                            <p><i class="bi bi-clock"></i> Working Hours: 8:00 - 18:00 (Mon - Fri)</p>
-                        </div>
-                        <div class="col-md-6">
-                            <form>
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" id="name" placeholder="Enter your name">
+                            <li class="nav-item d-flex align-items-center">
+                                <div>
+                                    <a class="avatar" href="#" data-bs-toggle="dropdown" aria-expanded="false" id="avatarDropdown">
+                                        <img class="avatar rounded-circle border" src="@avatarUrl" alt="User Avatar" style="width:32px;height:32px;object-fit:cover;">
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="avatarDropdown">
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile"><i class="bi bi-person-bounding-box fs-5"></i> Profile</a></li>
+                                        @if(User.IsInRole("admin"))
+                                        {
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-card-list fs-5"></i> Manager product</a></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="Dashboard" asp-action="OrderIndex"><i class="bi bi-card-list fs-5"></i> Manager Order</a></li>
+                                        }
+                                        <li><a class="dropdown-item" href="https://kienmiu.itch.io/randua-adventure"><i class="bi bi-controller"></i> Play game</a></li>
+                                        @if(User.IsInRole("user"))
+                                        {
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="Cart" asp-action="Index"><i class="bi bi-cart3 fs-5"></i> Your cart</a></li>
+                                        }
+                                        <li><a class="dropdown-item" asp-controller="Order" asp-action="Index"><i class="bi bi-clock-history fs-5"></i> Your History</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout"><i class="bi bi-box-arrow-in-right fs-5"></i> SignOut</a></li>
+                                    </ul>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" placeholder="Enter your email">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="message" class="form-label">Message</label>
-                                    <textarea class="form-control" id="message" rows="4" placeholder="Enter your message"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Send Message</button>
-                            </form>
-                        </div>
-                    </div>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Login/Register</a></li>
+                        }
+                    </ul>
                 </div>
-            </footer> *@
-        </div>
-
-      
-        
+            </div>
+        </nav>
     </header>
-
-    
-
-    <footer class="bg-dark border-top footer text-muted py-5">
+    <main role="main">
+        @RenderBody()
+        @await Html.PartialAsync("_chatbot")
+    </main>
+    <footer class="bg-dark border-top text-muted py-5 mt-5">
         <div class="container">
             <div class="text-center mb-4">
-                <h2 class="section-heading text-uppercase">Contact Us</h2>
+                <h2 class="section-heading text-uppercase text-white">Contact Us</h2>
                 <p class="text-muted">Feel free to reach out if you have any questions.</p>
             </div>
             <div class="row">
                 <div class="col-md-6 mb-4">
-                    <h4>Contact Information</h4>
+                    <h4 class="text-white">Contact Information</h4>
                     <p><i class="bi bi-geo-alt"></i> Address: 123 ABC Street, District X, Ho Chi Minh City</p>
                     <p><i class="bi bi-telephone"></i> Phone: (0123) 456 789</p>
                     <p><i class="bi bi-envelope"></i> Email: contact@example.com</p>
@@ -670,15 +109,15 @@
                 <div class="col-md-6">
                     <form>
                         <div class="mb-3">
-                            <label for="name" class="form-label">Full Name</label>
+                            <label for="name" class="form-label text-white">Full Name</label>
                             <input type="text" class="form-control" id="name" placeholder="Enter your name">
                         </div>
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
+                            <label for="email" class="form-label text-white">Email</label>
                             <input type="email" class="form-control" id="email" placeholder="Enter your email">
                         </div>
                         <div class="mb-3">
-                            <label for="message" class="form-label">Message</label>
+                            <label for="message" class="form-label text-white">Message</label>
                             <textarea class="form-control" id="message" rows="4" placeholder="Enter your message"></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Send Message</button>
@@ -687,198 +126,6 @@
             </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/scripts.js"></script>
-
-
-    @* <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script> *@
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js"></script>
-    <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
-
-    <!-- Toastr CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> *@
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-    <!-- SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.2/sweetalert2.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.2/sweetalert2.all.min.js"></script>    
-    @* hop thoai *@
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-
-        document.addEventListener("DOMContentLoaded", function () {
-            if (!localStorage.getItem("welcomeMessageShown")) {
-                Swal.fire({
-                    title: "iFood Greetings!",
-                    text: "We wish you the best experience.",
-                    imageUrl: "/cutlery.png", // 🔹 Đường dẫn ảnh trong wwwroot
-                    imageWidth: 100,  
-                    imageHeight: 100, 
-                    imageAlt: "iFood Logo",
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-
-                // Đánh dấu đã hiển thị thông báo
-                localStorage.setItem("welcomeMessageShown", "true");
-            }
-        });
-    </script>
-
-    <!-- Toastr CSS -->
-    <script>
-    
-        // Toastr thông báo
-        $(document).ready(function () {
-            toastr.options = {
-                closeButton: true,
-                progressBar: true,
-                positionClass: "toast-top-right",
-                timeOut: 3000
-            };
-            var successMessage = '@TempData["SuccessMessage"]';
-            var errorMessage = '@TempData["ErrorMessage"]';
-            var warnMessage = '@TempData["WarnMessage"]';
-            var infoMessage = '@TempData["InfoMessage"]';
-            if (successMessage) toastr.success(successMessage, "Thành công!");
-            if (errorMessage) toastr.error(errorMessage, "Lỗi!");
-            if (warnMessage) toastr.warning(warnMessage, "Cảnh báo!");
-            if (infoMessage) toastr.info(infoMessage, "Thông tin!");
-        });
-
-   
-
-
-    </script>
-    <script>
-        var userAvatarUrl = "@avatarUrl";
-        var botAvatarUrl = "@botAvatarUrl";
-    </script>
-     <script>
-    function toggleChatbox() {
-        $("#chatbox-container").toggle();
-    }
-
-
-$(document).ready(function () {
-        const ProductCategory = [
-            "Boiled", "Steamed", "Fried", "Grilled", "Braised", "Stirfried", "Simmered", "Salads"
-        ];
-        const ProductStatus = [
-            "Unknown", "Bestseller", "New Arrival", "Featured", "Out of Stock",
-            "Discounted", "Limited Edition", "Coming Soon"
-        ];
-
-        function appendMessage(sender, message, isBot = false) {
-            const messageClass = isBot ? "bot" : "user";
-            const messageBubbleClass = isBot ? "bot-message" : "user-message";
-            const avatarUrl = isBot ? botAvatarUrl : userAvatarUrl;
-            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            const messageHtml = `
-                <div class="message-container ${messageClass}">
-                    <img src="${avatarUrl}" class="avatar" alt="Avatar">
-                    <div class="message-content">
-                        <p class="${messageBubbleClass}">${message}</p>
-                        <div class="message-time">${currentTime}</div>
-                        ${isBot ? '<div class="message-actions"><span>Được tạo bởi AI</span> • <span>😊</span></div>' : ''}
-                    </div>
-                </div>
-            `;
-
-            $("#chatlog").append(messageHtml);
-            $("#chatbox-content").scrollTop($("#chatbox-content")[0].scrollHeight);
-        }
-
-        function displayProducts(products) {
-            let baseUrl = window.location.origin;
-            if (products.length > 0) {
-                let productList = '<div class="product-list"></div>';
-                $("#chatlog").append(productList);
-
-                products.forEach(product => {
-                    let productCard = `
-                        <div class="product-card">
-                            <img src="${product.img}" alt="${product.name}" class="product-image">
-                            <div class="product-info">
-                                <h5>${product.name.length > 15 ? product.name.slice(0, 15) + "..." : product.name}</h5>
-                                <p>${ProductCategory[product.category]}</p>
-                                <p>${ProductStatus[product.status] || "Unknown"}</p>
-                                <p><strong>${product.price}</strong></p>
-                                <a href="${baseUrl}/Product/Detail/${product.id}" class="product-button">🔍 Detail</a>
-                            </div>
-                        </div>
-                    `;
-                    $(".product-list").append(productCard);
-                });
-
-                $(".product-card").hide().fadeIn(500);
-            } else {
-                appendMessage("Bot", "Không có sản phẩm nào phù hợp.", true);
-            }
-        }
-
-        function sendMessage() {
-            const userMessage = $("#userInput").val().trim();
-            if (!userMessage) return;
-
-            appendMessage("Bạn", userMessage);
-            $("#userInput").val("");
-            $("#sendButton").prop("disabled", true);
-
-            $.post('@Url.Action("GetResponse", "ChatBot")', { message: userMessage }, function (data) {
-                appendMessage("Bot", data.response || "Đây là danh sách sản phẩm tôi tìm thấy:", true);
-                if (data.products) displayProducts(data.products);
-            }).fail(function () {
-                appendMessage("Bot", "Lỗi hệ thống, vui lòng thử lại sau.", true);
-            }).always(function () {
-                $("#sendButton").prop("disabled", false);
-            });
-        }
-        function loadChatHistory() {
-            $.get('/ChatHistory/Get', function (history) {
-                history.forEach(msg => {
-                    appendMessage(msg.sender === "bot" ? "Bot" : "Bạn", msg.message, msg.sender === "bot");
-                    if (msg.products && msg.products.length > 0) displayProducts(msg.products);
-                });
-            });
-        }
-
-     
-
-
-        // Gắn sự kiện
-        $("#sendButton").click(sendMessage);
-        $("#userInput").keypress(function (e) {
-            if (e.which === 13) sendMessage();
-        });
-
-        // Tải lịch sử khi trang load
-        loadChatHistory();
-
-    });
-
-    // Cuộn ngang danh sách sản phẩm
-    document.addEventListener("DOMContentLoaded", function () {
-        const productList = document.querySelector(".product-list");
-        if (productList) {
-            productList.addEventListener("wheel", function (event) {
-                event.preventDefault();
-                productList.scrollLeft += event.deltaY * 2;
-            });
-        }
-    });
-
-    </script>
-
-
-
-
-
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

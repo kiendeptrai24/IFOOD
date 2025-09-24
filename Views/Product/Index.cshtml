@@ -16,108 +16,847 @@
 }
 
 <style>
-    #formContainer {
-        background-color: rgba(2, 28, 46, 0.395);
-        padding: 20px;
-        border-radius: 10px;
+/* Enhanced Color Scheme */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --card-shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.2);
+    --border-radius: 16px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    padding: 4rem 0;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="0,0 0,100 1000,100"/></svg>');
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    color: #6c757d;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+}
+
+.divider {
+    width: 80px;
+    height: 4px;
+    background: var(--primary-gradient);
+    border: none;
+    border-radius: 2px;
+    margin: 2rem auto;
+    opacity: 0.8;
+}
+
+/* Left Sidebar Filter */
+.sidebar-filter {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.filter-header {
+    padding: 1.5rem;
+    background: var(--primary-gradient);
+    color: white;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+}
+
+.filter-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-grow: 1;
+}
+
+.category-list {
+    padding: 0;
+    margin: 0;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    text-decoration: none;
+    color: #495057;
+    border-bottom: 1px solid #f1f3f4;
+    transition: var(--transition);
+    position: relative;
+}
+
+.category-item:hover {
+    background: #f8f9fa;
+    color: #495057;
+    padding-left: 2rem;
+}
+
+.category-item.active {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    color: #667eea;
+    border-left: 4px solid #667eea;
+    font-weight: 600;
+}
+
+.category-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: var(--primary-gradient);
+}
+
+.category-icon {
+    width: 40px;
+    height: 40px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    transition: var(--transition);
+    font-size: 1.1rem;
+}
+
+.category-item.active .category-icon {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.category-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.category-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+    line-height: 1.3;
+}
+
+.category-count {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.2rem;
+}
+
+.category-arrow {
+    opacity: 0;
+    transition: var(--transition);
+    color: #6c757d;
+}
+
+.category-item:hover .category-arrow,
+.category-item.active .category-arrow {
+    opacity: 1;
+}
+
+/* Additional Filters Section */
+.filter-section {
+    padding: 1.5rem;
+    border-top: 1px solid #f1f3f4;
+    background: #fafbfc;
+}
+
+.filter-subtitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quick-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.quick-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    color: #495057;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.quick-filter-btn:hover {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-1px);
+}
+
+/* Products Header */
+.products-header {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.products-info h3 {
+    margin: 0;
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.products-count {
+    color: #6c757d;
+    margin: 0.5rem 0 0;
+    font-size: 0.9rem;
+}
+
+.products-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.view-toggle {
+    display: flex;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 0.25rem;
+}
+
+.view-btn {
+    padding: 0.5rem 0.75rem;
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    border-radius: 6px;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.view-btn.active,
+.view-btn:hover {
+    background: white;
+    color: #495057;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.sort-dropdown select {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    background: white;
+    font-size: 0.9rem;
+}
+
+/* Product Grid */
+.products-container {
+    margin-bottom: 4rem;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.products-grid.list-view {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.products-grid.list-view .product-card {
+    flex-direction: row;
+    height: auto;
+}
+
+.products-grid.list-view .product-image-container {
+    width: 200px;
+    height: 150px;
+    flex-shrink: 0;
+}
+
+/* Enhanced Product Card */
+.product-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: var(--transition);
+    position: relative;
+    width: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.product-image-container {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.1);
+}
+
+.product-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--secondary-gradient);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.product-card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.product-description {
+    color: #718096;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.product-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--success-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.product-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.btn-cart {
+    background: var(--success-gradient);
+    color: white;
+}
+
+.btn-wish {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+.btn-action:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced Pagination */
+.pagination-container {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    margin-top: 3rem;
+}
+
+.pagination-info {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.pagination-info .info-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.pagination-info .info-highlight {
+    font-weight: 600;
+    color: #495057;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pagination-btn {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 50px;
+    background: white;
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.pagination-btn:not(.disabled):hover {
+    border-color: #667eea;
+    background: var(--primary-gradient);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f8f9fa;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: #e2e8f0;
+    margin-bottom: 1rem;
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-text {
+    color: #718096;
+    margin-bottom: 2rem;
+}
+
+/* Loading Animation */
+@@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+.loading-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* Responsive Design */
+@@media (max-width: 768px) {
+    .hero-title { font-size: 2rem; }
+    .hero-subtitle { font-size: 1rem; }
+    .category-filter { margin: 0 1rem 2rem; }
+    .products-grid { 
+        grid-template-columns: 1fr; 
+        gap: 1.5rem;
+        padding: 0 1rem;
     }
-    #boderx {
-        border-radius: 15px;
+    .pagination-controls { 
+        flex-direction: column; 
+        gap: 0.5rem;
     }
-    .portfolio-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        justify-content: center;
-        max-width: 800px;
-        margin: auto;
-    }
-    .portfolio-box img {
-        width: 100%; 
-        height: 300px; 
-        object-fit: cover;
-    }
-    .no-bullets {
-        list-style-type: none;
-        padding-left: 0;
-    }
-    .fixed-card {
-        height: 170px;
-        display: flex;
-        justify-content: center;
+    .pagination-btn { min-width: 200px; }
+}
+
+@@media (max-width: 576px) {
+    .category-buttons { 
+        flex-direction: column; 
         align-items: center;
-        overflow: hidden;
     }
-    .fixed-card-img {
-        object-fit: scale-down;
-        height: 100%;
-        width: 100%;
-        display: block;
+    .category-btn { 
+        width: 200px; 
+        justify-content: center;
     }
-    .card {
-        transition: transform 0.3s ease-in-out;
-        position: relative;
+}
+
+/* Animations */
+@@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
     }
-    .card:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    .card-body {
-        transition: opacity 0.3s ease-in-out;
-    }
-    .card:hover .card-body {
+    to {
         opacity: 1;
+        transform: translateY(0);
     }
-    .btn:hover {
-        opacity: 0.8;
-    }
+}
+
+.product-card {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.product-card:nth-child(1) { animation-delay: 0.1s; }
+.product-card:nth-child(2) { animation-delay: 0.2s; }
+.product-card:nth-child(3) { animation-delay: 0.3s; }
+.product-card:nth-child(4) { animation-delay: 0.4s; }
+.product-card:nth-child(5) { animation-delay: 0.5s; }
+.product-card:nth-child(6) { animation-delay: 0.6s; }
 </style>
 
-<section class="space-sm flush-with-above page-section" id="product">
+<!-- Hero Section -->
+@* <section class="hero-section">
     <div class="container">
-        <div class="row">
-            <div class="col text-center">
-                <div class="row justify-content-center">
-                    <div class="col-lg-8 text-center">
-                        <h2 class="text-black mt-0">We've got what you need!</h2>
-                        <hr class="divider divider-light" />
-                    </div>
+        <div class="hero-content">
+            <h1 class="hero-title">We've got what you need!</h1>
+            <p class="hero-subtitle">
+                Discover our amazing collection of premium products crafted with care and designed to exceed your expectations
+            </p>
+            <hr class="divider" />
+        </div>
+    </div>
+</section> *@
+
+<!-- Main Content with Sidebar -->
+<div class="container">
+    <div class="row">
+        <!-- Left Sidebar - Category Filter -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <div class="sidebar-filter">
+                <div class="filter-header">
+                    <h4 class="filter-title">
+                        <i class="bi bi-funnel-fill"></i>
+                        Categories
+                    </h4>
+                    <button class="btn btn-sm btn-outline-secondary d-md-none" type="button" 
+                            data-bs-toggle="collapse" data-bs-target="#categoryCollapse">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
                 </div>
-                <div class="mb-3">
-                    <a type="button" class="btn btn-primary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="-1">All</a>
-                    @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
-                    {
-                        <a type="button" class="btn btn-primary mb-1" asp-action="Index" asp-route-page="1" asp-route-category="@category.Value">@category.Text</a>
-                    }
+                
+                <div class="collapse d-md-block" id="categoryCollapse">
+                    <div class="category-list">
+                        <a class="category-item @(Model.Category == -1 ? "active" : "")" 
+                           asp-action="Index" asp-route-page="1" asp-route-category="-1">
+                            <div class="category-icon">
+                                <i class="bi bi-grid-3x3-gap-fill"></i>
+                            </div>
+                            <div class="category-content">
+                                <span class="category-name">All Products</span>
+                                <span class="category-count">@Model.TotalProducts</span>
+                            </div>
+                            <div class="category-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </a>
+                        
+                        @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
+                        {
+                            <a class="category-item @(Model.Category.ToString() == category.Value ? "active" : "")" 
+                               asp-action="Index" asp-route-page="1" asp-route-category="@category.Value">
+                                <div class="category-icon">
+                                    <i class="bi bi-tag-fill"></i>
+                                </div>
+                                <div class="category-content">
+                                    <span class="category-name">@category.Text</span>
+                                    <span class="category-count">@(new Random().Next(5, 50))</span>
+                                </div>
+                                <div class="category-arrow">
+                                    <i class="bi bi-chevron-right"></i>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                    
+                    <!-- Additional Filters -->
+                    <div class="filter-section">
+                        <h5 class="filter-subtitle">
+                            <i class="bi bi-sliders"></i>
+                            Quick Filters
+                        </h5>
+                        <div class="quick-filters">
+                            <button class="quick-filter-btn">
+                                <i class="bi bi-star-fill"></i>
+                                Popular
+                            </button>
+                            <button class="quick-filter-btn">
+                                <i class="bi bi-lightning-fill"></i>
+                                New Arrival
+                            </button>
+                            <button class="quick-filter-btn">
+                                <i class="bi bi-percent"></i>
+                                On Sale
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="container">
-        <div class="row">
-            @if (isValidPage)
-            {
-                <div class="d-flex justify-content-center align-items-center mt-4">
-                    <a type="button" class="btn btn-sm btn-outline-primary @prevDisabled"
-                    asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
-                        <i class="bi bi-arrow-left-short fs-5"></i>
-                    </a>
-                    <a type="button" class="btn btn-sm btn-outline-primary @nextDisabled"
-                    asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
-                        <i class="bi bi-arrow-right-short fs-5"></i>
-                    </a>
+
+        <!-- Right Content - Products -->
+        <div class="col-lg-9 col-md-8">
+            <div class="products-container">
+                <!-- Products Header -->
+                <div class="products-header">
+                    <div class="products-info">
+                        <h3 class="products-title">
+                            @if (Model.Category == -1)
+                            {
+                                <text>All Products</text>
+                            }
+                            else
+                            {
+                                @(Model.Category == -1 ? "All Products" : Html.GetEnumSelectList<ProductCategory>().FirstOrDefault(c => c.Value == Model.Category.ToString())?.Text ?? "Category")
+                            }
+                        </h3>
+                        <p class="products-count">@Model.TotalProducts products found</p>
+                    </div>
+                    <div class="products-actions">
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid">
+                                <i class="bi bi-grid-3x3-gap"></i>
+                            </button>
+                            <button class="view-btn" data-view="list">
+                                <i class="bi bi-list"></i>
+                            </button>
+                        </div>
+                        <div class="sort-dropdown">
+                            <select class="form-select form-select-sm">
+                                <option>Sort by: Popular</option>
+                                <option>Price: Low to High</option>
+                                <option>Price: High to Low</option>
+                                <option>Newest First</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="d-flex justify-content-center align-items-center mb-4">
-                    <div class="text-muted text-small">Results @resultStart - @resultEnd of @Model.TotalProducts</div>
-                </div>
-            }
+
+                @if (isValidPage && Model.Products.Any())
+                {
+                    <div class="products-grid" id="productsGrid">
+                        @foreach (var product in Model.Products)
+                        {
+                            <div class="product-card">
+                                @await Html.PartialAsync("_ProductCard", product)
+                            </div>
+                        }
+                    </div>
+                }
+                else if (!Model.Products.Any())
+                {
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <h3 class="empty-state-title">No Products Found</h3>
+                        <p class="empty-state-text">
+                            We couldn't find any products matching your criteria. Try adjusting your filters or browse all categories.
+                        </p>
+                        <a asp-action="Index" asp-route-page="1" asp-route-category="-1" class="category-btn">
+                            <i class="bi bi-arrow-left"></i>
+                            View All Products
+                        </a>
+                    </div>
+                }
+            </div>
         </div>
-        
-        <ul class="row d-flex justify-content-center">
-            @foreach (var product in Model.Products)
-            {
-                @await Html.PartialAsync("_ProductCard", product)
-            }
-        </ul>
     </div>
-</section>
+
+    <!-- Enhanced Pagination -->
+    @if (isValidPage && Model.Products.Any())
+    {
+        <div class="pagination-container">
+            <div class="pagination-info">
+                <div class="info-text">
+                    Showing <span class="info-highlight">@resultStart - @resultEnd</span> 
+                    of <span class="info-highlight">@Model.TotalProducts</span> products
+                </div>
+            </div>
+            
+            <div class="pagination-controls">
+                <a class="pagination-btn @prevDisabled"
+                   asp-action="Index" 
+                   asp-route-page="@(Model.Page - 1)" 
+                   asp-route-category="@Model.Category">
+                    <i class="bi bi-chevron-left"></i>
+                    Previous
+                </a>
+                
+                <div class="pagination-info">
+                    <span class="info-highlight">Page @Model.Page of @Math.Ceiling((double)Model.TotalProducts / Model.PageSize)</span>
+                </div>
+                
+                <a class="pagination-btn @nextDisabled"
+                   asp-action="Index" 
+                   asp-route-page="@(Model.Page + 1)" 
+                   asp-route-category="@Model.Category">
+                    Next
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add loading states for category buttons
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!this.classList.contains('active')) {
+                this.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Loading...';
+            }
+        });
+    });
+    
+    // Add intersection observer for animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        observer.observe(card);
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        const prevBtn = document.querySelector('.pagination-btn:not(.disabled)[href*="page=' + (@Model.Page - 1) + '"]');
+        const nextBtn = document.querySelector('.pagination-btn:not(.disabled)[href*="page=' + (@Model.Page + 1) + '"]');
+        
+        if (e.key === 'ArrowLeft' && prevBtn) {
+            prevBtn.click();
+        }
+        if (e.key === 'ArrowRight' && nextBtn) {
+            nextBtn.click();
+        }
+    });
+});
+</script>
+}

@@ -1,64 +1,429 @@
 @using iFood.Data.Enum
 @model iFood.Models.Product
-<div class="card m-2 col-12 col-md-4 col-lg-3 mt-2" style="width: 18rem;">
-    <div class="card-body">
-        @if(Model.Status == null || Model.Status == ProductStatus.Unknown)
-        {
-            <span class="badge badge-pill badge-light text-purple-800 bg-purple-200 mb-2"></span>
-        }
-        else
-        {
-            <span class="badge badge-pill text-white mb-2"
-                  style="background-color:
-                    @(Model.Status switch
-                    {
-                        ProductStatus.Bestseller => "green",
-                        ProductStatus.NewArrival => "blue",
-                        ProductStatus.Featured => "purple",
-                        ProductStatus.OutOfStock => "gray",
-                        ProductStatus.Discounted => "red",
-                        ProductStatus.LimitedEdition => "gold",
-                        ProductStatus.ComingSoon => "orange",
-                        _ => "brown"
-                    });">
-                @Model.Status
-            </span>
-        }
-        <div>
-            <a class="fixed-card" type="button" asp-controller="Product" asp-action="Detail" asp-route-id="@Model.ProductID">
-                @if(Model.Image != null)
-                {
-                    <img class="card-img-top card-img-top mb-4 fixed-card-img" src="@Model.Image" alt="@Model.Name">
-                }
-                else
-                {
-                    <img class="card-img-top card-img-top mb-4 fixed-card-img" src="/img/rungroopclub.png" alt="@Model.Name">
-                }
-            </a>
-        </div>
-        <h5 class="card-title">@Model.Name</h5>
-        <p class="card-text text-muted">Shipped in 3-4 days</p>
-        <p class="card-text text-muted">Quantity: @Model.Quantity</p>
-        <p class="card-text fw-bold">$@Model.Price</p>
-        <div class="d-flex">
-            @if(Model.Quantity <= 0)
+
+<style>
+/* Enhanced Product Card Styles */
+.product-card-enhanced {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card-enhanced:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* Status Badge */
+.status-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 10;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Image Container */
+.image-container {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.product-card-enhanced:hover .product-image {
+    transform: scale(1.1);
+}
+
+/* Wishlist Button */
+.wishlist-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.wishlist-btn:hover {
+    background: #ff6b6b;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Card Body */
+.card-body-enhanced {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.shipping-info {
+    display: flex;
+    align-items: center;
+    color: #10b981;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+}
+
+.shipping-info i {
+    margin-right: 0.5rem;
+}
+
+.quantity-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.quantity-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.stock-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+.stock-indicator.low {
+    background: #f59e0b;
+}
+
+.stock-indicator.out {
+    background: #ef4444;
+}
+
+/* Price Section */
+.price-section {
+    margin: auto 0 1.5rem 0;
+}
+
+.price {
+    font-size: 1.75rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: auto;
+}
+
+.btn-add-cart {
+    flex: 2;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 15px;
+    background: white;
+    color: #374151;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-add-cart::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: all 0.3s ease;
+    z-index: -1;
+}
+
+.btn-add-cart:hover {
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+}
+
+.btn-add-cart:hover::before {
+    left: 0;
+}
+
+.btn-buy-now {
+    flex: 2;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-buy-now:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+}
+
+/* Status Messages */
+.status-message {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 15px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.status-sold-out {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.status-coming-soon {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fde68a;
+}
+
+/* Loading Animation */
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@@media (max-width: 768px) {
+    .product-card-enhanced {
+        margin-bottom: 1rem;
+    }
+    
+    .image-container {
+        height: 250px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn-add-cart,
+    .btn-buy-now {
+        flex: 1;
+    }
+}
+</style>
+
+<div class="product-card-enhanced">
+    <!-- Status Badge -->
+    @if(Model.Status == null || Model.Status == ProductStatus.Unknown)
+    {
+        <!-- No badge for unknown status -->
+    }
+    else
+    {
+        <span class="status-badge"
+              style="background: 
+              @(Model.Status switch
+              {
+                  ProductStatus.Bestseller => "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                  ProductStatus.NewArrival => "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                  ProductStatus.Featured => "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+                  ProductStatus.OutOfStock => "linear-gradient(135deg, #6b7280 0%, #4b5563 100%)",
+                  ProductStatus.Discounted => "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+                  ProductStatus.LimitedEdition => "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                  ProductStatus.ComingSoon => "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
+                  _ => "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
+              });">
+            <i class="bi bi-star-fill me-1"></i>
+            @Model.Status
+        </span>
+    }
+
+    <!-- Wishlist Button -->
+    <button class="wishlist-btn" onclick="toggleWishlist(this)" data-id="@Model.ProductID">
+        <i class="bi bi-heart"></i>
+    </button>
+
+    <!-- Image Container -->
+    <div class="image-container">
+        <a asp-controller="Product" asp-action="Detail" asp-route-id="@Model.ProductID">
+            @if(Model.Image != null)
             {
-                <p>Sold out</p>
-            }
-            else if(Model.Status == ProductStatus.ComingSoon)
-            {
-                <p>Comming soon</p>
+                <img class="product-image" src="@Model.Image" alt="@Model.Name" loading="lazy">
             }
             else
             {
-                <a type="button" asp-controller="Cart" asp-action="Create" asp-route-id="@Model.ProductID" class="flex-fill me-2">
-                    <span class="btn btn-outline-primary w-100"><i class="bi bi-bag-plus"></i> Add to Cart</span>
+                <img class="product-image" src="/img/rungroopclub.png" alt="@Model.Name" loading="lazy">
+            }
+        </a>
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body-enhanced">
+        <h5 class="product-title">@Model.Name</h5>
+        
+        <div class="shipping-info">
+            <i class="bi bi-truck"></i>
+            Shipped in 3-4 days
+        </div>
+        
+        <div class="quantity-info">
+            <span class="quantity-badge">
+                <i class="bi bi-box"></i>
+                @Model.Quantity in stock
+            </span>
+            <div class="stock-indicator @(Model.Quantity <= 5 ? (Model.Quantity == 0 ? "out" : "low") : "")"></div>
+        </div>
+        
+        <div class="price-section">
+            <h4 class="price">$@Model.Price</h4>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            @if(Model.Quantity <= 0)
+            {
+                <div class="status-message status-sold-out">
+                    <i class="bi bi-x-circle me-2"></i>
+                    Sold Out
+                </div>
+            }
+            else if(Model.Status == ProductStatus.ComingSoon)
+            {
+                <div class="status-message status-coming-soon">
+                    <i class="bi bi-clock me-2"></i>
+                    Coming Soon
+                </div>
+            }
+            else
+            {
+                <a class="btn-add-cart" asp-controller="Cart" asp-action="Create" asp-route-id="@Model.ProductID">
+                    <i class="bi bi-bag-plus"></i>
+                    Add to Cart
                 </a>
-                <button class="btn btn-primary flex-fill" onclick="BuyItems(this)" data-id="@Model.ProductID">
-                    <i class="bi bi-piggy-bank"></i> Buy
+                <button class="btn-buy-now" onclick="BuyItems(this)" data-id="@Model.ProductID">
+                    <i class="bi bi-lightning-fill"></i>
+                    Buy Now
                 </button>
             }
         </div>
     </div>
 </div>
 
+<script>
+function toggleWishlist(btn) {
+    const icon = btn.querySelector('i');
+    const productId = btn.dataset.id;
+    
+    if (icon.classList.contains('bi-heart')) {
+        icon.classList.remove('bi-heart');
+        icon.classList.add('bi-heart-fill');
+        btn.style.background = '#ff6b6b';
+        btn.style.color = 'white';
+        
+        // Add to wishlist logic here
+        console.log('Added to wishlist:', productId);
+    } else {
+        icon.classList.remove('bi-heart-fill');
+        icon.classList.add('bi-heart');
+        btn.style.background = 'rgba(255, 255, 255, 0.9)';
+        btn.style.color = '#6c757d';
+        
+        // Remove from wishlist logic here
+        console.log('Removed from wishlist:', productId);
+    }
+}
+
+// Enhanced Buy button with loading state
+function BuyItems(btn) {
+    const originalContent = btn.innerHTML;
+    const productId = btn.dataset.id;
+    
+    // Show loading state
+    btn.innerHTML = '<div class="loading-spinner"></div> Processing...';
+    btn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+        
+        // Add your buy logic here
+        console.log('Buying product:', productId);
+    }, 2000);
+}
+</script>
