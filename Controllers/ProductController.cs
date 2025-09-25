@@ -61,6 +61,33 @@ public class ProductController : Controller
         
         return View(productViewModel);
     }
+    public async Task<IActionResult> LoadProducts(int category = -1, int page = 1, int pageSize = 6)
+    {
+        var products = category switch
+        {
+            -1 => await _productRepository.GetSliceAsync((page - 1) * pageSize, pageSize),
+            _ => await _productRepository.GetProductsByCategoryAndSliceAsync((ProductCategory)category, (page - 1) * pageSize, pageSize),
+        };
+
+        var count = category switch
+        {
+            -1 => await _productRepository.GetCountAsync(),
+            _ => await _productRepository.GetCountByCategoryAsync((ProductCategory)category),
+        };
+
+        var productViewModel = new IndexProductViewModel
+        {
+            Products = products,
+            Page = page,
+            PageSize = pageSize,
+            TotalProducts = count,
+            TotalPages = (int)Math.Ceiling(count / (double)pageSize),
+            Category = category,
+        };
+
+        return PartialView("_ProductList", productViewModel);
+    }
+
     public async Task<IActionResult> Detail(int id)
     {
         Product product = await _productRepository.GetByIdAsync(id);

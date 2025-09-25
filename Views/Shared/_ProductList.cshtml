@@ -1,0 +1,20 @@
+@using iFood.ViewModels
+@model IndexProductViewModel
+
+@if (Model.Products.Any())
+{
+    <div class="products-grid" id="productsGrid">
+        @foreach (var product in Model.Products)
+        {
+            <div class="product-card">
+                @await Html.PartialAsync("_ProductCard", product)
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <h3>No Products Found</h3>
+    </div>
+}

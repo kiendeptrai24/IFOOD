@@ -1,4 +1,5 @@
-﻿@using iFood.Data.Enum
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using iFood.Data.Enum
 @using iFood.Extensions
 @using iFood.ViewModels
 @model IndexProductViewModel
@@ -14,7 +15,61 @@
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
+@section Scripts {
+<script>
 
+    function loadProducts(page, category) {
+    $.get("/Home/LoadProducts", { page: page, category: category }, function (data) {
+        $("#product-container").html(data);
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add loading states for category buttons
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.classList.contains('active')) {
+                    this.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Loading...';
+                }
+            });
+        });
+        
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            observer.observe(card);
+        });
+        
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const prevBtn = document.querySelector('.pagination-btn:not(.disabled)[href*="page=' + (@Model.Page - 1) + '"]');
+            const nextBtn = document.querySelector('.pagination-btn:not(.disabled)[href*="page=' + (@Model.Page + 1) + '"]');
+            
+            if (e.key === 'ArrowLeft' && prevBtn) {
+                prevBtn.click();
+            }
+            if (e.key === 'ArrowRight' && nextBtn) {
+                nextBtn.click();
+            }
+        });
+    });
+</script>
+}
 <style>
 /* Enhanced Color Scheme */
 :root {
@@ -618,18 +673,8 @@
 .product-card:nth-child(6) { animation-delay: 0.6s; }
 </style>
 
-<!-- Hero Section -->
-@* <section class="hero-section">
-    <div class="container">
-        <div class="hero-content">
-            <h1 class="hero-title">We've got what you need!</h1>
-            <p class="hero-subtitle">
-                Discover our amazing collection of premium products crafted with care and designed to exceed your expectations
-            </p>
-            <hr class="divider" />
-        </div>
-    </div>
-</section> *@
+
+
 
 <!-- Main Content with Sidebar -->
 <div class="container">
@@ -709,6 +754,7 @@
 
         <!-- Right Content - Products -->
         <div class="col-lg-9 col-md-8">
+           
             <div class="products-container">
                 <!-- Products Header -->
                 <div class="products-header">
@@ -747,13 +793,8 @@
 
                 @if (isValidPage && Model.Products.Any())
                 {
-                    <div class="products-grid" id="productsGrid">
-                        @foreach (var product in Model.Products)
-                        {
-                            <div class="product-card">
-                                @await Html.PartialAsync("_ProductCard", product)
-                            </div>
-                        }
+                    <div id="product-container">
+                        @await Html.PartialAsync("_ProductList", Model)
                     </div>
                 }
                 else if (!Model.Products.Any())
@@ -812,51 +853,3 @@
     }
 </div>
 
-@section Scripts {
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add loading states for category buttons
-    document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (!this.classList.contains('active')) {
-                this.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Loading...';
-            }
-        });
-    });
-    
-    // Add intersection observer for animations
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-    
-    document.querySelectorAll('.product-card').forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        observer.observe(card);
-    });
-    
-    // Add keyboard navigation
-    document.addEventListener('keydown', function(e) {
-        const prevBtn = document.querySelector('.pagination-btn:not(.disabled)[href*="page=' + (@Model.Page - 1) + '"]');
-        const nextBtn = document.querySelector('.pagination-btn:not(.disabled)[href*="page=' + (@Model.Page + 1) + '"]');
-        
-        if (e.key === 'ArrowLeft' && prevBtn) {
-            prevBtn.click();
-        }
-        if (e.key === 'ArrowRight' && nextBtn) {
-            nextBtn.click();
-        }
-    });
-});
-</script>
-}
