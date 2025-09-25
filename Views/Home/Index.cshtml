@@ -737,14 +737,19 @@
                 {
                     <div class="col-lg-4 col-md-6 mb-4">
                         <div class="product-card">
-                            <div class="product-image-container">
-                                <img src="@product.Image" alt="@product.Name" />
-                                <div class="product-overlay">
-                                    <button class="quick-add-btn" onclick="addToCart(@product.ProductID)">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
+                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID" class="product-link">
+                                <div class="product-image-container">
+                                    <img src="@product.Image" alt="@product.Name"/>
+                                    <div class="product-overlay">
+                                        <form asp-controller="Cart" asp-action="Create" asp-route-id="@product.ProductID" method="post">
+                                            <button type="submit" class="quick-add-btn">
+                                                <i class="fas fa-shopping-cart me-1"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
+
                             <div class="product-info">
                                 <div class="product-meta">Sold: @product.SoldOut | Views: @product.View</div>
                                 <h3 class="product-name">
@@ -801,7 +806,7 @@
                             <div class="product-footer d-flex justify-content-between align-items-center">
                                 <span class="product-price">$@bestseller.Price</span>
                                 <a class="add-to-cart-btn" asp-controller="Cart" asp-action="Create" asp-route-id="@bestseller.ProductID">
-                                    <i class="fas fa-plus"></i>
+                                    <i class="fas fa-shopping-cart me-1"></i>
                                 </a>
                             </div>
                         </div>

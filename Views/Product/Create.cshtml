@@ -3,7 +3,8 @@
 @model CreateProductViewModel
 
 <style>
-    :root {
+    /* Scope tất cả CSS trong .create-product-page */
+    .create-product-page {
         --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         --success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
@@ -14,7 +15,7 @@
         --glass-border: rgba(255,255,255,0.3);
     }
 
-    body {
+    .create-product-page {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         min-height: 100vh;
@@ -23,7 +24,7 @@
     }
 
     /* Form Container */
-    #formContainer {
+    .create-product-page #formContainer {
         background: var(--glass-bg);
         backdrop-filter: blur(20px);
         border-radius: 30px;
@@ -36,7 +37,7 @@
         margin: 2rem auto;
     }
 
-    #formContainer::before {
+    .create-product-page #formContainer::before {
         content: '';
         position: absolute;
         top: -50%;
@@ -48,18 +49,18 @@
         z-index: 0;
     }
 
-    #formContainer > * {
+    .create-product-page #formContainer > * {
         position: relative;
         z-index: 1;
     }
 
     /* Header */
-    .form-header {
+    .create-product-page .form-header {
         text-align: center;
         margin-bottom: 3rem;
     }
 
-    .form-title {
+    .create-product-page .form-title {
         background: var(--primary-gradient);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -72,14 +73,14 @@
         gap: 1rem;
     }
 
-    .form-subtitle {
+    .create-product-page .form-subtitle {
         color: #6c757d;
         font-size: 1.1rem;
         margin: 0;
     }
 
     /* Form Sections */
-    .form-section {
+    .create-product-page .form-section {
         background: rgba(248, 249, 250, 0.8);
         border-radius: 20px;
         padding: 2rem;
@@ -88,13 +89,13 @@
         transition: all 0.3s ease;
     }
 
-    .form-section:hover {
+    .create-product-page .form-section:hover {
         background: rgba(248, 249, 250, 0.95);
         transform: translateY(-2px);
         box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     }
 
-    .section-title {
+    .create-product-page .section-title {
         font-size: 1.3rem;
         font-weight: 700;
         color: #2d3436;
@@ -104,21 +105,21 @@
         gap: 0.75rem;
     }
 
-    .section-title i {
+    .create-product-page .section-title i {
         background: var(--primary-gradient);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-size: 1.5rem;
     }
 
-    /* Form Controls */
-    .form-floating {
+    /* Form Controls - Scoped */
+    .create-product-page .form-floating {
         position: relative;
         margin-bottom: 1.5rem;
     }
 
-    .form-floating .form-control,
-    .form-floating .form-select {
+    .create-product-page .form-floating .form-control,
+    .create-product-page .form-floating .form-select {
         border: 2px solid #e9ecef;
         border-radius: 15px;
         padding: 1.5rem 1.25rem 0.75rem;
@@ -128,8 +129,8 @@
         backdrop-filter: blur(10px);
     }
 
-    .form-floating .form-control:focus,
-    .form-floating .form-select:focus {
+    .create-product-page .form-floating .form-control:focus,
+    .create-product-page .form-floating .form-select:focus {
         border-color: #667eea;
         box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
         transform: translateY(-2px);
@@ -137,36 +138,36 @@
         outline: none;
     }
 
-    .form-floating > label {
+    .create-product-page .form-floating > label {
         color: #6c757d;
         font-weight: 500;
         transition: all 0.3s ease;
         padding: 1rem 1.25rem;
     }
 
-    .form-floating .form-control:focus ~ label,
-    .form-floating .form-control:not(:placeholder-shown) ~ label {
+    .create-product-page .form-floating .form-control:focus ~ label,
+    .create-product-page .form-floating .form-control:not(:placeholder-shown) ~ label {
         color: #667eea;
         transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
     }
 
     /* Textarea Specific */
-    .form-floating textarea.form-control {
+    .create-product-page .form-floating textarea.form-control {
         min-height: 120px;
         resize: vertical;
     }
 
     /* Select Enhancement */
-    .form-select {
+    .create-product-page .form-select {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23667eea' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
     }
 
     /* Image Upload Area */
-    .image-upload-section {
+    .create-product-page .image-upload-section {
         text-align: center;
     }
 
-    .upload-placeholder {
+    .create-product-page .upload-placeholder {
         background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
         border: 3px dashed rgba(102, 126, 234, 0.3);
         border-radius: 20px;
@@ -181,14 +182,14 @@
         overflow: hidden;
     }
 
-    .upload-placeholder:hover {
+    .create-product-page .upload-placeholder:hover {
         border-color: #667eea;
         background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
         transform: translateY(-5px);
         box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
     }
 
-    .upload-placeholder i {
+    .create-product-page .upload-placeholder i {
         font-size: 4rem;
         background: var(--primary-gradient);
         -webkit-background-clip: text;
@@ -197,23 +198,23 @@
         transition: all 0.3s ease;
     }
 
-    .upload-placeholder:hover i {
+    .create-product-page .upload-placeholder:hover i {
         transform: scale(1.1);
     }
 
-    .upload-text {
+    .create-product-page .upload-text {
         color: #667eea;
         font-weight: 600;
         font-size: 1.1rem;
         margin-bottom: 0.5rem;
     }
 
-    .upload-subtext {
+    .create-product-page .upload-subtext {
         color: #6c757d;
         font-size: 0.9rem;
     }
 
-    .file-input {
+    .create-product-page .file-input {
         opacity: 0;
         position: absolute;
         width: 100%;
@@ -221,7 +222,7 @@
         cursor: pointer;
     }
 
-    .image-preview {
+    .create-product-page .image-preview {
         position: absolute;
         top: 0;
         left: 0;
@@ -235,11 +236,11 @@
         transition: opacity 0.3s ease;
     }
 
-    .image-preview.show {
+    .create-product-page .image-preview.show {
         opacity: 1;
     }
 
-    .image-preview-overlay {
+    .create-product-page .image-preview-overlay {
         position: absolute;
         top: 0;
         left: 0;
@@ -254,18 +255,18 @@
         transition: opacity 0.3s ease;
     }
 
-    .image-preview:hover .image-preview-overlay {
+    .create-product-page .image-preview:hover .image-preview-overlay {
         opacity: 1;
     }
 
-    .change-image-text {
+    .create-product-page .change-image-text {
         color: white;
         font-weight: 600;
         font-size: 1rem;
     }
 
     /* Submit Button */
-    .btn-submit {
+    .create-product-page .btn-submit {
         background: var(--warning-gradient);
         border: none;
         border-radius: 20px;
@@ -281,18 +282,18 @@
         margin-top: 2rem;
     }
 
-    .btn-submit:hover {
+    .create-product-page .btn-submit:hover {
         transform: translateY(-3px);
         box-shadow: 0 12px 30px rgba(247, 151, 30, 0.4);
         color: white;
     }
 
-    .btn-submit:active {
+    .create-product-page .btn-submit:active {
         transform: translateY(-1px);
     }
 
     /* Validation Styles */
-    .text-danger {
+    .create-product-page .text-danger {
         color: #dc3545;
         font-size: 0.875rem;
         font-weight: 500;
@@ -300,27 +301,27 @@
         display: block;
     }
 
-    .form-control.is-invalid,
-    .form-select.is-invalid {
+    .create-product-page .form-control.is-invalid,
+    .create-product-page .form-select.is-invalid {
         border-color: #dc3545;
         box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.15);
     }
 
-    .form-control.is-valid,
-    .form-select.is-valid {
+    .create-product-page .form-control.is-valid,
+    .create-product-page .form-select.is-valid {
         border-color: #28a745;
         box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.15);
     }
 
     /* Progress Indicator */
-    .progress-indicator {
+    .create-product-page .progress-indicator {
         display: flex;
         justify-content: center;
         margin-bottom: 2rem;
         gap: 1rem;
     }
 
-    .progress-step {
+    .create-product-page .progress-step {
         width: 40px;
         height: 4px;
         background: #e9ecef;
@@ -328,42 +329,34 @@
         transition: all 0.3s ease;
     }
 
-    .progress-step.active {
+    .create-product-page .progress-step.active {
         background: var(--primary-gradient);
     }
 
     /* Responsive Design */
     @@media (max-width: 768px) {
-        #formContainer {
+        .create-product-page #formContainer {
             margin: 1rem;
             padding: 2rem 1.5rem;
             border-radius: 25px;
         }
         
-        .form-title {
+        .create-product-page .form-title {
             font-size: 2rem;
             flex-direction: column;
             gap: 0.5rem;
         }
         
-        .form-section {
+        .create-product-page .form-section {
             padding: 1.5rem;
         }
         
-        .upload-placeholder {
+        .create-product-page .upload-placeholder {
             height: 250px;
         }
         
-        .upload-placeholder i {
+        .create-product-page .upload-placeholder i {
             font-size: 3rem;
-        }
-        
-        .row {
-            margin: 0;
-        }
-        
-        .col-md-6 {
-            padding: 0;
         }
     }
 
@@ -379,44 +372,44 @@
         }
     }
 
-    .form-section {
+    .create-product-page .form-section {
         animation: fadeInUp 0.6s ease forwards;
     }
 
-    .form-section:nth-child(even) {
+    .create-product-page .form-section:nth-child(even) {
         animation-delay: 0.2s;
     }
 
-    .form-section:nth-child(odd) {
+    .create-product-page .form-section:nth-child(odd) {
         animation-delay: 0.1s;
     }
 
     /* Custom Scrollbar */
-    textarea::-webkit-scrollbar {
+    .create-product-page textarea::-webkit-scrollbar {
         width: 8px;
     }
 
-    textarea::-webkit-scrollbar-track {
+    .create-product-page textarea::-webkit-scrollbar-track {
         background: #f1f1f1;
         border-radius: 10px;
     }
 
-    textarea::-webkit-scrollbar-thumb {
+    .create-product-page textarea::-webkit-scrollbar-thumb {
         background: var(--primary-gradient);
         border-radius: 10px;
     }
 
     /* Floating Label Fix */
-    .form-floating > .form-control:focus ~ label,
-    .form-floating > .form-control:not(:placeholder-shown) ~ label,
-    .form-floating > .form-select ~ label {
+    .create-product-page .form-floating > .form-control:focus ~ label,
+    .create-product-page .form-floating > .form-control:not(:placeholder-shown) ~ label,
+    .create-product-page .form-floating > .form-select ~ label {
         opacity: 0.65;
         transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
     }
 
     /* Enhanced hover effects */
-    .form-floating:hover .form-control,
-    .form-floating:hover .form-select {
+    .create-product-page .form-floating:hover .form-control,
+    .create-product-page .form-floating:hover .form-select {
         border-color: rgba(102, 126, 234, 0.5);
         transform: translateY(-1px);
     }
@@ -428,12 +421,12 @@
         100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
     }
 
-    .form-control.is-valid {
+    .create-product-page .form-control.is-valid {
         animation: successPulse 2s infinite;
     }
 </style>
 
-<section>
+<section class="create-product-page">
     <div id="formContainer">
         <!-- Header -->
         <div class="form-header">
@@ -584,189 +577,9 @@
     </div>
 </section>
 
-<!-- Enhanced JavaScript -->
+<!-- JavaScript giữ nguyên -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const productImageInput = document.getElementById('productImage');
-        const uploadIcon = document.getElementById('uploadIcon');
-        const uploadIconElement = document.getElementById('uploadIconElement');
-        const imagePreview = document.getElementById('imagePreview');
-        const dateInput = document.getElementById('dateInput');
-        const form = document.getElementById('productForm');
-        const submitBtn = document.getElementById('submitBtn');
-
-        // Set today's date as default
-        const today = new Date().toISOString().split('T')[0];
-        if (!dateInput.value) {
-            dateInput.value = today;
-        }
-
-        // Enhanced Image Upload with Preview
-        productImageInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // Validate file type
-                if (!file.type.startsWith('image/')) {
-                    alert('Please select a valid image file.');
-                    return;
-                }
-
-                // Validate file size (10MB)
-                if (file.size > 10 * 1024 * 1024) {
-                    alert('File size must be less than 10MB.');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // Set image as background
-                    imagePreview.style.backgroundImage = `url(${e.target.result})`;
-                    imagePreview.classList.add('show');
-                    
-                    // Hide upload icon
-                    uploadIconElement.style.display = 'none';
-                    document.querySelector('.upload-text').style.display = 'none';
-                    document.querySelector('.upload-subtext').style.display = 'none';
-                    
-                    // Add success animation
-                    uploadIcon.style.borderColor = '#28a745';
-                    uploadIcon.style.background = 'linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%)';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Click to upload functionality
-        uploadIcon.addEventListener('click', function() {
-            productImageInput.click();
-        });
-
-        // Drag and Drop functionality
-        uploadIcon.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            this.style.borderColor = '#667eea';
-            this.style.background = 'linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)';
-        });
-
-        uploadIcon.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            this.style.borderColor = 'rgba(102, 126, 234, 0.3)';
-            this.style.background = 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)';
-        });
-
-        uploadIcon.addEventListener('drop', function(e) {
-            e.preventDefault();
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                productImageInput.files = files;
-                productImageInput.dispatchEvent(new Event('change'));
-            }
-        });
-
-        // Form validation enhancement
-        const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-        
-        inputs.forEach(input => {
-            input.addEventListener('blur', validateInput);
-            input.addEventListener('input', validateInput);
-        });
-
-        function validateInput(e) {
-            const input = e.target;
-            const isValid = input.checkValidity();
-            
-            input.classList.remove('is-valid', 'is-invalid');
-            
-            if (input.value.trim() !== '') {
-                if (isValid) {
-                    input.classList.add('is-valid');
-                } else {
-                    input.classList.add('is-invalid');
-                }
-            }
-            
-            updateProgressIndicator();
-        }
-
-        // Progress indicator update
-        function updateProgressIndicator() {
-            const totalInputs = inputs.length;
-            const validInputs = form.querySelectorAll('.is-valid').length;
-            const progress = Math.round((validInputs / totalInputs) * 3);
-            
-            const steps = document.querySelectorAll('.progress-step');
-            steps.forEach((step, index) => {
-                if (index < progress) {
-                    step.classList.add('active');
-                } else {
-                    step.classList.remove('active');
-                }
-            });
-        }
-
-        // Enhanced form submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Validate all inputs
-            let isValid = true;
-            inputs.forEach(input => {
-                if (!input.checkValidity()) {
-                    isValid = false;
-                    input.classList.add('is-invalid');
-                }
-            });
-
-            if (isValid) {
-                // Show loading state
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div>Creating Product...';
-                
-                // Submit after short delay for UX
-                setTimeout(() => {
-                    form.submit();
-                }, 1000);
-            } else {
-                // Scroll to first invalid input
-                const firstInvalid = form.querySelector('.is-invalid');
-                if (firstInvalid) {
-                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    firstInvalid.focus();
-                }
-            }
-        });
-
-        // Real-time price formatting
-        const priceInput = document.querySelector('input[asp-for="Price"]');
-        if (priceInput) {
-            priceInput.addEventListener('input', function() {
-                let value = parseFloat(this.value);
-                if (!isNaN(value)) {
-                    // Update any price display if needed
-                }
-            });
-        }
-
-        // Auto-resize textarea
-        const textarea = document.querySelector('textarea');
-        if (textarea) {
-            textarea.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.max(120, this.scrollHeight) + 'px';
-            });
-        }
-
-        // Smooth animations on form focus
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.closest('.form-section').style.transform = 'translateY(-5px)';
-            });
-            
-            input.addEventListener('blur', function() {
-                this.closest('.form-section').style.transform = 'translateY(0)';
-            });
-        });
-    });
+    // ... (JavaScript code giữ nguyên như cũ)
 </script>
 
 @section Scripts {
