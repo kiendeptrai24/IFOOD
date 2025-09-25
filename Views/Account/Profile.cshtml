@@ -1,56 +1,99 @@
 ﻿@using iFood.ViewModels
-
 @model ProfileUserViewModel
 
 <style>
-    body {
-        background-color: #021C2E; /* Màu xanh đậm bên ngoài */
+    :root {
+        --primary-color: #0f172a;
+        --secondary-color: #1e293b;
+        --accent-color: #3b82f6;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --text-light: #f1f5f9;
+        --text-muted: #64748b;
+        --border-color: #334155;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
     }
 
-    #formContainer {
-        background-color: rgba(255, 140, 0, 0.9); /* Màu cam */
-        padding: 40px;
-        border-radius: 20px;
-        color: white;
-        max-width: 800px;
-    }
-
-    .position-relative {
+    .profile-page {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-light);
         position: relative;
     }
 
-    .field-icon {
+    /* Animated background particles - chỉ cho profile page */
+    .profile-page::before {
+        content: '';
         position: absolute;
-        top: 50%;
-        right: 10px;
-        transform: translateY(-50%);
-        cursor: pointer;
-        font-size: 18px;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+        z-index: -1;
     }
 
-    .form-control {
-        padding-right: 40px;
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border: none;
+    .profile-container {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 2.5rem;
+        max-width: 900px;
+        box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.25),
+            0 0 0 1px rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
     }
 
-    .button-container {
+    .profile-container:hover {
+        transform: translateY(-2px);
+        box-shadow: 
+            0 35px 60px -12px rgba(0, 0, 0, 0.35),
+            0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        position: relative;
+    }
+
+    .profile-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--accent-color), var(--success-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+    }
+
+    .profile-subtitle {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        font-weight: 400;
+    }
+
+    /* Avatar Section */
+    .avatar-section {
         display: flex;
-        gap: 10px;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+        position: relative;
     }
 
-    .btn-custom {
-        background: #FF5722;
-        color: white;
-        padding: 12px 25px;
-        border-radius: 8px;
-        transition: 0.3s;
-        font-size: 16px;
-    }
-
-    .btn-custom:hover {
-        background: #E64A19;
+    .avatar-container {
+        position: relative;
+        margin-bottom: 1.5rem;
     }
 
     .avatar-preview {
@@ -59,56 +102,317 @@
         border-radius: 50%;
         object-fit: cover;
         cursor: pointer;
-        transition: transform 0.3s;
+        border: 4px solid var(--accent-color);
+        transition: all 0.4s ease;
+        box-shadow: 
+            0 15px 35px rgba(59, 130, 246, 0.3),
+            0 0 0 8px rgba(59, 130, 246, 0.1);
     }
 
     .avatar-preview:hover {
-        transform: scale(1.1);
+        transform: scale(1.05);
+        border-color: var(--success-color);
+        box-shadow: 
+            0 20px 40px rgba(16, 185, 129, 0.4),
+            0 0 0 12px rgba(16, 185, 129, 0.15);
+    }
+
+    .avatar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        cursor: pointer;
+    }
+
+    .avatar-container:hover .avatar-overlay {
+        opacity: 1;
+    }
+
+    .avatar-overlay i {
+        font-size: 2rem;
+        color: white;
+    }
+
+    /* Form Controls - scoped to profile page */
+    .profile-page .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-page .form-floating {
+        position: relative;
+    }
+
+    .profile-page .form-control {
+        background: var(--glass-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-light);
+        font-size: 1rem;
+        padding: 1rem 1.25rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .profile-page .form-control:focus {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        color: var(--text-light);
+    }
+
+    .profile-page .form-control::placeholder {
+        color: var(--text-muted);
+    }
+
+    .profile-page .form-floating > label {
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+    }
+
+    .profile-page .form-floating > .form-control:focus ~ label,
+    .profile-page .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        color: var(--accent-color);
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+
+    /* Password Toggle - scoped */
+    .profile-page .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: color 0.3s ease;
+        z-index: 10;
+    }
+
+    .profile-page .password-toggle:hover {
+        color: var(--accent-color);
+    }
+
+    /* Buttons - scoped */
+    .profile-page .btn-primary {
+        background: linear-gradient(135deg, var(--accent-color), #1d4ed8);
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-page .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .profile-page .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .profile-page .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        background: linear-gradient(135deg, #1d4ed8, var(--accent-color));
+    }
+
+    .profile-page .btn-upload {
+        background: linear-gradient(135deg, var(--success-color), #059669);
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .profile-page .btn-upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        background: linear-gradient(135deg, #059669, var(--success-color));
+    }
+
+    .profile-page .btn-danger {
+        background: linear-gradient(135deg, var(--danger-color), #dc2626);
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-page .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+        background: linear-gradient(135deg, #dc2626, var(--danger-color));
+    }
+
+    /* Alert */
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 12px;
+        color: #fca5a5;
+        backdrop-filter: blur(10px);
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .profile-container {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .profile-title {
+            font-size: 2rem;
+        }
+        
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+        }
+        
+        .form-control {
+            padding: 0.875rem 1rem;
+        }
+    }
+
+    /* Loading Animation */
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Success animation */
+    @@keyframes success {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .success-animation {
+        animation: success 0.6s ease-in-out;
     }
 </style>
 
-<section>
-     @if(TempData["Error"] != null)
+<section class="profile-page py-5">
+    @if(TempData["Error"] != null)
     {
-        <div class="col-md-12 alert alert-danger">
-            <span><b>Sorry!</b> - @TempData["Error"]</span>
+        <div class="container mb-4">
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Oops!</strong> @TempData["Error"]
+            </div>
         </div>
     }
-   <div class="container d-flex align-items-center justify-content-center min-vh-100">
-        <div id="formContainer">
-            <h2 class="text-center">Account Settings</h2>
-            <form id="avatar-form" action="ChangeAvatar" method="post" enctype="multipart/form-data">
-                <div class="text-center mb-4">
-                    <input type="file" asp-for="Avatar" class="d-none" id="avatar-input" accept="image/*">
-                    <img src="@(Model.AvatarUrl ?? "https://placehold.co/180")"
-                        class="avatar-preview"
-                        alt="User Avatar"
-                        onclick="document.getElementById('avatar-input').click();">
+    
+    <div class="container d-flex align-items-center justify-content-center min-vh-100">
+        <div class="profile-container">
+            <div class="profile-header">
+                <h1 class="profile-title">Account Settings</h1>
+                <p class="profile-subtitle">Manage your profile information and preferences</p>
+            </div>
 
-                    <button type="submit" class="btn btn-custom mt-3">UPLOAD NEW PHOTO</button>
+            <!-- Avatar Section -->
+            <form id="avatar-form" action="ChangeAvatar" method="post" enctype="multipart/form-data">
+                <div class="avatar-section">
+                    <div class="avatar-container">
+                        <input type="file" asp-for="Avatar" class="d-none" id="avatar-input" accept="image/*">
+                        <img src="@(Model.AvatarUrl ?? "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face")"
+                             class="avatar-preview"
+                             alt="User Avatar"
+                             onclick="document.getElementById('avatar-input').click();">
+                        <div class="avatar-overlay" onclick="document.getElementById('avatar-input').click();">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-upload" id="upload-btn" disabled>
+                        <i class="fas fa-upload me-2"></i>
+                        <span class="btn-text">Upload New Photo</span>
+                    </button>
                 </div>
             </form>
-            <form asp-action="Profile" method="post">
-                <div class="form-floating mb-3">
-                    <input asp-for="Name" class="form-control" type="text" placeholder="Username"/>
-                    <label asp-for="Name">Username</label>
+
+            <!-- Profile Form -->
+            <form asp-action="Profile" method="post" id="profile-form">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating form-group">
+                            <input asp-for="Name" class="form-control" type="text" placeholder="Username"/>
+                            <label asp-for="Name">
+                                <i class="fas fa-user me-2"></i>Username
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-group">
+                            <input asp-for="Email" class="form-control" type="email" readonly>
+                            <label asp-for="Email">
+                                <i class="fas fa-envelope me-2"></i>Email Address
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Email" class="form-control" type="email" readonly>
-                    <label asp-for="Email">Email address</label>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating form-group position-relative">
+                            <input asp-for="Password" id="password-field" class="form-control" type="password" placeholder="Password"/>
+                            <label asp-for="Password">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                            <i class="fas fa-eye password-toggle" data-toggle="password-field"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-group">
+                            <input asp-for="Phone" class="form-control" type="tel" placeholder="Phone Number"/>
+                            <label asp-for="Phone">
+                                <i class="fas fa-phone me-2"></i>Phone Number
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-floating mb-3 position-relative">
-                    <input asp-for="Password" id="password-field" class="form-control" type="password" placeholder="Password"/>
-                    <label asp-for="Password">Password</label>
-                    <i class="fa fa-eye field-icon toggle-password" data-toggle="password-field"></i>
-                </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Phone" class="form-control" type="phone" placeholder="Phone Number"/>
-                    <label asp-for="Phone">Phone</label>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-custom" type="submit">UPDATE PROFILE</button>
-                    <button class="btn btn-danger">DELETE ACCOUNT</button>
+
+                <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mt-4">
+                    <button class="btn btn-primary flex-fill" type="submit" id="update-btn">
+                        <i class="fas fa-save me-2"></i>
+                        <span class="btn-text">Update Profile</span>
+                    </button>
+                    <button class="btn btn-danger" type="button" onclick="confirmDelete()">
+                        <i class="fas fa-trash me-2"></i>
+                        Delete Account
+                    </button>
                 </div>
             </form>
         </div>
@@ -116,7 +420,8 @@
 </section>
 
 <script>
-    document.querySelectorAll('.toggle-password').forEach(item => {
+    // Password toggle functionality
+    document.querySelectorAll('.password-toggle').forEach(item => {
         item.addEventListener('click', function () {
             var passwordField = document.getElementById(this.getAttribute('data-toggle'));
             if (passwordField) {
@@ -126,31 +431,104 @@
             }
         });
     });
+
+    // Avatar preview and upload handling
     document.getElementById('avatar-input').addEventListener('change', function(event) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            document.querySelector('.avatar-preview').src = e.target.result;
+        const uploadBtn = document.getElementById('upload-btn');
+        const file = event.target.files[0];
+        
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return;
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB.');
+                return;
+            }
+            
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                const avatar = document.querySelector('.avatar-preview');
+                avatar.src = e.target.result;
+                avatar.classList.add('success-animation');
+                
+                // Enable upload button
+                uploadBtn.disabled = false;
+                uploadBtn.classList.add('btn-success');
+            };
+            reader.readAsDataURL(file);
+            
+            // Mark form as changed
+            document.getElementById('avatar-form').setAttribute('data-changed', 'true');
         }
-        reader.readAsDataURL(event.target.files[0]);
-    });
-    
-</script>
-<script>
-    document.getElementById('avatar-input').addEventListener('change', function(event) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            document.querySelector('.avatar-preview').src = e.target.result;
-            document.getElementById('avatar-form').setAttribute('data-changed', 'true'); // Đánh dấu đã thay đổi ảnh
-        };
-        reader.readAsDataURL(event.target.files[0]);
     });
 
+    // Avatar form submission
     document.getElementById('avatar-form').addEventListener('submit', function(event) {
+        const uploadBtn = document.getElementById('upload-btn');
+        const btnText = uploadBtn.querySelector('.btn-text');
+        
         if (this.getAttribute('data-changed') !== 'true') {
-            event.preventDefault(); // Ngăn submit nếu ảnh chưa thay đổi
+            event.preventDefault();
+            return;
         }
+        
+        // Show loading state
+        btnText.innerHTML = '<span class="loading"></span> Uploading...';
+        uploadBtn.disabled = true;
+    });
+
+    // Profile form submission
+    document.getElementById('profile-form').addEventListener('submit', function(event) {
+        const updateBtn = document.getElementById('update-btn');
+        const btnText = updateBtn.querySelector('.btn-text');
+        
+        // Show loading state
+        btnText.innerHTML = '<span class="loading"></span> Updating...';
+        updateBtn.disabled = true;
+    });
+
+    // Delete account confirmation
+    function confirmDelete() {
+        if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            // Add your delete account logic here
+            window.location.href = '/Account/Delete';
+        }
+    }
+
+    // Form validation
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.style.borderColor = 'var(--danger-color)';
+            } else {
+                this.style.borderColor = 'var(--border-color)';
+            }
+        });
+        
+        input.addEventListener('focus', function() {
+            this.style.borderColor = 'var(--accent-color)';
+        });
+    });
+
+    // Add smooth scrolling for better UX
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('.profile-container');
+        container.style.opacity = '0';
+        container.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            container.style.transition = 'all 0.6s ease';
+            container.style.opacity = '1';
+            container.style.transform = 'translateY(0)';
+        }, 100);
     });
 </script>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
