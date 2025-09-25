@@ -1,7 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject UserManager<AppUser> UserManager
 @{
-    var appUser = User.Identity.IsAuthenticated ? await UserManager.GetUserAsync(User) : null;
+    var appUser = User.Identity?.IsAuthenticated == true 
+    ? await UserManager.GetUserAsync(User) 
+    : null;
     var avatarUrl = appUser?.ProfileImageUrl ?? "https://placehold.co/30x30";
     var botAvatarUrl = Url.Content("~/Chatbot.jpg");
 }
@@ -47,7 +49,7 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 fw-bold">
                         <li class="nav-item"><a class="nav-link" asp-controller="Product" asp-action="Index">Product</a></li>
-                        @if(User.Identity.IsAuthenticated)
+                        @if (User?.Identity?.IsAuthenticated == true)
                         {
                             if(User.IsInRole("user"))
                             {

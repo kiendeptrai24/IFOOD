@@ -622,7 +622,6 @@
     }
 </style>
 @section Scripts {
-@* <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> *@
 <script>
     function loadProducts(page, category) {
         $.get("@Url.Action("LoadProducts", "Home")", { page: page, category: category }, function (data) {
@@ -636,9 +635,6 @@
     });
 </script>
 }
-
-
-
 <!-- Hero Section -->
 <section class="modern-hero">
     <div class="container">
@@ -738,79 +734,9 @@
 
         <div id="product-container">
             <!-- Nội dung Partial sẽ load vào đây -->
-            <h1>hhello</h1>
         </div>
     </div>
 </section>
-
-@* <section id="product" class="menu-section">
-    <div class="container">
-        <h2 class="section-title">Our Menu</h2>
-        <p class="section-subtitle">Discover our carefully crafted dishes made with the finest ingredients</p>
-        
-        <!-- Category Filters -->
-        <div class="category-filters">
-            <a class="filter-btn active" asp-action="Index" asp-route-page="1" asp-route-category="-1">All</a>
-            @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
-            {
-                <a class="filter-btn" asp-action="Index" asp-route-page="1" asp-route-category="@category.Value">@category.Text</a>
-            }
-        </div>
-
-        @if (isValidPage)
-        {
-            <!-- Pagination -->
-            <div class="pagination-wrapper">
-                <a class="pagination-btn @prevDisabled" asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-category="@Model.Category">
-                    <i class="fas fa-chevron-left"></i>
-                </a>
-                <div class="pagination-info">Results @resultStart - @resultEnd of @Model.TotalProducts</div>
-                <a class="pagination-btn @nextDisabled" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-category="@Model.Category">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-            </div>
-
-            <!-- Product Grid -->
-            <div class="row">
-                @foreach (Product product in Model.Products)
-                {
-                    <div class="col-lg-4 col-md-6 mb-4">
-                        <div class="product-card">
-                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID" class="product-link">
-                                <div class="product-image-container">
-                                    <img src="@product.Image" alt="@product.Name"/>
-                                    <div class="product-overlay">
-                                        <form asp-controller="Cart" asp-action="Create" asp-route-id="@product.ProductID" method="post">
-                                            <button type="submit" class="quick-add-btn">
-                                                <i class="fas fa-shopping-cart me-1"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </a>
-
-                            <div class="product-info">
-                                <div class="product-meta">Sold: @product.SoldOut | Views: @product.View</div>
-                                <h3 class="product-name">
-                                    @(product.Name.Length > 22 ? product.Name.Substring(startIndex: 0, length: 22) + "..." : product.Name)
-                                </h3>
-                                <p class="product-description">
-                                    @(product.Description.Length > 40 ? product.Description.Substring(0, 40) + "..." : product.Description)
-                                </p>
-                                <div class="product-footer d-flex justify-content-between align-items-center">
-                                    <span class="product-price">$@product.Price</span>
-                                    <a class="add-to-cart-btn" asp-controller="Cart" asp-action="Create" asp-route-id="@product.ProductID">
-                                        <i class="fas fa-shopping-cart me-1"></i>Add
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-    </div>
-</section> *@
 
 <!-- Bestsellers Section -->
 <section class="bestsellers-section">
@@ -826,6 +752,8 @@
             </button>
             
             <div class="bestseller-carousel" id="bestsellerCarousel">
+            @if(Model.BestSellerProducts != null)
+            {
                 @foreach (var bestseller in Model.BestSellerProducts)
                 {
                     <div class="bestseller-card">
@@ -837,20 +765,22 @@
                         <div class="product-info">
                             <div class="product-meta">Sold: @bestseller.SoldOut | Views: @bestseller.View</div>
                             <h4 class="product-name">
-                                @(bestseller.Name.Length > 22 ? bestseller.Name.Substring(0, 22) + "..." : bestseller.Name)
+                                @(bestseller?.Name?.Length > 22 ? bestseller.Name.Substring(0, 22) + "..." : bestseller?.Name)
                             </h4>
                             <p class="product-description">
-                                @(bestseller.Description.Length > 40 ? bestseller.Description.Substring(0, 40) + "..." : bestseller.Description)
+                                @(bestseller?.Description?.Length > 40 ? bestseller.Description.Substring(0, 40) + "..." : bestseller?.Description)
                             </p>
                             <div class="product-footer d-flex justify-content-between align-items-center">
-                                <span class="product-price">$@bestseller.Price</span>
-                                <a class="add-to-cart-btn" asp-controller="Cart" asp-action="Create" asp-route-id="@bestseller.ProductID">
+                                <span class="product-price">$@bestseller?.Price</span>
+                                <a class="add-to-cart-btn" asp-controller="Cart" asp-action="Create" asp-route-id="@bestseller?.ProductID">
                                     <i class="fas fa-shopping-cart me-1"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
                 }
+
+            }
             </div>
         </div>
     </div>

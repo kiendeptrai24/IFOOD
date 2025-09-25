@@ -1,7 +1,9 @@
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<AppUser> UserManager
 @{
-    var appUser = User.Identity.IsAuthenticated ? await UserManager.GetUserAsync(User) : null;
+    var appUser = User.Identity?.IsAuthenticated == true 
+    ? await UserManager.GetUserAsync(User) 
+    : null;
     var userAvatarUrl = appUser?.ProfileImageUrl ?? "https://placehold.co/36x36/2196F3/white?text=U";
     var botAvatarUrl = Url.Content("~/Chatbot.jpg");
 }

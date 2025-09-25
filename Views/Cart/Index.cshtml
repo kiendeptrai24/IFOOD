@@ -452,64 +452,73 @@
                 <div class="cart-items-container">
                     @foreach (var item in Model.CartItems)
                     {
-                        <div class="cart-item d-flex align-items-center" data-item-id="@item.Id">
-                            <!-- Checkbox -->
-                            <input type="checkbox" 
-                                   class="item-checkbox me-3" 
-                                   checked 
-                                   onchange="calculateTotal(); updateItemSelection(this)"
-                                   data-id="@item.Id" 
-                                   data-price="@item.Total">
+                        if(item != null)
+                        {
+                        
+                            <div class="cart-item d-flex align-items-center" data-item-id="@item.Id">
+                                <!-- Checkbox -->
+                                <input type="checkbox" 
+                                    class="item-checkbox me-3" 
+                                    checked 
+                                    onchange="calculateTotal(); updateItemSelection(this)"
+                                    data-id="@item.Id" 
+                                    data-price="@item.Total">
 
-                            <!-- Action Buttons -->
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-delete delete-button" 
-                                        data-id="@item.Id"
-                                        title="Remove from cart">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                                <button class="btn-icon btn-favorite" 
-                                        title="Save for later">
-                                    <i class="bi bi-heart"></i>
-                                </button>
-                            </div>
-
-                            <!-- Product Image -->
-                            <img src="@item.product.Image" 
-                                 alt="@item.product.Name" 
-                                 class="product-image">
-
-                            <!-- Product Info -->
-                            <div class="product-info">
-                                <h3 class="product-name">@item.product.Name</h3>
-                                <div class="product-meta">
-                                    <i class="bi bi-tag me-1"></i>@item.product.Category
+                                <!-- Action Buttons -->
+                                <div class="action-buttons">
+                                    <button class="btn-icon btn-delete delete-button" 
+                                            data-id="@item.Id"
+                                            title="Remove from cart">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    <button class="btn-icon btn-favorite" 
+                                            title="Save for later">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
                                 </div>
-                                <div class="product-price">
-                                    <i class="bi bi-currency-dollar"></i>@item.Price.ToString("F2")
+                                @if(item.product != null)
+                                {
+                                    <!-- Product Image -->
+                                    <img src="@item.product.Image" 
+                                        alt="@item.product.Name" 
+                                        class="product-image">
+
+                                    <!-- Product Info -->
+                                    <div class="product-info">
+                                        <h3 class="product-name">@item.product.Name</h3>
+                                        <div class="product-meta">
+                                            <i class="bi bi-tag me-1"></i>@item.product.Category
+                                        </div>
+                                        <div class="product-price">
+                                            <i class="bi bi-currency-dollar"></i>@item?.Price.ToString("F2")
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- Quantity Controls -->
+                                @if(item != null)
+                                {
+                                    <div class="quantity-controls">
+                                        <button class="quantity-btn" 
+                                                onclick="updateQuantity(@item.Id, -1)"
+                                                @(item.Quantity <= 1 ? "disabled" : "")>
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <span class="quantity-display" id="quantity-@item.Id">@item.Quantity</span>
+                                        <button class="quantity-btn" 
+                                                onclick="updateQuantity(@item.Id, 1)">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                }
+
+                                <!-- Price Info -->
+                                <div class="price-info">
+                                    <div class="item-price">Unit: $@item?.Price.ToString("F2")</div>
+                                    <div class="item-total" id="total-@item?.Id">$@item?.Total.ToString("F2")</div>
                                 </div>
                             </div>
-
-                            <!-- Quantity Controls -->
-                            <div class="quantity-controls">
-                                <button class="quantity-btn" 
-                                        onclick="updateQuantity(@item.Id, -1)"
-                                        @(item.Quantity <= 1 ? "disabled" : "")>
-                                    <i class="bi bi-dash"></i>
-                                </button>
-                                <span class="quantity-display" id="quantity-@item.Id">@item.Quantity</span>
-                                <button class="quantity-btn" 
-                                        onclick="updateQuantity(@item.Id, 1)">
-                                    <i class="bi bi-plus"></i>
-                                </button>
-                            </div>
-
-                            <!-- Price Info -->
-                            <div class="price-info">
-                                <div class="item-price">Unit: $@item.Price.ToString("F2")</div>
-                                <div class="item-total" id="total-@item.Id">$@item.Total.ToString("F2")</div>
-                            </div>
-                        </div>
+                        }
                     }
                 </div>
             }
