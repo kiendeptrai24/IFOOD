@@ -57,6 +57,33 @@ public class HomeController : Controller
         };
         return View(homeViewModel);
     }
+    public async Task<IActionResult> LoadProducts(int category = -1, int page = 1, int pageSize = 8)
+    {
+        var products = category switch
+        {
+            -1 => await _productRepository.GetSliceAsync((page - 1) * pageSize, pageSize),
+            _ => await _productRepository.GetProductsByCategoryAndSliceAsync((ProductCategory)category, (page - 1) * pageSize, pageSize),
+        };
+
+        var count = category switch
+        {
+            -1 => await _productRepository.GetCountAsync(),
+            _ => await _productRepository.GetCountByCategoryAsync((ProductCategory)category),
+        };
+
+        var homeViewModel = new HomeViewModel
+        {
+            Products = products,
+            Page = page,
+            PageSize = pageSize,
+            TotalProducts = count,
+            TotalPages = (int)Math.Ceiling(count / (double)pageSize),
+            Category = category,
+        };
+
+        return PartialView("_ProductListPartial", homeViewModel);
+    }
+
 
     public async Task<IActionResult> Privacy()
     {

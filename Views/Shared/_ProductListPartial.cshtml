@@ -1,0 +1,54 @@
+@using iFood.ViewModels
+@model HomeViewModel
+
+<!-- Pagination -->
+<div class="pagination-wrapper">
+    <a class="pagination-btn @(Model.HasPreviousPage ? "" : "disabled")"
+       href="#" onclick="loadProducts(@(Model.Page - 1), @Model.Category); return false;">
+        <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="pagination-info">Results @(((Model.Page - 1) * Model.PageSize) + 1) - @(Math.Min(Model.Page * Model.PageSize, Model.TotalProducts)) of @Model.TotalProducts</div>
+    <a class="pagination-btn @(Model.HasNextPage ? "" : "disabled")"
+       href="#" onclick="loadProducts(@(Model.Page + 1), @Model.Category); return false;">
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</div>
+
+<!-- Product Grid -->
+<div class="row">
+    @foreach (var product in Model.Products)
+    {
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="product-card">
+                <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductID" class="product-link">
+                    <div class="product-image-container">
+                        <img src="@product.Image" alt="@product.Name"/>
+                        <div class="product-overlay">
+                            <form asp-controller="Cart" asp-action="Create" asp-route-id="@product.ProductID" method="post">
+                                <button type="submit" class="quick-add-btn">
+                                    <i class="fas fa-shopping-cart me-1"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="product-info">
+                    <div class="product-meta">Sold: @product.SoldOut | Views: @product.View</div>
+                    <h3 class="product-name">
+                        @(product.Name.Length > 22 ? product.Name.Substring(0, 22) + "..." : product.Name)
+                    </h3>
+                    <p class="product-description">
+                        @(product.Description.Length > 40 ? product.Description.Substring(0, 40) + "..." : product.Description)
+                    </p>
+                    <div class="product-footer d-flex justify-content-between align-items-center">
+                        <span class="product-price">$@product.Price</span>
+                        <a class="add-to-cart-btn" asp-controller="Cart" asp-action="Create" asp-route-id="@product.ProductID">
+                            <i class="fas fa-shopping-cart me-1"></i>Add
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
