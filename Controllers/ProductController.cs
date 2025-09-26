@@ -3,7 +3,6 @@ using iFood.Models;
 using iFood.Interfaces;
 using iFood.ViewModels;
 using iFood.Data.Enum;
-using CloudinaryDotNet.Actions;
 
 namespace iFood.Controllers;
 
