@@ -1,5 +1,6 @@
 ﻿@using iFood.Data.Enum
-@model Product
+@using iFood.ViewModels
+@model ProductDetailViewModel
 
 <style>
     @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
@@ -648,83 +649,76 @@
 
 <div class="product-container">
     <div class="floating-elements"></div>
-    
     <div>
         <div class="row no-gutters">
             <div class="col-lg-6 product-image-section">
                 <div class="main-image-container">
-                    <img src="@Model.Image" class="main-image" alt="@Model.Name" id="mainImage">
+                    <img src="@Model.Product.Image" class="main-image" alt="@Model.Product.Name" id="mainImage">
                 </div>
                 <div class="thumbnail-container">
                     <div class="thumbnail active">
-                        <img src="@Model.Image" alt="@Model.Name">
+                        <img src="@Model.Product.Image" alt="@Model.Product.Name">
                     </div>
                     <div class="thumbnail">
-                        <img src="@Model.Image" alt="@Model.Name">
+                        <img src="@Model.Product.Image" alt="@Model.Product.Name">
                     </div>
                     <div class="thumbnail">
-                        <img src="@Model.Image" alt="@Model.Name">
+                        <img src="@Model.Product.Image" alt="@Model.Product.Name">
                     </div>
                     <div class="thumbnail">
-                        <img src="@Model.Image" alt="@Model.Name">
+                        <img src="@Model.Product.Image" alt="@Model.Product.Name">
                     </div>
                     <div class="thumbnail">
-                        <img src="@Model.Image" alt="@Model.Name">
+                        <img src="@Model.Product.Image" alt="@Model.Product.Name">
                     </div>
                 </div>
             </div>
-            
             <div class="col-lg-6 product-info-section">
-                <h1 class="product-title">@Model.Name</h1>
-                
+                <h1 class="product-title">@Model.Product.Name</h1>
                 <div class="rating-container">
                     <div id="ratingStars" class="stars">
                         <!-- Stars will be dynamically generated here -->
                     </div>
-                    <span class="rating-text" id="ratingValue">4.5</span>
+                    <span class="rating-text" id="ratingValue">@Model.Product.Rating.ToString("0.00")</span>
                     <span class="rating-text">•</span>
-                    <span class="rating-text">154 orders</span>
+                    <span class="rating-text">@Model.Product.SoldOut orders</span>
                     <span class="stock-badge">
                         <i class="bi bi-check-circle-fill"></i> In Stock
                     </span>
                 </div>
-                
                 <div class="price-container">
-                    <p class="price">$@Model.Price</p>
+                    <p class="price">$@Model.Product.Price</p>
                     <span class="price-unit">per box</span>
                 </div>
-                
-                <p class="description">@Model.Description</p>
-                
+                <p class="description">@Model.Product.Description</p>
                 <div class="product-details">
                     <div class="detail-row">
                         <span class="detail-label">
                             <i class="bi bi-tag-fill"></i> Category:
                         </span>
-                        <span class="detail-value">@Model.Category</span>
+                        <span class="detail-value">@Model.Product.Category</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">
                             <i class="bi bi-calendar-check"></i> Release Date:
                         </span>
-                        <span class="detail-value">@Model.DateSell.ToString("MMM dd, yyyy")</span>
+                        <span class="detail-value">@Model.Product.DateSell.ToString("MMM dd, yyyy")</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">
                             <i class="bi bi-box-seam"></i> Available Quantity:
                         </span>
-                        <span class="detail-value">@Model.Quantity.ToString()</span>
+                        <span class="detail-value">@Model.Product.Quantity.ToString()</span>
                     </div>
                 </div>
-
                 <div class="action-section">
-                    @if(Model.Quantity <= 0)
+                    @if(Model.Product.Quantity <= 0)
                     {
                         <div class="status-message sold-out">
                             <i class="bi bi-exclamation-triangle-fill"></i> Sold Out
                         </div>
                     }
-                    else if(Model.Status == ProductStatus.ComingSoon)
+                    else if(Model.Product.Status == ProductStatus.ComingSoon)
                     {
                         <div class="status-message coming-soon">
                             <i class="bi bi-clock-fill"></i> Coming Soon
@@ -733,10 +727,10 @@
                     else
                     {
                         <div class="action-buttons">
-                            <a asp-controller="Cart" asp-action="Create" asp-route-id="@Model.ProductID" class="btn-modern btn-add-cart ripple-effect">
+                            <a asp-controller="Cart" asp-action="Create" asp-route-id="@Model.Product.ProductID" class="btn-modern btn-add-cart ripple-effect">
                                 <i class="bi bi-bag-plus-fill"></i> Add to Cart
                             </a>
-                            <button class="btn-modern btn-buy ripple-effect" onclick="BuyItems(this)" data-id="@Model.ProductID">
+                            <button class="btn-modern btn-buy ripple-effect" onclick="BuyItems(this)" data-id="@Model.Product.ProductID">
                                 <i class="bi bi-lightning-charge-fill"></i> Buy Now
                             </button>
                         </div>
@@ -746,6 +740,79 @@
         </div>
     </div>
 </div>
+    <!-- Comment Section -->
+    <div class="container mt-5">
+        <h2 class="mb-4">Đánh giá & Bình luận</h2>
+        <div class="mb-4">
+            <form asp-action="AddReview" asp-controller="Product" method="post">
+                <input type="hidden" name="productId" value="@Model.Product.ProductID" />
+                <div class="form-group mb-2">
+                    <label for="rating">Đánh giá (sao):</label>
+                    <select name="rating" class="form-control" style="max-width:120px;display:inline-block;">
+                        <option value="5">5</option>
+                        <option value="4">4</option>
+                        <option value="3">3</option>
+                        <option value="2">2</option>
+                        <option value="1">1</option>
+                    </select>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="comment">Bình luận:</label>
+                    <textarea name="comment" class="form-control" rows="2" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Gửi bình luận</button>
+            </form>
+        </div>
+        <div>
+            @if(Model.Product.Reviews != null && Model.Product.Reviews.Count > 0)
+            {
+                <ul class="list-group">
+                @foreach(var review in Model.Product.Reviews.OrderByDescending(r => r.CreatedAt))
+                {
+                    <li class="list-group-item">
+                        <strong>@(review.AppUser?.UserName ?? "Ẩn danh")</strong>
+                        <span class="text-warning">@string.Concat(Enumerable.Repeat("★", review.Rating ?? 0))</span>
+                        <span class="text-muted" style="font-size:0.9em">@review.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                        <div>@review.Comment</div>
+                    </li>
+                }
+                </ul>
+            }
+            else
+            {
+                <div class="alert alert-info">Chưa có bình luận nào cho sản phẩm này.</div>
+            }
+        </div>
+    </div>
+
+    <!-- Related Products Section -->
+    <div class="container mt-5">
+        <h2 class="mb-4">Sản phẩm liên quan</h2>
+        <div class="row">
+            @if(Model.RelatedProducts != null && Model.RelatedProducts.Count > 0)
+            {
+                @foreach(var item in Model.RelatedProducts)
+                {
+                    <div class="col-md-3 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <img src="@item.Image" class="card-img-top" alt="@item.Name" style="height:180px;object-fit:cover;">
+                            <div class="card-body">
+                                <h5 class="card-title">@item.Name</h5>
+                                <p class="card-text">@item.Price.ToString("N0") đ</p>
+                                <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductID" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="alert alert-info">Không có sản phẩm liên quan.</div>
+                </div>
+            }
+        </div>
+    </div>
 
 <script>
     // Enhanced star rating with better animation
@@ -1078,7 +1145,7 @@
     // Initialize everything when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize core functionality
-        generateStars(4.5);
+        generateStars(@Model.Product.Rating);
         initializeThumbnails();
         initParallaxEffect();
         initScrollAnimations();

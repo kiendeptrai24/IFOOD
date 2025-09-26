@@ -62,7 +62,9 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product> GetByIdAsync(int id)
     {
-        return await _context.Products.FirstOrDefaultAsync(c => c.ProductID == id);
+        return await _context.Products
+        .Include(p => p.Reviews)
+        .FirstOrDefaultAsync(c => c.ProductID == id);
     }
 
     public async Task<Product> GetByIdAsyncNoTracking(int id)

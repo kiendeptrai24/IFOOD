@@ -93,8 +93,48 @@ public class ProductController : Controller
         Product product = await _productRepository.GetByIdAsync(id);
         product.View++;
         _productRepository.Update(product);
-        return View(product);
 
+        // Lấy các sản phẩm liên quan cùng category, loại trừ sản phẩm hiện tại
+        var allProducts = await _productRepository.GetAll();
+        var relatedProducts = allProducts
+            .Where(p => p.Category == product.Category && p.ProductID != product.ProductID)
+            .Take(4)
+            .ToList();
+
+        var viewModel = new ProductDetailViewModel
+        {
+            Product = product,
+            RelatedProducts = relatedProducts
+        };
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddReview(int productId, int rating, string comment)
+    {
+        var userId = HttpContext.User.GetUserId();
+        if (string.IsNullOrEmpty(userId))
+        {
+            TempData["ErrorMessage"] = "Bạn cần đăng nhập để bình luận.";
+            return RedirectToAction("Detail", new { id = productId });
+        }
+        var review = new Review
+        {
+            ProductID = productId,
+            Rating = rating,
+            Comment = comment,
+            AppUserId = userId,
+            CreatedAt = DateTime.UtcNow
+        };
+        // Lưu review vào database
+        // Nếu có repository riêng cho Review thì dùng, nếu không thì lưu qua Product
+        Product product = await _productRepository.GetByIdAsync(productId);
+        if (product.Reviews == null)
+            product.Reviews = new List<Review>();
+        product.Reviews.Add(review);
+        _productRepository.Update(product);
+        TempData["SuccessMessage"] = "Đã gửi bình luận!";
+        return RedirectToAction("Detail", new { id = productId });
     }
     
     public IActionResult Create()

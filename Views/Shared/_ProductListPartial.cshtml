@@ -26,14 +26,14 @@
                         <div class="product-image-container">
                             <img src="@product.Image" alt="@product.Name"/>
                             <div class="product-overlay">
-                                <a asp-controller="Cart" asp-action="Create" asp-route-id="@product.ProductID">
+                                <form asp-controller="Cart" asp-action="Create" asp-route-id="@product.ProductID" method="post">
                                     <button type="submit" class="quick-add-btn">
                                         <i class="fas fa-shopping-cart me-1"></i>
                                     </button>
-                                </a>
+                                </form>
                             </div>
                         </div>
-                    </a>
+                    </a>    
 
                     <div class="product-info">
                         <div class="product-meta">Sold: @product.SoldOut | Views: @product.View</div>
