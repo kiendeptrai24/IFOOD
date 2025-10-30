@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
 
-    var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 
 // cau hinh APA gemini
@@ -34,6 +34,13 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 
 // Cấu hình Cloudinary
 builder.Services.Configure<CloudinarySetting>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    // Cấu hình lockout (khoá tài khoản)
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15); // bị khoá trong 5 phút
+    options.Lockout.MaxFailedAccessAttempts = 3; // sai 3 lần thì khoá
+    options.Lockout.AllowedForNewUsers = true;
+});
 
 // Cấu hình database
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
@@ -41,33 +48,33 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+
 // Cấu hình Identity
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDBContext>()
     .AddDefaultTokenProviders(); // Thêm dòng này để kích hoạt Token Providers
 
 // Cấu hình Session
-builder.Services.AddDistributedMemoryCache(); 
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(1440); // ⚡ Timeout 30 phút
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/Account/Login";
+});
 
-//  Cấu hình Authentication & Cookie
-// builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-//     .AddCookie();
-
-// cau hinh gg
 builder.Services.AddAuthentication(options =>
 {
-    // options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    // options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    // options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-    //options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;  
+    options.DefaultScheme = "Cookies";
+    options.DefaultChallengeScheme = "Google";
 })
-.AddCookie()
+.AddCookie("Cookies")
 .AddGoogle(options =>
 {
     options.ClientId = builder.Configuration["GoogleKeys:ClientId"];

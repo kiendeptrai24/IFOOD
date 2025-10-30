@@ -34,29 +34,60 @@ public class AccountController : Controller
 
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel loginVM)
-    {   
-        if(!ModelState.IsValid) return View(loginVM);
+    {
+        if (!ModelState.IsValid) return View(loginVM);
 
         var user = await _userManager.FindByEmailAsync(loginVM.EmailAddress);
-        if(user != null)
+        if (user == null)
         {
-            // User is found, check passwork
-            var PasswordCheck = await _userManager.CheckPasswordAsync(user, loginVM.Password);
-            if(PasswordCheck)
-            {
-                // Password correct, sign in
-                var result = await _signInManager.PasswordSignInAsync(user, loginVM.Password, false, false);
-                if(result.Succeeded)
-                    return RedirectToAction("Index", "Home");
-            }
-            // password is incorrect
-            TempData["Error"] = "Wrong credentials. please, try again";
+            TempData["Error"] = "Wrong credentials. Please try again.";
             return View(loginVM);
         }
-        //User not Found
-        TempData["Error"] = "Wrong credentials. please, try again";
-        return View(loginVM);
+
+        // Check xem user có bị khoá chưa
+        if (await _userManager.IsLockedOutAsync(user))
+        {
+            TempData["Error"] = "Your account is locked. Please try again later.";
+            return View(loginVM);
+        }
+
+        // Check password
+        if (await _userManager.CheckPasswordAsync(user, loginVM.Password))
+        {
+            await _userManager.ResetAccessFailedCountAsync(user); // reset số lần sai nếu đúng
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return RedirectToAction("Index", "Home");
+        }
+        else
+        {
+            // Ghi lại lần đăng nhập sai
+            await _userManager.AccessFailedAsync(user);
+
+            int failedCount = await _userManager.GetAccessFailedCountAsync(user);
+            int maxAttempts = 3;
+            int remaining = maxAttempts - failedCount;
+
+            if (remaining <= 0)
+            {
+                TempData["Error"] = "Your account has been locked due to multiple failed login attempts. Please try again later.";
+                var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user);
+                if (lockoutEnd.HasValue)
+                {
+                    var remainingTime = lockoutEnd.Value - DateTimeOffset.UtcNow;
+                    TempData["Error"] = $"Your account is locked. Try again in {remainingTime.Minutes} minutes.";
+                }
+
+            }
+            else    
+            {
+                TempData["Error"] = $"Wrong credentials. You have {remaining} more attempt{(remaining > 1 ? "s" : "")} before your account is locked.";
+            }
+
+            return View(loginVM);
+        }
     }
+
+
     public async Task LoginByGoogle()
     {
         await HttpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme
@@ -69,23 +100,16 @@ public class AccountController : Controller
     public async Task<IActionResult> GoogleResponse()
     {
         var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
         if (!result.Succeeded)
         {
             TempData["error"] = "Đăng nhập thất bại!";
             return RedirectToAction("Login", "Account");
         }
 
-        var claims = result.Principal.Identities.FirstOrDefault()?.Claims.Select(claim => new
-        {
-            claim.Issuer,
-            claim.OriginalIssuer,
-            claim.Type,
-            claim.Value
-        });
-        //get email claims
-        
-        var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userName = email.Split('@')[0];
+        var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+        var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userName = email?.Split('@')[0];
 
         var existingUser = await _userManager.FindByEmailAsync(email);
         if (existingUser != null)
@@ -136,10 +160,7 @@ public class AccountController : Controller
             await _signInManager.SignInAsync(existingUser, isPersistent: false);
             return RedirectToAction("Index","Home"); 
         }
-        
-
-    // Debug: return Json(claims);
-}
+    }
 
 
     [HttpGet]

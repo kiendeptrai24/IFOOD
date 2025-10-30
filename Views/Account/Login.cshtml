@@ -176,7 +176,7 @@
         margin-bottom: 1.5rem;
     }
 
-    .form-control {
+    .form-control1 {
         width: 100%;
         padding: 15px 20px;
         border: 2px solid #e9ecef;
@@ -187,27 +187,13 @@
         outline: none;
     }
 
-    .form-control:focus {
+    .form-control1:focus {
         border-color: #667eea;
         box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
     }
 
-    .form-floating label {
-        position: absolute;
-        top: 50%;
-        left: 20px;
-        transform: translateY(-50%);
-        transition: all 0.3s ease;
-        color: #6c757d;
-        pointer-events: none;
-        background: white;
-        padding: 0 5px;
-    }
-
     .form-floating input:focus + label,
     .form-floating input:not(:placeholder-shown) + label {
-        width: 30%;
-        height: 30%;
         top: 0;
         font-size: 0.85rem;
         color: #667eea;
@@ -235,7 +221,7 @@
         color: #667eea;
     }
 
-    .form-control.has-icon {
+    .form-control1.has-icon {
         padding-right: 50px;
     }
 
@@ -504,6 +490,13 @@
             <span><b>Sorry!</b> - @TempData["Error"]</span>
         </div>
     }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" style="position: fixed; top: 20px; right: 20px; z-index: 1000; max-width: 400px;">
+            @TempData["Error"]
+        </div>
+    }
+
 
     <div class="auth-card fade-in">
         <!-- Left Side - Info Panel -->
@@ -542,13 +535,13 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         
                         <div class="form-floating">
-                            <input asp-for="EmailAddress" class="form-control" type="email" placeholder=" "/>
+                            <input asp-for="EmailAddress" class="form-control form-control1" type="email" placeholder=" "/>
                             <label asp-for="EmailAddress">Email Address</label>
                             <span asp-validation-for="EmailAddress" class="text-danger"></span>
                         </div>
 
                         <div class="form-floating position-relative">
-                            <input asp-for="Password" id="login-password" class="form-control has-icon" type="password" placeholder=" "/>
+                            <input asp-for="Password" id="login-password" class="form-control  form-control1 has-icon" type="password" placeholder=" "/>
                             <label asp-for="Password">Password</label>
                             <i class="fas fa-eye field-icon" onclick="togglePassword('login-password', this)"></i>
                             <span asp-validation-for="Password" class="text-danger"></span>
@@ -585,18 +578,18 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         
                         <div class="form-floating">
-                            <input name="EmailAddress" class="form-control" type="email" placeholder=" " required/>
+                            <input name="EmailAddress" class="form-control form-control1" type="email" placeholder=" " required/>
                             <label>Email Address</label>
                         </div>
 
                         <div class="form-floating position-relative">
-                            <input name="Password" id="register-password" class="form-control has-icon" type="password" placeholder=" " required/>
+                            <input name="Password" id="register-password" class="form-control form-control1 has-icon" type="password" placeholder=" " required/>
                             <label>Password</label>
                             <i class="fas fa-eye field-icon" onclick="togglePassword('register-password', this)"></i>
                         </div>
 
                         <div class="form-floating position-relative">
-                            <input name="ConfirmPassword" id="confirm-password" class="form-control has-icon" type="password" placeholder=" " required/>
+                            <input name="ConfirmPassword" id="confirm-password" class="form-control form-control1 has-icon" type="password" placeholder=" " required/>
                             <label>Confirm Password</label>
                             <i class="fas fa-eye field-icon" onclick="togglePassword('confirm-password', this)"></i>
                         </div>
@@ -693,7 +686,7 @@
     });
 
     // Enhanced form interactions
-    document.querySelectorAll('.form-control').forEach(input => {
+    document.querySelectorAll('.form-control1').forEach(input => {
         input.addEventListener('focus', function() {
             this.parentElement.classList.add('focused');
         });
