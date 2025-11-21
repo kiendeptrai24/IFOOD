@@ -16,13 +16,15 @@ public class AccountController : Controller
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly SignInManager<AppUser> _signInManager;
+    private readonly IEmailService _emailService;
     private readonly IPhotoService _photoService;
 
-    public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IPhotoService photoService)
+    public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IPhotoService photoService, IEmailService emailService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _photoService = photoService;
+        _emailService = emailService;
     }
     [HttpGet]
     public IActionResult Login()
@@ -54,9 +56,20 @@ public class AccountController : Controller
         // Check password
         if (await _userManager.CheckPasswordAsync(user, loginVM.Password))
         {
-            await _userManager.ResetAccessFailedCountAsync(user); // reset số lần sai nếu đúng
-            await _signInManager.SignInAsync(user, isPersistent: false);
-            return RedirectToAction("Index", "Home");
+            // await _userManager.ResetAccessFailedCountAsync(user); // reset số lần sai nếu đúng
+            // await _signInManager.SignInAsync(user, isPersistent: false);
+            // return RedirectToAction("Index", "Home");
+            // Tạo OTP
+            string otp = new Random().Next(100000, 999999).ToString();
+
+            // Lưu vào session
+            HttpContext.Session.SetString("OTP", otp);
+            HttpContext.Session.SetString("OTP_Email", user.Email);
+
+            // Gửi email
+            await _emailService.SendOtpAsync(user.Email, otp);
+
+            return RedirectToAction("VerifyOtp");
         }
         else
         {
@@ -196,7 +209,18 @@ public class AccountController : Controller
         }
 
         await _userManager.AddToRoleAsync(newUser, UserRoles.User);
-        return RedirectToAction("Index", "Home");
+
+        // Tạo OTP
+        string otp = new Random().Next(100000, 999999).ToString();
+
+        // Lưu vào session
+        HttpContext.Session.SetString("OTP", otp);
+        HttpContext.Session.SetString("OTP_Email", newUser.Email);
+
+        // Gửi email
+        await _emailService.SendOtpAsync(newUser.Email, otp);
+
+        return RedirectToAction("VerifyOtp");
     }
     [HttpGet]
     public async Task<IActionResult> Logout()
@@ -357,5 +381,40 @@ public class AccountController : Controller
         TempData["Success"] = "Avatar updated successfully!";
         return RedirectToAction("Profile", "Account");
     }
+    [HttpGet]
+    public IActionResult VerifyOtp()
+    {
+        var model = new OtpViewModel();
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> VerifyOtp(OtpViewModel model)
+    {
+        string sessionOtp = HttpContext.Session.GetString("OTP");
+        string sessionEmail = HttpContext.Session.GetString("OTP_Email");
+
+        if (sessionOtp == null || sessionEmail == null)
+        {
+            TempData["Error"] = "OTP session expired.";
+            return RedirectToAction("Login");
+        }
+
+        if (model.Otp != sessionOtp)
+        {
+            TempData["Error"] = "Invalid OTP.";
+            return View(model);
+        }
+
+        // Xác nhận OTP đúng → đăng nhập user
+        var user = await _userManager.FindByEmailAsync(sessionEmail);
+        await _signInManager.SignInAsync(user, isPersistent: false);
+
+        // Clear session
+        HttpContext.Session.Remove("OTP");
+        HttpContext.Session.Remove("OTP_Email");
+
+        return RedirectToAction("Index", "Home");
+}
 
 }
