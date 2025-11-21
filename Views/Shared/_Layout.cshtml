@@ -29,6 +29,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.2/sweetalert2.all.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Fix alert notification positioning */
+        .alert.alert-danger {
+            z-index: 10000 !important;
+        }
+        /* Ensure navbar stays below alerts */
+        .navbar.sticky-top {
+            z-index: 1030;
+        }
+    </style>
 </head>
 <body id="page-top">
     <header>

@@ -186,13 +186,17 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
     {
-        if (!ModelState.IsValid) return View(registerViewModel);
+        if (!ModelState.IsValid)
+        {
+            TempData["Error"] = "Please fill in all required fields correctly";
+            return RedirectToAction("Login");
+        }
 
         var user = await _userManager.FindByEmailAsync(registerViewModel.EmailAddress);
         if (user != null)
         {
-            TempData["Error"] = "This email address is already in use";
-            return View(registerViewModel);
+            TempData["Error"] = "This email address is already in use. Please login instead.";
+            return RedirectToAction("Login");
         }
 
         var newUser = new AppUser()
@@ -204,8 +208,8 @@ public class AccountController : Controller
 
         if (!newUserResponse.Succeeded)
         {
-            TempData["Error"] = "Your password must be at least 6 characters Include uppercase, lowercase, numbers and special characters";
-            return View(registerViewModel);
+            TempData["Error"] = "Your password must be at least 6 characters. Include uppercase, lowercase, numbers and special characters";
+            return RedirectToAction("Login");
         }
 
         await _userManager.AddToRoleAsync(newUser, UserRoles.User);
