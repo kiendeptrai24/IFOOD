@@ -56,10 +56,14 @@ public class AccountController : Controller
         // Check password
         if (await _userManager.CheckPasswordAsync(user, loginVM.Password))
         {
-            // await _userManager.ResetAccessFailedCountAsync(user); // reset số lần sai nếu đúng
-            // await _signInManager.SignInAsync(user, isPersistent: false);
-            // return RedirectToAction("Index", "Home");
-            // Tạo OTP
+            // nếu user là admin thì không cần qua bước xác thực OTP
+            if (await _userManager.IsInRoleAsync(user, iFood.Data.UserRoles.Admin))
+            {
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Tạo OTP cho các user bình thường
             string otp = new Random().Next(100000, 999999).ToString();
 
             // Lưu vào session
