@@ -739,7 +739,7 @@
 </div>
     <!-- Comment Section -->
     <div class="container mt-5">
-        <h2 class="mb-4">Đánh giá & Bình luận</h2>
+        <h2 class="mb-4">Reviews & Comments</h2>
         <div class="mb-4">
             <form asp-action="AddReview" asp-controller="Product" method="post">
                 <input type="hidden" name="productId" value="@Model.Product.ProductID" />
@@ -757,7 +757,7 @@
                     <label for="comment">Bình luận:</label>
                     <textarea name="comment" class="form-control" rows="2" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Gửi bình luận</button>
+                <button type="submit" class="btn btn-primary">Submit Comment</button>
             </form>
         </div>
         <div>
@@ -767,7 +767,7 @@
                 @foreach(var review in Model.Product.Reviews.OrderByDescending(r => r.CreatedAt))
                 {
                     <li class="list-group-item">
-                        <strong>@(review.AppUser?.UserName ?? "Ẩn danh")</strong>
+                        <strong>@(review.AppUser?.UserName ?? "Anonymous")</strong>
                         <span class="text-warning">@string.Concat(Enumerable.Repeat("★", review.Rating ?? 0))</span>
                         <span class="text-muted" style="font-size:0.9em">@review.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
                         <div>@review.Comment</div>
@@ -777,14 +777,14 @@
             }
             else
             {
-                <div class="alert alert-info">Chưa có bình luận nào cho sản phẩm này.</div>
+                <div class="alert alert-info">No comments yet for this product.</div>
             }
         </div>
     </div>
 
     <!-- Related Products Section -->
     <div class="container mt-5">
-        <h2 class="mb-4">Sản phẩm liên quan</h2>
+        <h2 class="mb-4">Related Products</h2>
         <div class="row">
             @if(Model.RelatedProducts != null && Model.RelatedProducts.Count > 0)
             {
@@ -796,7 +796,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">@item.Name</h5>
                                 <p class="card-text">@item.Price.ToString("N0") đ</p>
-                                <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductID" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                                <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductID" class="btn btn-outline-primary btn-sm">View Details</a>
                             </div>
                         </div>
                     </div>
@@ -805,7 +805,7 @@
             else
             {
                 <div class="col-12">
-                    <div class="alert alert-info">Không có sản phẩm liên quan.</div>
+                    <div class="alert alert-info">No related products found.</div>
                 </div>
             }
         </div>

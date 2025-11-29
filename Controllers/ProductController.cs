@@ -131,8 +131,8 @@ public class ProductController : Controller
         if (product.Reviews == null)
             product.Reviews = new List<Review>();
         product.Reviews.Add(review);
-        _productRepository.Update(product);
-        TempData["SuccessMessage"] = "Đã gửi bình luận!";
+    _productRepository.Update(product);
+    TempData["SuccessMessage"] = "Comment submitted!";
         return RedirectToAction("Detail", new { id = productId });
     }
     
