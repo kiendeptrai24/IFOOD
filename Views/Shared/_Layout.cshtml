@@ -49,10 +49,17 @@
                 @* <i class="fas fa-utensils text-white" style="font-size: 6rem; z-index: 2; position: relative;"/> *@
                 @* <i class="bi bi-egg-fried"></i>  *@
                 IFood</a>
-                <form method="get" class="d-flex ms-3">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="searchTerm">
-                    <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
-                </form>
+                @{ 
+                    var currentController = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLowerInvariant();
+                    var currentAction = ViewContext.RouteData.Values["action"]?.ToString()?.ToLowerInvariant();
+                }
+                @if (currentController == "product" && currentAction == "index")
+                {
+                    <form method="get" class="d-flex ms-3">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="searchTerm">
+                        <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
+                    </form>
+                }
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive">
                     <span class="navbar-toggler-icon"></span>
                 </button>
