@@ -55,9 +55,17 @@ public class PaymentController : Controller
             return RedirectToAction("Index","Cart");
         }
         var response = await _paymentToggle.Paymentstrategy(paymentMethod,model);
-        
+
         HttpContext.Session.SetString("ProductToCallBack", JsonConvert.SerializeObject(products));
         HttpContext.Session.SetString("OrderToCallBack", JsonConvert.SerializeObject(newOrder));
+
+        // If payment strategy returns COD, return the callback URL so frontend can navigate to finalize the COD order
+        if (string.Equals(response, "COD", StringComparison.OrdinalIgnoreCase))
+        {
+            var codUrl = Url.Action("SaveCOD", "Callback");
+            return Json(new { payUrl = codUrl });
+        }
+
         return Json(new { payUrl = response });
     }
     public async Task<IActionResult> CreatePaymentByCart(PaymentMethod paymentMethod)
@@ -90,11 +98,17 @@ public class PaymentController : Controller
         };
         //dieu kien payment method o day
         //var response = await _momoService.CreatePaymentMomoAsync(model);
-        var response =  await _paymentToggle.Paymentstrategy(paymentMethod,model);
-
+        var response = await _paymentToggle.Paymentstrategy(paymentMethod, model);
         HttpContext.Session.SetString("ProductToCallBack", JsonConvert.SerializeObject(products));
         HttpContext.Session.SetString("CartToCallBack", JsonConvert.SerializeObject(carts));
         HttpContext.Session.SetString("OrderToCallBack", JsonConvert.SerializeObject(order));
+
+        if (string.Equals(response, "COD", StringComparison.OrdinalIgnoreCase))
+        {
+            var codUrl = Url.Action("SaveCOD", "Callback");
+            return Json(new { payUrl = codUrl });
+        }
+
         if (Response.HasStarted)
         {
             Console.WriteLine("Lỗi: Headers đã gửi, không thể redirect!");

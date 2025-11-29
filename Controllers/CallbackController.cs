@@ -188,6 +188,69 @@ namespace iFood.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SaveCOD()
+        {
+            var productToDeleteJson = HttpContext.Session.GetString("ProductToCallBack");
+            var cartToDeleteJson = HttpContext.Session.GetString("CartToCallBack");
+            var orderJson = HttpContext.Session.GetString("OrderToCallBack");
+
+            if (string.IsNullOrEmpty(productToDeleteJson))
+                return BadRequest("Product not found!");
+
+            var products = JsonConvert.DeserializeObject<List<Product>>(productToDeleteJson) ?? new List<Product>();
+            var carts = string.IsNullOrEmpty(cartToDeleteJson)
+                ? new List<Cart>()
+                : JsonConvert.DeserializeObject<List<Cart>>(cartToDeleteJson) ?? new List<Cart>();
+            var order = string.IsNullOrEmpty(orderJson)
+                ? null
+                : JsonConvert.DeserializeObject<Order>(orderJson);
+
+            if (order == null)
+                return BadRequest("Order not found!");
+
+            if (order.OrderDetails != null)
+            {
+                foreach (var item in order.OrderDetails)
+                {
+                    _productRepository.CheckAttackProduct(item.Product);
+                }
+            }
+
+            await _orderRepository.AddAsync(order);
+
+            order.TransactionId = Guid.NewGuid().ToString();
+            order.PaymentMethod = PaymentMethod.COD;
+            order.Ordercode = Guid.NewGuid().ToString();
+            order.OrderDate = DateTime.Now;
+            order.status = Status.PendingConfirmation;
+            _orderRepository.Update(order);
+
+            if (carts != null && carts.Any())
+            {
+                foreach (var cart in carts)
+                {
+                    _cartRepository.Delete(cart);
+                }
+            }
+
+            if (products != null)
+            {
+                foreach (var product in products)
+                {
+                    Product productToUpdate = await _productRepository.GetByIdAsync(product.ProductID);
+                    if (productToUpdate != null)
+                    {
+                        productToUpdate.Quantity -= product.Quantity;
+                        _productRepository.Update(productToUpdate);
+                    }
+                }
+            }
+            _productRepository.UnTracking();
+
+            return RedirectToAction("Index", "Home");
+        }
+
         
     }
 }
