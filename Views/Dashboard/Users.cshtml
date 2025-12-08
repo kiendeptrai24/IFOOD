@@ -1,0 +1,562 @@
+@using Microsoft.AspNetCore.Identity
+@using iFood.Models
+@model IEnumerable<AppUser>
+
+<div class="container-fluid py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="display-5 fw-bold text-gradient mb-2">
+                    <i class="bi bi-people-fill me-3"></i>User Management
+                </h1>
+                <p class="text-muted fs-5">Manage and monitor all system users</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card bg-gradient-primary">
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="mb-0">@Model.Count()</h3>
+                    <p class="mb-0">Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-gradient-success">
+                <div class="stat-icon">
+                    <i class="bi bi-unlock"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="mb-0">@Model.Count(u => !u.LockoutEnd.HasValue || u.LockoutEnd <= DateTimeOffset.UtcNow)</h3>
+                    <p class="mb-0">Active Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-gradient-danger">
+                <div class="stat-icon">
+                    <i class="bi bi-lock"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="mb-0">@Model.Count(u => u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow)</h3>
+                    <p class="mb-0">Locked Users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="user-table-card">
+        <div class="card-header-custom">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-semibold">
+                    <i class="bi bi-list-ul me-2"></i>Users List
+                </h4>
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Search users..." id="userSearch">
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-wrapper">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <div class="th-content">
+                                <i class="bi bi-person-circle me-2"></i>User
+                            </div>
+                        </th>
+                        <th>
+                            <div class="th-content">
+                                <i class="bi bi-envelope me-2"></i>Email
+                            </div>
+                        </th>
+                        <th class="text-center">
+                            <div class="th-content justify-content-center">
+                                <i class="bi bi-shield-check me-2"></i>Status
+                            </div>
+                        </th>
+                        <th class="text-center">
+                            <div class="th-content justify-content-center">
+                                <i class="bi bi-gear me-2"></i>Actions
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if(Model.Any())
+                {
+                    @foreach(var user in Model)
+                    {
+                        var isLocked = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow;
+                        <tr class="user-row">
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar @(isLocked ? "locked" : "")">
+                                        <span>@user.UserName?.Substring(0, 1).ToUpper()</span>
+                                        @if(isLocked)
+                                        {
+                                            <div class="lock-badge">
+                                                <i class="bi bi-lock-fill"></i>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="user-details">
+                                        <div class="user-name">@user.UserName</div>
+                                        <div class="user-id">ID: @user.Id.Substring(0, 8)...</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="email-cell">
+                                    <i class="bi bi-envelope-fill me-2 text-muted"></i>
+                                    <span>@user.Email</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                @if(isLocked)
+                                {
+                                    <span class="status-badge locked">
+                                        <span class="status-dot"></span>
+                                        <span class="status-text">Locked Out</span>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge active">
+                                        <span class="status-dot"></span>
+                                        <span class="status-text">Active</span>
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if(isLocked)
+                                {
+                                    <form asp-action="UnlockUser" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@user.Id" />
+                                        <button type="submit" class="action-btn unlock-btn" title="Unlock this user">
+                                            <i class="bi bi-unlock-fill me-2"></i>
+                                            <span>Unlock User</span>
+                                        </button>
+                                        @Html.AntiForgeryToken()
+                                    </form>
+                                }
+                                else
+                                {
+                                    <div class="no-action">
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            <div class="empty-content">
+                                <i class="bi bi-inbox"></i>
+                                <h5>No Users Found</h5>
+                                <p>There are no users in the system yet.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        --danger-gradient: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        --hover-shadow: 0 15px 50px rgba(0, 0, 0, 0.12);
+    }
+
+    .text-gradient {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .page-header {
+        padding: 2rem 0;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    /* Stat Cards */
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+    }
+
+    .stat-card.bg-gradient-primary::before {
+        background: var(--primary-gradient);
+    }
+
+    .stat-card.bg-gradient-success::before {
+        background: var(--success-gradient);
+    }
+
+    .stat-card.bg-gradient-danger::before {
+        background: var(--danger-gradient);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .bg-gradient-primary .stat-icon {
+        background: var(--primary-gradient);
+    }
+
+    .bg-gradient-success .stat-icon {
+        background: var(--success-gradient);
+    }
+
+    .bg-gradient-danger .stat-icon {
+        background: var(--danger-gradient);
+    }
+
+    .stat-details h3 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2d3748;
+    }
+
+    .stat-details p {
+        color: #718096;
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
+    /* User Table Card */
+    .user-table-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+
+    .card-header-custom {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .search-box {
+        position: relative;
+        width: 300px;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0aec0;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Table Styles */
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .user-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .user-table thead {
+        background: #f8fafc;
+    }
+
+    .user-table th {
+        padding: 1.25rem 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .th-content {
+        display: flex;
+        align-items: center;
+    }
+
+    .user-table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .user-table tbody tr:hover {
+        background: #f8fafc;
+        transform: scale(1.01);
+    }
+
+    .user-table td {
+        padding: 1.5rem;
+    }
+
+    /* User Info Cell */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .user-avatar {
+        position: relative;
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.25rem;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .user-avatar.locked {
+        background: var(--danger-gradient);
+        box-shadow: 0 4px 12px rgba(238, 9, 121, 0.3);
+    }
+
+    .lock-badge {
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        color: #ef4444;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .user-details {
+        flex: 1;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+
+    .user-id {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        font-family: 'Courier New', monospace;
+    }
+
+    .email-cell {
+        display: flex;
+        align-items: center;
+        color: #475569;
+        font-size: 0.95rem;
+    }
+
+    /* Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.25rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .status-badge.active {
+        background: linear-gradient(135deg, #d4f4dd 0%, #a7f3d0 100%);
+        color: #047857;
+    }
+
+    .status-badge.locked {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #dc2626;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    .status-badge.active .status-dot {
+        background: #10b981;
+    }
+
+    .status-badge.locked .status-dot {
+        background: #ef4444;
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    /* Action Button */
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+    }
+
+    .action-btn:active {
+        transform: translateY(0);
+    }
+
+    .no-action {
+        font-size: 1.5rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 4rem 2rem;
+    }
+
+    .empty-content {
+        text-align: center;
+        color: #94a3b8;
+    }
+
+    .empty-content i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-content h5 {
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .search-box {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+
+        .stat-details h3 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<script>
+    // Simple search functionality
+    document.getElementById('userSearch')?.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('.user-row');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+</script>
+
+@* Yêu cầu Bootstrap Icons - thêm vào _Layout.cshtml nếu chưa có *@
+@* <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"> *@

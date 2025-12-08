@@ -4,6 +4,7 @@ using iFood.Interfaces;
 using iFood.ViewModels;
 using iFood.Data.Enum;
 using CloudinaryDotNet.Core;
+using Microsoft.AspNetCore.Identity;
 
 namespace iFood.Controllers;
 
@@ -12,12 +13,40 @@ public class DashboardController : Controller
     private readonly IProductRepository _productRepository;
     private readonly IPhotoService _photoService;
     private readonly IOrderRepository _orderRepository;
+    private readonly UserManager<AppUser> _userManager;
 
-    public DashboardController(IProductRepository productRepository,IPhotoService photoService,IOrderRepository orderRepository)
+    public DashboardController(IProductRepository productRepository,IPhotoService photoService,IOrderRepository orderRepository, UserManager<AppUser> userManager)
     {
         _productRepository = productRepository;
         _photoService = photoService;
         _orderRepository = orderRepository;
+        _userManager = userManager;
+    }
+
+    // Admin: list users and unlock
+    [HttpGet]
+    // [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Users()
+    {
+        var users = _userManager.Users.ToList();
+        return View(users);
+    }
+
+    [HttpPost]
+    // [ValidateAntiForgeryToken]
+    // [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UnlockUser(string id)
+    {
+        if (string.IsNullOrEmpty(id)) return RedirectToAction("Users");
+
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return RedirectToAction("Users");
+
+        // Reset lockout end date
+        await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
+        await _userManager.ResetAccessFailedCountAsync(user);
+
+        return RedirectToAction("Users");
     }
 
     // public async Task<IActionResult> Index()
