@@ -57,11 +57,13 @@ public class MomoService : IMomoService
 
         var response = await client.ExecuteAsync(request);
 
-        
-        var momoResponse = JsonConvert.DeserializeObject<MomoCreatePaymentResponseModel>(response.Content);
+        if (response == null || string.IsNullOrEmpty(response.Content))
+        {
+            return string.Empty;
+        }
 
-        
-        return momoResponse.PayUrl;
+        // Return raw content so caller can decide how to handle JSON vs plain URL
+        return response.Content;
     }
     private string MomoComputeHmacSha256(string message, string secretKey)
     {

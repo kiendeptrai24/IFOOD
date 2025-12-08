@@ -1,18 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 
-using iFood.Interfaces;
 using iFood.Models;
-using System.Security.Claims;
 using iFood.Data.Enum;
 using Newtonsoft.Json;
-using System.Runtime.InteropServices.JavaScript;
-using ZaloPay.Helper.Crypto;
-using iFood.Models.ZaloPay;
-using Microsoft.Extensions.Options;
 using System.Text;
-using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
-using iFood.Helpers; // https://www.newtonsoft.com/json
+using iFood.Helpers;
+using iFood.Models.Momo; // https://www.newtonsoft.com/json
 
 namespace iFood.Controllers;
 [Authorize]
@@ -102,17 +96,27 @@ public class PaymentController : Controller
         HttpContext.Session.SetString("ProductToCallBack", JsonConvert.SerializeObject(products));
         HttpContext.Session.SetString("CartToCallBack", JsonConvert.SerializeObject(carts));
         HttpContext.Session.SetString("OrderToCallBack", JsonConvert.SerializeObject(order));
-
+        string message = "";
+        MomoCreatePaymentResponseModel result;
         if (string.Equals(response, "COD", StringComparison.OrdinalIgnoreCase))
         {
             var codUrl = Url.Action("SaveCOD", "Callback");
             return Json(new { payUrl = codUrl });
         }
+        else
+        {
+            result = JsonConvert.DeserializeObject<MomoCreatePaymentResponseModel>(response);
+            message = result.Message;
+            if(message != "Success")
+            {
+                TempData["Error"] = "Error MoMo: " + message;
+            }
 
+        }       
         if (Response.HasStarted)
         {
             Console.WriteLine("Lỗi: Headers đã gửi, không thể redirect!");
         }
-        return Json(new { payUrl = response });
+        return Json(new { payUrl = result.PayUrl });
     }
 }
