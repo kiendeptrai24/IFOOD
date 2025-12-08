@@ -344,7 +344,12 @@
         <div class="quantity-info">
             <span class="quantity-badge">
                 <i class="bi bi-box"></i>
-                @Model.Quantity in stock
+                @if(Model.Status != ProductStatus.ComingSoon)
+                {
+                    <text>
+                        @Model.Quantity in stock
+                    </text>
+                }
             </span>
             <div class="stock-indicator @(Model.Quantity <= 5 ? (Model.Quantity == 0 ? "out" : "low") : "")"></div>
         </div>

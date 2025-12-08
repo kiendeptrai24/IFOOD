@@ -717,27 +717,6 @@
 </section>
 
 
-<!-- Menu Section -->
-<section id="product" class="menu-section">
-    <div class="container">
-        <h2 class="section-title">Our Menu</h2>
-        <p class="section-subtitle">Discover our carefully crafted dishes</p>
-
-        <!-- Category Filters -->
-        <div class="category-filters">
-            <a href="#" class="filter-btn active" onclick="loadProducts(1, -1); return false;">All</a>
-            @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
-            {
-                <a href="#" class="filter-btn" onclick="loadProducts(1, @category.Value); return false;">@category.Text</a>
-            }
-        </div>
-
-        <div id="product-container">
-            <!-- Nội dung Partial sẽ load vào đây -->
-        </div>
-    </div>
-</section>
-
 <!-- Bestsellers Section -->
 <section class="bestsellers-section">
     <div class="container">
@@ -782,6 +761,26 @@
 
             }
             </div>
+        </div>
+    </div>
+</section>
+<!-- Menu Section -->
+<section id="product" class="menu-section">
+    <div class="container">
+        <h2 class="section-title">Our Menu</h2>
+        <p class="section-subtitle">Discover our carefully crafted dishes</p>
+
+        <!-- Category Filters -->
+        <div class="category-filters">
+            <a href="#" class="filter-btn active" onclick="loadProducts(1, -1); return false;">All</a>
+            @foreach (var category in Html.GetEnumSelectList<ProductCategory>())
+            {
+                <a href="#" class="filter-btn" onclick="loadProducts(1, @category.Value); return false;">@category.Text</a>
+            }
+        </div>
+
+        <div id="product-container">
+            <!-- Nội dung Partial sẽ load vào đây -->
         </div>
     </div>
 </section>
